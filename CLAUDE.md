@@ -447,7 +447,7 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 - [x] **F6** Estadísticas: agregaciones y las cuatro gráficas Canvas.
 - [x] **F7** Ajustes, onboarding e i18n completos, con Inter y Space Grotesk empaquetadas como fuentes variables.
 - [x] **F8** Widget 1×1. *Código completo; probarlo en Nova, Pixel Launcher y One UI sigue pendiente.*
-- [ ] **F9** Endurecimiento y publicación: R8, batería, prueba en OEM agresivo, ficha de Play.
+- [ ] **F9** Endurecimiento y publicación: R8, batería, prueba en OEM agresivo, ficha de Play. *R8 verificado y corregido (renombraba las constantes de los enums persistidos); 22 tests instrumentados en verde; release de 3,7 MB arrancando. Falta la checklist §10 en dispositivo real, batería y la subida. Ver `docs/f9-verificacion-en-emulador.md`.*
 
 **v1.1 (eventual)**
 
