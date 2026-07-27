@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name" translatable="false">¡Aquí hay tomate!</string>
+
+    <!-- Navigation -->
+    <string name="tab_timer">Timer</string>
+    <string name="tab_stats">Statistics</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- Timer phases -->
+    <string name="phase_focus">Focus</string>
+    <string name="phase_short_break">Break</string>
+    <string name="phase_long_break">Long break</string>
+    <string name="phase_ringing">Time\'s up!</string>
+
+    <!-- Timer controls -->
+    <string name="control_start">Start</string>
+    <string name="control_pause">Pause</string>
+    <string name="control_resume">Resume</string>
+    <string name="control_start_break">Start break</string>
+    <string name="control_back_to_work">Back to work</string>
+    <string name="control_reset">Reset</string>
+
+    <!-- Cycle readout, e.g. 2/4 -->
+    <string name="cycle_progress">%1$d/%2$d</string>
+
+    <!-- Timer accessibility -->
+    <plurals name="a11y_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="a11y_seconds">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+    <string name="a11y_remaining_with_minutes">%1$s and %2$s remaining</string>
+    <string name="a11y_remaining_seconds_only">%1$s remaining</string>
+    <string name="a11y_tomato_progress">%1$s, %2$d%% elapsed</string>
+    <string name="a11y_cycle_position">Pomodoro %1$d of %2$d</string>
+
+    <!-- Alert sounds -->
+    <string name="sound_silent">Silent</string>
+    <string name="sound_bell">Bell</string>
+    <string name="sound_bowl">Singing bowl</string>
+    <string name="sound_digital">Digital</string>
+    <string name="sound_soft">Soft</string>
+
+    <!-- Widget background -->
+    <string name="widget_background_solid">Solid</string>
+    <string name="widget_background_transparent">Transparent</string>
+
+    <!-- Language -->
+    <string name="language_auto">Auto</string>
+    <string name="language_spanish" translatable="false">Español</string>
+    <string name="language_english" translatable="false">English</string>
+
+    <!-- Notification channels -->
+    <string name="channel_timer_running_name">Running timer</string>
+    <string name="channel_timer_running_description">Shows the countdown while an interval is running, with controls to pause or skip it.</string>
+    <string name="channel_timer_alerts_name">Interval finished</string>
+    <string name="channel_timer_alerts_description">Alerts you when a focus interval or a break ends.</string>
+
+    <!-- Widget -->
+    <string name="widget_label">Pomodoro</string>
+    <string name="widget_description">One-cell timer. Tap to start or pause, double-tap to reset.</string>
+
+    <!-- Changelog -->
+    <string name="changelog_title">What\'s new</string>
+    <string name="changelog_current_badge">Current</string>
+
+    <string-array name="changelog_1_0_0">
+        <item>First release.</item>
+        <item>Pomodoro timer with focus, short break and long break every N Pomodoros. Every duration is configurable.</item>
+        <item>One-cell home screen widget: tap to start or pause, double-tap to reset.</item>
+        <item>Statistics: completed Pomodoros, time focused, day streak, monthly map and 30-day trend.</item>
+        <item>End-of-interval alert with a sound of your choice and vibration for as long as you want.</item>
+        <item>Spanish and English.</item>
+    </string-array>
+</resources>

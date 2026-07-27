@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  See the note in backup_rules.xml: the timer state is device- and moment-specific and must not
+  travel between devices or survive a reinstall.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="datastore/timer_state.preferences_pb" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="datastore/timer_state.preferences_pb" />
+    </device-transfer>
+</data-extraction-rules>

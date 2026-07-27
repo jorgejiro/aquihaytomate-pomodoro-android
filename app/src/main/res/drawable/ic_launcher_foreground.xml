@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Adaptive icon foreground. All artwork stays inside the 66 dp safe zone (x and y from 21 to 87),
+  so no launcher mask can clip the tomato. See docs/design-spec.md §9.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Body -->
+    <path android:pathData="M54,35 C68.5,35 80,46.5 80,61 C80,75.5 68.5,87 54,87 C39.5,87 28,75.5 28,61 C28,46.5 39.5,35 54,35 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="34"
+                android:startY="41"
+                android:endX="76"
+                android:endY="83"
+                android:startColor="#FF4433"
+                android:endColor="#C42D1F" />
+        </aapt:attr>
+    </path>
+
+    <!-- Specular highlight, top left -->
+    <path
+        android:pathData="M42,48 C45,44 50,42 54,43 C50,45 46,48 44,53 C42.5,52.5 41.5,50.5 42,48 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.22" />
+
+    <!-- Stem -->
+    <path
+        android:pathData="M52.5,25 L55.5,25 L55.5,36 L52.5,36 Z"
+        android:fillColor="#3F6B2E" />
+
+    <!-- Calyx, three leaves -->
+    <path
+        android:pathData="M54,32 L62,29 L69,32 L61,39 L54,40 L47,39 L39,32 L46,29 Z"
+        android:fillColor="#4A7A3B" />
+</vector>

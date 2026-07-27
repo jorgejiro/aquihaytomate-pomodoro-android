@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Parent must be an AppCompat theme because MainActivity extends AppCompatActivity, which is
+      required for AppCompatDelegate.setApplicationLocales. The app itself is dark only; the XML
+      theme just has to not fight the Compose one before setContent runs.
+    -->
+    <style name="Theme.AquiHayTomate" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Navigation -->
+    <string name="tab_timer">Temporizador</string>
+    <string name="tab_stats">Estadísticas</string>
+    <string name="tab_settings">Ajustes</string>
+
+    <!-- Timer phases -->
+    <string name="phase_focus">Enfoque</string>
+    <string name="phase_short_break">Descanso</string>
+    <string name="phase_long_break">Descanso largo</string>
+    <string name="phase_ringing">¡Tiempo!</string>
+
+    <!-- Timer controls -->
+    <string name="control_start">Iniciar</string>
+    <string name="control_pause">Pausar</string>
+    <string name="control_resume">Reanudar</string>
+    <string name="control_start_break">Empezar descanso</string>
+    <string name="control_back_to_work">Volver al tajo</string>
+    <string name="control_reset">Reiniciar</string>
+
+    <!-- Cycle readout, e.g. 2/4 -->
+    <string name="cycle_progress">%1$d/%2$d</string>
+
+    <!-- Timer accessibility -->
+    <plurals name="a11y_minutes">
+        <item quantity="one">%d minuto</item>
+        <item quantity="many">%d minutos</item>
+        <item quantity="other">%d minutos</item>
+    </plurals>
+    <plurals name="a11y_seconds">
+        <item quantity="one">%d segundo</item>
+        <item quantity="many">%d segundos</item>
+        <item quantity="other">%d segundos</item>
+    </plurals>
+    <string name="a11y_remaining_with_minutes">%1$s y %2$s restantes</string>
+    <string name="a11y_remaining_seconds_only">%1$s restantes</string>
+    <string name="a11y_tomato_progress">%1$s, %2$d%% transcurrido</string>
+    <string name="a11y_cycle_position">Pomodoro %1$d de %2$d</string>
+
+    <!-- Alert sounds -->
+    <string name="sound_silent">Silencio</string>
+    <string name="sound_bell">Campana</string>
+    <string name="sound_bowl">Cuenco tibetano</string>
+    <string name="sound_digital">Digital</string>
+    <string name="sound_soft">Suave</string>
+
+    <!-- Widget background -->
+    <string name="widget_background_solid">Sólido</string>
+    <string name="widget_background_transparent">Transparente</string>
+
+    <!-- Language -->
+    <string name="language_auto">Auto</string>
+
+    <!-- Notification channels -->
+    <string name="channel_timer_running_name">Temporizador en marcha</string>
+    <string name="channel_timer_running_description">Muestra la cuenta atrás mientras corre un intervalo, con controles para pausarlo o saltarlo.</string>
+    <string name="channel_timer_alerts_name">Fin de intervalo</string>
+    <string name="channel_timer_alerts_description">Te avisa cuando termina un intervalo de enfoque o un descanso.</string>
+
+    <!-- Widget -->
+    <string name="widget_label">Pomodoro</string>
+    <string name="widget_description">Temporizador de una casilla. Un toque para iniciar o pausar, dos para reiniciar.</string>
+
+    <!-- Changelog -->
+    <string name="changelog_title">Novedades</string>
+    <string name="changelog_current_badge">Actual</string>
+
+    <string-array name="changelog_1_0_0">
+        <item>Primera versión.</item>
+        <item>Temporizador Pomodoro con enfoque, descanso corto y descanso largo cada N pomodoros. Todas las duraciones son configurables.</item>
+        <item>Widget de escritorio de una sola casilla: un toque para iniciar o pausar, dos toques para reiniciar.</item>
+        <item>Estadísticas: pomodoros completados, tiempo enfocado, racha de días, mapa mensual y tendencia de 30 días.</item>
+        <item>Aviso al terminar cada intervalo con sonido a elegir y vibración de la duración que tú decidas.</item>
+        <item>Español e inglés.</item>
+    </string-array>
+</resources>
