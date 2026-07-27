@@ -9,6 +9,7 @@ import javax.inject.Inject
 /** Restarts a paused countdown from where it stopped. */
 class ResumeTimerUseCase @Inject constructor(
     private val timerStateRepository: TimerStateRepository,
+    private val syncTimerRuntime: SyncTimerRuntimeUseCase,
     private val clock: Clock,
     private val elapsedRealtime: ElapsedRealtimeSource,
 ) {
@@ -17,12 +18,14 @@ class ResumeTimerUseCase @Inject constructor(
         val nowEpochMs = clock.millis()
         val nowElapsedRealtimeMs = elapsedRealtime.millis()
 
-        return timerStateRepository.update { state ->
+        val changed = timerStateRepository.update { state ->
             if (state.status != TimerStatus.PAUSED) {
                 null
             } else {
                 TimerTransitions.resume(state, nowEpochMs, nowElapsedRealtimeMs)
             }
         }
+        if (changed) syncTimerRuntime()
+        return changed
     }
 }

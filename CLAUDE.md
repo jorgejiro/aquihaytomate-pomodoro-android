@@ -43,7 +43,7 @@ El nombre juega con el tomate (*pomodoro* en italiano, de donde viene el nombre 
 - Control secundario `reiniciar`, visible solo si hay progreso.
 - Puntos de ciclo abajo (`● ● ○ ○   2/4`) indicando en qué pomodoro del ciclo vamos.
 
-### 2.2 Pantalla Estadísticas 🔨 Pendiente
+### 2.2 Pantalla Estadísticas ✅ Implementada
 
 - Cifras de hoy: pomodoros completados, tiempo enfocado, racha de días.
 - Barras diarias de la semana, con línea de objetivo diario punteada.
@@ -53,7 +53,7 @@ El nombre juega con el tomate (*pomodoro* en italiano, de donde viene el nombre 
 
 Todo dibujado con Compose `Canvas`. **Sin librería de gráficos** — ver `docs/decisions/005-graficas-con-compose-canvas-sin-vico.md`.
 
-### 2.3 Pantalla Ajustes 🔨 Pendiente
+### 2.3 Pantalla Ajustes ✅ Implementada
 
 | Ajuste | Por defecto | Rango |
 |---|---|---|
@@ -71,11 +71,11 @@ Todo dibujado con Compose `Canvas`. **Sin librería de gráficos** — ver `docs
 
 Más: estado de los permisos (notificaciones y alarmas exactas) con botón a los ajustes del sistema, refrescado en `onResume`; y **Acerca de** con la versión instalada y acceso a **Novedades**.
 
-### 2.4 Pantalla Onboarding 🔨 Pendiente
+### 2.4 Pantalla Onboarding ✅ Implementada
 
 Tres páginas: qué es la técnica pomodoro · elige tus duraciones · el widget y el permiso de notificaciones.
 
-### 2.5 Widget de escritorio 1×1 🔨 Pendiente
+### 2.5 Widget de escritorio 1×1 ✅ Implementado
 
 **La funcionalidad diferencial del proyecto.**
 
@@ -87,14 +87,14 @@ Tres páginas: qué es la técnica pomodoro · elige tus duraciones · el widget
 - Implementado con **RemoteViews clásico**, no con Glance. Ver `docs/decisions/001-widget-con-remoteviews-y-chronometer.md`.
 - El descuento lo pinta un `Chronometer` de `RemoteViews`, que tickea en el proceso del launcher **sin despertar la app**.
 
-### 2.6 Alertas de fin de slot 🔨 Pendiente
+### 2.6 Alertas de fin de slot ✅ Implementadas
 
-- Sonido seleccionable de un catálogo de 4 más silencio, reproducido con `USAGE_ALARM` (usa el volumen de alarma, no el de multimedia).
+- Sonido seleccionable de un catálogo de 4 más silencio, reproducido con `USAGE_ALARM` (usa el volumen de alarma, no el de multimedia). Los clips son **Opus mono en contenedor `.ogg`** —no Vorbis—, sintetizados para la app: mismo contenedor, soportado desde API 21 y comprime mejor en mono.
 - **Vibración de duración configurable en segundos**, por defecto 5 s, en pulsos de 400 ms con huecos de 250 ms.
 - Respeta modo silencio y No molestar.
 - **La alerta la toca la app, no el canal de notificación.** Ver `docs/decisions/004-alerta-propia-en-vez-de-sonido-de-canal.md`.
 
-### 2.7 Pantalla Novedades (changelog) 🔨 Pendiente
+### 2.7 Pantalla Novedades (changelog) ✅ Implementada
 
 Igual que en Bebe Agua. **Cuatro sitios que hay que mantener sincronizados** al publicar una versión:
 
@@ -132,7 +132,7 @@ El test unitario `ChangelogCatalogTest` falla si el `versionCode` compilado no t
 | Notificaciones | `NotificationManagerCompat` + dos canales: `timer_running` (LOW) y `timer_alerts` (HIGH), **ambos mudos** |
 | Concurrencia | Coroutines **1.10.2** + Flow |
 | i18n | `strings.xml` (`values/` inglés base, `values-es/`); cambio en runtime con `AppCompatDelegate.setApplicationLocales` |
-| Tipografía | **Inter** + **Space Grotesk** (OFL) empaquetadas en `res/font/`, con figuras tabulares |
+| Tipografía | **Inter** + **Space Grotesk** (OFL) empaquetadas en `res/font/` como **fuentes variables** (un fichero por familia, `FontVariation` elige el peso), con figuras tabulares |
 | Tests | **JUnit 4** + MockK **1.13.9** + Turbine **1.2.0** + Compose UI Test + `room-testing` |
 | Logs | `Timber 5.0.1` (solo en debug) |
 | Backup | `android:allowBackup="false"` |
@@ -442,11 +442,11 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 - [x] **F1** Núcleo puro: `TimerMath`, `SlotPlanner`, `StreakCalculator`, `StatsAggregation`, `VibrationPatterns`, `AlertPolicy`, `TomatoGeometry` + tests. *Sin nada de Android.*
 - [x] **F2** Persistencia: Room + DAO + los dos DataStore + repositorios.
 - [x] **F3** Motor sin servicio: use cases de comando, `TimerViewModel`, `TimerScreen`, `LiquidTomato`. *Hito alcanzado: pomodoro completo con la app abierta, `lint test` verde con 157 tests unitarios.*
-- [ ] **F4** Supervivencia: FGS, notificaciones, alarma de respaldo, los tres receivers. *Hito: checklist de resiliencia en dispositivo real.*
-- [ ] **F5** Alertas: sonidos y vibración configurable.
-- [ ] **F6** Estadísticas: agregaciones y las cuatro gráficas Canvas.
-- [ ] **F7** Ajustes, onboarding e i18n completos.
-- [ ] **F8** Widget 1×1. *Hito: funciona en Nova, Pixel Launcher y One UI.*
+- [x] **F4** Supervivencia: FGS, notificaciones, alarma de respaldo, los tres receivers. *Código completo; la checklist de resiliencia en dispositivo real sigue pendiente.*
+- [x] **F5** Alertas: sonidos y vibración configurable. *Los cuatro clips son Opus mono sintetizados para la app, ~80 KB.*
+- [x] **F6** Estadísticas: agregaciones y las cuatro gráficas Canvas.
+- [x] **F7** Ajustes, onboarding e i18n completos, con Inter y Space Grotesk empaquetadas como fuentes variables.
+- [x] **F8** Widget 1×1. *Código completo; probarlo en Nova, Pixel Launcher y One UI sigue pendiente.*
 - [ ] **F9** Endurecimiento y publicación: R8, batería, prueba en OEM agresivo, ficha de Play.
 
 **v1.1 (eventual)**
@@ -515,7 +515,7 @@ Este proyecto replica deliberadamente las convenciones de `/Users/jorge/dev/bebe
 
 Si te topas con una de estas, **pregunta a Jorge** antes de inventar una respuesta:
 
-1. ¿La cifra del widget muestra solo minutos (`24`) o minutos y segundos (`24:58`)? A 40 dp con Space Grotesk hay que medirlo en dispositivo. *Propuesta: `MM` a secas cuando quedan ≥ 1 min, `SS` en rojo cuando queda menos.*
+1. ~~¿La cifra del widget muestra solo minutos (`24`) o minutos y segundos (`24:58`)?~~ **Resuelta en `docs/decisions/007-*`: `MM:SS` a 13 sp.** Solo los minutos exigiría repintar cada 60 s, que es el coste que el ADR 001 rechazó. Queda medir el tamaño en dispositivo durante la checklist de F8.
 2. ¿El doble toque del widget debe pedir confirmación al reiniciar una sesión larga ya avanzada, o reinicia sin más? *Propuesta: sin confirmación, pero el toque simple posterior dentro de 3 s deshace.*
 3. ¿La ventana del doble toque son 400 ms fijos o se hace configurable en Ajustes? *Propuesta: 400 ms fijos en v1, se calibra en dispositivo real durante F8.*
 4. ¿Se muestran los descansos en las estadísticas en algún momento futuro, o el histórico es solo de enfoque para siempre? La columna `slot_type` está preparada para ambas.

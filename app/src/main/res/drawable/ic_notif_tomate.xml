@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Notification icon: a pure alpha mask, since the system tints it flat white. No thin holes and no
+  colour, or it turns into a white blob on some launchers. See docs/design-spec.md §9.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Body: a circle flattened slightly at the top, where the calyx sits. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,5.6c4.2,0 7.4,3.3 7.4,7.5c0,4.2 -3.3,7.4 -7.4,7.4c-4.2,0 -7.4,-3.2 -7.4,-7.4C4.6,8.9 7.8,5.6 12,5.6z" />
+
+    <!-- Calyx: three broad leaves, kept chunky so they survive the 24 dp downscale. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,2.4l1.1,2.2l2.4,-0.9l-0.7,2.4l-2.8,0.6l-2.8,-0.6l-0.7,-2.4l2.4,0.9z" />
+</vector>

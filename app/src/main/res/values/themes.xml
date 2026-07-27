@@ -10,4 +10,14 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
+
+    <!--
+      No windowSplashScreenIconBackgroundColor on purpose: the tomato floats straight on black and runs
+      into the timer screen without a visible seam. See docs/design-spec.md §9.
+    -->
+    <style name="Theme.AquiHayTomate.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@android:color/black</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_tomate</item>
+        <item name="postSplashScreenTheme">@style/Theme.AquiHayTomate</item>
+    </style>
 </resources>

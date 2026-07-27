@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- App -->
     <string name="app_name" translatable="false">¡Aquí hay tomate!</string>
 
@@ -39,6 +39,94 @@
     <string name="a11y_tomato_progress">%1$s, %2$d%% elapsed</string>
     <string name="a11y_cycle_position">Pomodoro %1$d of %2$d</string>
 
+    <!-- Statistics -->
+    <string name="stats_today">Today</string>
+    <string name="stats_focused">focused</string>
+    <string name="stats_streak">streak</string>
+    <string name="stats_best_streak">best streak</string>
+    <string name="stats_this_week">This week</string>
+    <string name="stats_week_range">%1$s – %2$s</string>
+    <string name="stats_day_detail">%1$s · %2$s · %3$s</string>
+    <string name="heatmap_less">less</string>
+    <string name="heatmap_more">more</string>
+    <string name="duration_hours_minutes">%1$d h %2$d m</string>
+    <string name="duration_minutes">%1$d m</string>
+
+    <plurals name="stats_last_days">
+        <item quantity="one">Last day</item>
+        <item quantity="other">Last %d days</item>
+    </plurals>
+    <plurals name="stats_pomodoros_label">
+        <item quantity="one">pomodoro</item>
+        <item quantity="other">pomodoros</item>
+    </plurals>
+    <plurals name="stats_pomodoros_short">
+        <item quantity="one">%d pom.</item>
+        <item quantity="other">%d pom.</item>
+    </plurals>
+
+    <!-- Statistics accessibility -->
+    <string name="a11y_streak_strip" tools:ignore="PluralsCandidate">%1$d active days out of the last %2$d</string>
+    <string name="a11y_trend" tools:ignore="PluralsCandidate">%1$d pomodoros over the last %2$d days</string>
+    <string name="a11y_previous_period">Previous</string>
+    <string name="a11y_next_period">Next</string>
+
+    <!-- Settings -->
+    <string name="settings_section_durations">Durations</string>
+    <string name="settings_section_behaviour">Behaviour</string>
+    <string name="settings_section_alerts">Alerts</string>
+    <string name="settings_section_widget">Widget</string>
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_section_system">System</string>
+    <string name="settings_section_about">About</string>
+
+    <string name="settings_focus">Focus</string>
+    <string name="settings_short_break">Short break</string>
+    <string name="settings_long_break">Long break</string>
+    <string name="settings_pomodoros_per_cycle">Pomodoros per cycle</string>
+    <string name="settings_auto_start">Auto-start the next interval</string>
+    <string name="settings_keep_screen_on">Keep the screen on</string>
+    <string name="settings_daily_goal">Daily goal</string>
+    <string name="settings_alert_sound">Sound when it ends</string>
+    <string name="settings_vibration">Vibration</string>
+    <string name="settings_vibration_off">Off</string>
+    <string name="settings_widget_background">Background</string>
+    <string name="settings_liquid_animation">Liquid animation</string>
+    <string name="settings_liquid_animation_sublabel">The level keeps dropping either way</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_exact_alarms">Exact alarms</string>
+    <string name="settings_exact_alarms_denied_sublabel">The timer still works, but it is less punctual with the screen off</string>
+    <string name="settings_granted">OK</string>
+    <string name="settings_denied">Denied</string>
+    <string name="settings_licenses">Licences</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_version_value">%1$s (%2$d)</string>
+
+    <plurals name="settings_minutes">
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d min</item>
+    </plurals>
+    <plurals name="settings_seconds">
+        <item quantity="one">%d s</item>
+        <item quantity="other">%d s</item>
+    </plurals>
+
+    <!-- Onboarding -->
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_start">Get started</string>
+    <string name="onboarding_page1_title">¡Aquí hay tomate!</string>
+    <string name="onboarding_page1_body">Twenty-five minutes of work, five of rest, and a widget that takes up a single cell.</string>
+    <string name="onboarding_page2_title">Your durations</string>
+    <string name="onboarding_page2_focus">Focus</string>
+    <string name="onboarding_page2_break">Break</string>
+    <string name="onboarding_page2_hint">You can change all of this later in Settings.</string>
+    <string name="onboarding_page3_title">On your home screen</string>
+    <string name="onboarding_page3_body">One tap starts and pauses. Two taps reset.</string>
+    <string name="onboarding_page3_notifications">Allow notifications</string>
+    <string name="onboarding_page3_exact_alarms">Allow exact alarms</string>
+    <string name="onboarding_page3_optional">Optional. The timer works without them.</string>
+
     <!-- Alert sounds -->
     <string name="sound_silent">Silent</string>
     <string name="sound_bell">Bell</string>
@@ -61,9 +149,26 @@
     <string name="channel_timer_alerts_name">Interval finished</string>
     <string name="channel_timer_alerts_description">Alerts you when a focus interval or a break ends.</string>
 
+    <!-- Notifications -->
+    <string name="notification_title_focus">Focus · %1$d/%2$d</string>
+    <string name="notification_paused">Paused · %1$s</string>
+    <string name="notification_focus_finished">Focus interval done · %1$d of %2$d</string>
+    <string name="notification_break_finished">Break over.</string>
+    <string name="notification_action_pause">Pause</string>
+    <string name="notification_action_resume">Resume</string>
+    <string name="notification_action_skip">Skip</string>
+    <string name="notification_action_reset">Reset</string>
+    <string name="notification_action_dismiss">Dismiss</string>
+
     <!-- Widget -->
     <string name="widget_label">Pomodoro</string>
     <string name="widget_description">One-cell timer. Tap to start or pause, double-tap to reset.</string>
+
+    <!-- Widget glyphs. Not translatable: they are symbols, not words. -->
+    <string name="widget_idle_glyph" translatable="false">▸</string>
+    <string name="widget_paused_glyph" translatable="false">❚❚</string>
+    <string name="widget_ringing_glyph" translatable="false">!</string>
+    <string name="widget_preview_time" translatable="false">25:00</string>
 
     <!-- Changelog -->
     <string name="changelog_title">What\'s new</string>

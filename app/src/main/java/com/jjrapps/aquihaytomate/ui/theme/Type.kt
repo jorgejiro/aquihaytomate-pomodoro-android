@@ -2,14 +2,46 @@ package com.jjrapps.aquihaytomate.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.jjrapps.aquihaytomate.R
 
-// TODO(F7): bundle the Inter and Space Grotesk TTFs in res/font/ and point these at them.
-//  See docs/design-spec.md §3. Until then the system families keep the metrics roughly right.
-val InterFontFamily: FontFamily = FontFamily.SansSerif
-val GroteskFontFamily: FontFamily = FontFamily.Default
+/**
+ * Inter for text, Space Grotesk for figures. Both SIL OFL 1.1, bundled in `res/font/`, with the licence
+ * in `res/raw/licenses_ofl.txt`.
+ *
+ * **Variable fonts, one file per family.** A single `Inter[opsz,wght].ttf` covers every weight the app
+ * uses, where the static cut would have been three files for Inter alone; `FontVariation` picks the
+ * weight at runtime. About 1 MB for the two, and supported from API 26 — comfortably under `minSdk` 31.
+ */
+private val InterWeights = listOf(FontWeight.Normal, FontWeight.Medium, FontWeight.SemiBold)
+private val GroteskWeights = listOf(FontWeight.Medium, FontWeight.Bold)
+
+@OptIn(ExperimentalTextApi::class)
+val InterFontFamily: FontFamily = FontFamily(
+    InterWeights.map { weight ->
+        Font(
+            resId = R.font.inter_variable,
+            weight = weight,
+            variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)),
+        )
+    },
+)
+
+@OptIn(ExperimentalTextApi::class)
+val GroteskFontFamily: FontFamily = FontFamily(
+    GroteskWeights.map { weight ->
+        Font(
+            resId = R.font.space_grotesk_variable,
+            weight = weight,
+            variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)),
+        )
+    },
+)
 
 /**
  * Tabular figures. Without this the digits have different widths and the countdown jitters
@@ -65,6 +97,29 @@ val SectionLabelStyle = TextStyle(
     letterSpacing = 1.6.sp,
 )
 
+/** The label of a settings row. */
+val RowLabel = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 15.sp,
+)
+
+/** Titles of onboarding pages and of the changelog. */
+val TitleScreen = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.SemiBold,
+    fontSize = 28.sp,
+    letterSpacing = (-0.4).sp,
+)
+
+/** Running text. */
+val BodyDefault = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Normal,
+    fontSize = 15.sp,
+    lineHeight = 22.sp,
+)
+
 /** Labels under figures, the secondary control, chart detail lines. */
 val Caption = TextStyle(
     fontFamily = InterFontFamily,
@@ -83,19 +138,9 @@ val NumberSmall = TextStyle(
 
 val AquiHayTomateTypography = Typography(
     displayLarge = DisplayTimer,
-    headlineMedium = TextStyle(
-        fontFamily = InterFontFamily,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 28.sp,
-        letterSpacing = (-0.4).sp,
-    ),
+    headlineMedium = TitleScreen,
     titleMedium = ControlLabel,
-    bodyMedium = TextStyle(
-        fontFamily = InterFontFamily,
-        fontWeight = FontWeight.Normal,
-        fontSize = 15.sp,
-        lineHeight = 22.sp,
-    ),
+    bodyMedium = BodyDefault,
     bodySmall = TextStyle(
         fontFamily = InterFontFamily,
         fontWeight = FontWeight.Normal,

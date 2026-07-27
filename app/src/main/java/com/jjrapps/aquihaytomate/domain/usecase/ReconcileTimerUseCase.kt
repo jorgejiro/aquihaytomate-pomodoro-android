@@ -20,6 +20,7 @@ import javax.inject.Inject
 class ReconcileTimerUseCase @Inject constructor(
     private val timerStateRepository: TimerStateRepository,
     private val completeSlot: CompleteSlotUseCase,
+    private val syncTimerRuntime: SyncTimerRuntimeUseCase,
     private val clock: Clock,
     private val elapsedRealtime: ElapsedRealtimeSource,
 ) {
@@ -31,7 +32,12 @@ class ReconcileTimerUseCase @Inject constructor(
 
         val nowEpochMs = clock.millis()
         val nowElapsedRealtimeMs = elapsedRealtime.millis()
-        if (!TimerMath.isExpired(state, nowEpochMs, nowElapsedRealtimeMs)) return false
+        if (!TimerMath.isExpired(state, nowEpochMs, nowElapsedRealtimeMs)) {
+            // Still running, but the service may well be gone — the process could have been killed, or
+            // this could be the first call after a reboot, where the old alarm died with the old uptime.
+            syncTimerRuntime()
+            return false
+        }
 
         // How stale the expiry is decides whether the user hears about it. Ringing for something that
         // finished before breakfast is noise, but the pomodoro still deserves to be recorded.

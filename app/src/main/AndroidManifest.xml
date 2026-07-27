@@ -12,7 +12,7 @@
     <!--
       Never declare USE_EXACT_ALARM (Play reserves it for alarm clocks and calendars) nor
       USE_FULL_SCREEN_INTENT. See CLAUDE.md §3.
-      The service, receivers and widget provider are added in phases F4 and F8.
+      The widget provider is added in phase F8.
     -->
 
     <application
@@ -30,13 +30,94 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AquiHayTomate">
+            android:theme="@style/Theme.AquiHayTomate.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--
+          specialUse is the only foreground service type this app may declare. The justification for
+          Play Console is written in docs/play-store-publication-texts.md and has to be submitted with
+          the FIRST internal-testing upload, not with the production one.
+
+          stopWithTask="false" so a swipe from recents does not take the countdown with it.
+        -->
+        <service
+            android:name=".timer.PomodoroTimerService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:stopWithTask="false">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="pomodoro_countdown_timer" />
+        </service>
+
+        <!-- Layer 3: the backup alarm lands here. -->
+        <receiver
+            android:name=".timer.TimerAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.jjrapps.aquihaytomate.SLOT_DEADLINE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Notification actions. -->
+        <receiver
+            android:name=".timer.TimerActionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.jjrapps.aquihaytomate.PAUSE" />
+                <action android:name="com.jjrapps.aquihaytomate.RESUME" />
+                <action android:name="com.jjrapps.aquihaytomate.SKIP" />
+                <action android:name="com.jjrapps.aquihaytomate.RESET" />
+                <action android:name="com.jjrapps.aquihaytomate.START_NEXT" />
+                <action android:name="com.jjrapps.aquihaytomate.DISMISS" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+          directBootAware so LOCKED_BOOT_COMPLETED can rearm the alarm before the user unlocks. The
+          DataStore files live in credential-encrypted storage, so that pass may find nothing; the plain
+          BOOT_COMPLETED that follows unlock is the one that always works.
+        -->
+        <receiver
+            android:name=".timer.BootReceiver"
+            android:directBootAware="true"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+          The 1×1 widget. exported="true" because the launcher lives in another process and has to be able
+          to bind it.
+        -->
+        <receiver
+            android:name=".widget.PomodoroWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_pomodoro_info" />
+        </receiver>
+
+        <!-- Widget taps. Not exported: only our own PendingIntent reaches it. -->
+        <receiver
+            android:name=".widget.WidgetTapReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.jjrapps.aquihaytomate.WIDGET_TAP" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

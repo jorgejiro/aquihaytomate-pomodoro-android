@@ -13,8 +13,17 @@ class AlertPolicyTest {
         sound: AlertSound = AlertSound.BELL,
         vibrationSeconds: Int = 5,
         ringerMode: RingerMode = RingerMode.NORMAL,
-        dndSuppressesAlarms: Boolean = false,
-    ) = AlertPolicy.decide(sound, vibrationSeconds, ringerMode, dndSuppressesAlarms)
+        interruptionFilter: InterruptionFilter = InterruptionFilter.ALL,
+        dndAllowsAlarms: Boolean = true,
+        alarmVolumeLevel: Int = 7,
+    ) = AlertPolicy.decide(
+        sound = sound,
+        vibrationSeconds = vibrationSeconds,
+        ringerMode = ringerMode,
+        interruptionFilter = interruptionFilter,
+        dndAllowsAlarms = dndAllowsAlarms,
+        alarmVolumeLevel = alarmVolumeLevel,
+    )
 
     @Test
     fun `normal mode plays both by default`() {
@@ -61,15 +70,61 @@ class AlertPolicyTest {
         assertTrue(decision.isSilent)
     }
 
+    // Total DND means total.
     @Test
-    fun `do not disturb blocking alarms wins over everything`() {
+    fun `total do not disturb wins over everything`() {
         RingerMode.entries.forEach { mode ->
             assertEquals(
-                "ringer $mode should be silenced by DND",
+                "ringer $mode should be silenced by total DND",
                 AlertDecision.NOTHING,
-                decide(ringerMode = mode, dndSuppressesAlarms = true),
+                decide(ringerMode = mode, interruptionFilter = InterruptionFilter.NONE),
             )
         }
+    }
+
+    @Test
+    fun `priority do not disturb that blocks alarms silences the alert`() {
+        assertEquals(
+            AlertDecision.NOTHING,
+            decide(
+                interruptionFilter = InterruptionFilter.PRIORITY,
+                dndAllowsAlarms = false,
+            ),
+        )
+    }
+
+    @Test
+    fun `priority do not disturb that allows alarms lets us through`() {
+        val decision = decide(
+            interruptionFilter = InterruptionFilter.PRIORITY,
+            dndAllowsAlarms = true,
+        )
+
+        assertTrue(decision.playSound)
+        assertTrue(decision.vibrate)
+    }
+
+    // The alarms-only mode exists precisely to let timers like this one through.
+    @Test
+    fun `the alarms only filter lets us through`() {
+        val decision = decide(interruptionFilter = InterruptionFilter.ALARMS)
+
+        assertTrue(decision.playSound)
+        assertTrue(decision.vibrate)
+    }
+
+    // We play through USAGE_ALARM, so at zero there is nothing to hear.
+    @Test
+    fun `alarm volume at zero leaves only the vibration`() {
+        val decision = decide(alarmVolumeLevel = 0)
+
+        assertFalse(decision.playSound)
+        assertTrue(decision.vibrate)
+    }
+
+    @Test
+    fun `alarm volume at zero with vibration off is fully silent`() {
+        assertTrue(decide(alarmVolumeLevel = 0, vibrationSeconds = 0).isSilent)
     }
 
     @Test
@@ -78,7 +133,11 @@ class AlertPolicyTest {
 
         assertEquals(
             decide(sound = AlertSound.BOWL, vibrationSeconds = 12),
-            AlertPolicy.decide(settings, RingerMode.NORMAL, dndSuppressesAlarms = false),
+            AlertPolicy.decide(
+                settings = settings,
+                ringerMode = RingerMode.NORMAL,
+                alarmVolumeLevel = 7,
+            ),
         )
     }
 

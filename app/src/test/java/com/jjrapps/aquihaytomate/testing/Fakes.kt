@@ -11,6 +11,9 @@ import com.jjrapps.aquihaytomate.domain.model.WidgetBackground
 import com.jjrapps.aquihaytomate.domain.repository.AlertPlayer
 import com.jjrapps.aquihaytomate.domain.repository.SettingsRepository
 import com.jjrapps.aquihaytomate.domain.repository.StatsRepository
+import com.jjrapps.aquihaytomate.domain.repository.TimerAlarmScheduler
+import com.jjrapps.aquihaytomate.domain.repository.TimerNotifier
+import com.jjrapps.aquihaytomate.domain.repository.TimerServiceController
 import com.jjrapps.aquihaytomate.domain.repository.TimerStateRepository
 import com.jjrapps.aquihaytomate.domain.time.ElapsedRealtimeSource
 import java.time.Clock
@@ -164,6 +167,69 @@ class FakeStatsRepository : StatsRepository {
     override fun completedDays(): Flow<List<LocalDate>> = rows.map { sessions ->
         sessions.filter { it.completed }.map { it.localDate }.distinct().sorted()
     }
+}
+
+/**
+ * Records what the engine asked the runtime to do, so the tests can assert on the service, the alarm
+ * and the notification without any Android around.
+ */
+class FakeTimerRuntime : TimerAlarmScheduler, TimerServiceController, TimerNotifier {
+
+    var armedDeadlineMs: Long? = null
+        private set
+    var armCount: Int = 0
+        private set
+    var cancelCount: Int = 0
+        private set
+    var serviceRunning: Boolean = false
+        private set
+    var startCount: Int = 0
+        private set
+    var pausedNotificationCount: Int = 0
+        private set
+    var finishedNotificationCount: Int = 0
+        private set
+
+    /** Set to false to simulate `ForegroundServiceStartNotAllowedException`. */
+    var serviceStartAllowed: Boolean = true
+
+    /** Set to false to simulate `SCHEDULE_EXACT_ALARM` denied. */
+    var exactAlarmsAllowed: Boolean = true
+
+    override fun arm(deadlineElapsedRealtimeMs: Long): Boolean {
+        armedDeadlineMs = deadlineElapsedRealtimeMs
+        armCount++
+        return exactAlarmsAllowed
+    }
+
+    override fun cancel() {
+        armedDeadlineMs = null
+        cancelCount++
+    }
+
+    override fun canScheduleExactAlarms(): Boolean = exactAlarmsAllowed
+
+    override fun start(): Boolean {
+        startCount++
+        serviceRunning = serviceStartAllowed
+        return serviceStartAllowed
+    }
+
+    override fun stop() {
+        serviceRunning = false
+    }
+
+    override fun showPaused(state: TimerState, remainingMs: Long) {
+        pausedNotificationCount++
+    }
+
+    override fun showSlotFinished(state: TimerState) {
+        finishedNotificationCount++
+    }
+
+    override fun clearOngoing() = Unit
+
+    override fun clearAlert() = Unit
 }
 
 class FakeAlertPlayer : AlertPlayer {

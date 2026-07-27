@@ -31,6 +31,7 @@ class CompleteSlotUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val recordFocusSlot: RecordFocusSlotUseCase,
     private val alertPlayer: AlertPlayer,
+    private val syncTimerRuntime: SyncTimerRuntimeUseCase,
     private val clock: Clock,
     private val elapsedRealtime: ElapsedRealtimeSource,
 ) {
@@ -95,8 +96,11 @@ class CompleteSlotUseCase @Inject constructor(
             }
         }
 
-        if (closedByUs && alertUser) {
-            alertPlayer.play(settings.alertSound, settings.vibrationSeconds)
+        if (closedByUs) {
+            // Rearm or tear down before alerting: the alert can take seconds of vibration, and the
+            // next slot's alarm should already be armed by then.
+            syncTimerRuntime()
+            if (alertUser) alertPlayer.play(settings.alertSound, settings.vibrationSeconds)
         }
         return closedByUs
     }

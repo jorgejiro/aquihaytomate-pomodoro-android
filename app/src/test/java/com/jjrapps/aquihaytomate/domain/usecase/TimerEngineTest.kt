@@ -7,6 +7,7 @@ import com.jjrapps.aquihaytomate.domain.model.TimerStatus
 import com.jjrapps.aquihaytomate.testing.FakeAlertPlayer
 import com.jjrapps.aquihaytomate.testing.FakeSettingsRepository
 import com.jjrapps.aquihaytomate.testing.FakeStatsRepository
+import com.jjrapps.aquihaytomate.testing.FakeTimerRuntime
 import com.jjrapps.aquihaytomate.testing.FakeTimerStateRepository
 import com.jjrapps.aquihaytomate.testing.MutableClock
 import com.jjrapps.aquihaytomate.testing.MutableElapsedRealtime
@@ -37,16 +38,21 @@ class TimerEngineTest {
     private val stats = FakeStatsRepository()
     private val alerts = FakeAlertPlayer()
 
+    private val runtime = FakeTimerRuntime()
+
     private val recordFocusSlot = RecordFocusSlotUseCase(stats, clock)
-    private val start = StartTimerUseCase(timerState, settings, clock, elapsed)
-    private val pause = PauseTimerUseCase(timerState, clock, elapsed)
-    private val resume = ResumeTimerUseCase(timerState, clock, elapsed)
+    private val sync =
+        SyncTimerRuntimeUseCase(timerState, runtime, runtime, runtime, clock, elapsed)
+    private val start = StartTimerUseCase(timerState, settings, sync, clock, elapsed)
+    private val pause = PauseTimerUseCase(timerState, sync, clock, elapsed)
+    private val resume = ResumeTimerUseCase(timerState, sync, clock, elapsed)
     private val toggle = ToggleTimerUseCase(timerState, start, pause)
-    private val reset = ResetTimerUseCase(timerState, settings, recordFocusSlot, clock, elapsed)
-    private val skip = SkipSlotUseCase(timerState, settings, recordFocusSlot, clock, elapsed)
+    private val reset =
+        ResetTimerUseCase(timerState, settings, recordFocusSlot, sync, clock, elapsed)
+    private val skip = SkipSlotUseCase(timerState, settings, recordFocusSlot, sync, clock, elapsed)
     private val complete =
-        CompleteSlotUseCase(timerState, settings, recordFocusSlot, alerts, clock, elapsed)
-    private val reconcile = ReconcileTimerUseCase(timerState, complete, clock, elapsed)
+        CompleteSlotUseCase(timerState, settings, recordFocusSlot, alerts, sync, clock, elapsed)
+    private val reconcile = ReconcileTimerUseCase(timerState, complete, sync, clock, elapsed)
 
     private fun advance(millis: Long) {
         clock.advanceBy(millis)
@@ -617,6 +623,100 @@ class TimerEngineTest {
         advance(shortBreakMs)
         complete()
         assertEquals(2, state().cyclePosition)
+    }
+
+    // ─── The runtime: service, alarm and notification ───────────────────────
+
+    @Test
+    fun `starting arms the alarm at the monotonic deadline and starts the service`() = runTest {
+        start()
+
+        assertEquals(state().endAtElapsedRealtimeMs, runtime.armedDeadlineMs)
+        assertTrue(runtime.serviceRunning)
+    }
+
+    // No point burning a wakelock and a foreground notification on a stopped clock.
+    @Test
+    fun `pausing stops the service, cancels the alarm and posts a paused notification`() = runTest {
+        start()
+        advance(60_000L)
+        pause()
+
+        assertFalse(runtime.serviceRunning)
+        assertEquals(null, runtime.armedDeadlineMs)
+        assertEquals(1, runtime.pausedNotificationCount)
+    }
+
+    @Test
+    fun `resuming arms the alarm again`() = runTest {
+        start()
+        advance(60_000L)
+        pause()
+        resume()
+
+        assertEquals(state().endAtElapsedRealtimeMs, runtime.armedDeadlineMs)
+        assertTrue(runtime.serviceRunning)
+    }
+
+    @Test
+    fun `ringing tears the service down and posts the alert notification`() = runTest {
+        start()
+        advance(focusMs)
+        complete()
+
+        assertFalse(runtime.serviceRunning)
+        assertEquals(null, runtime.armedDeadlineMs)
+        assertEquals(1, runtime.finishedNotificationCount)
+    }
+
+    @Test
+    fun `auto start rearms the alarm for the next slot`() = runTest {
+        settings.set(TimerSettings(autoStartNext = true))
+        start()
+        advance(focusMs)
+        complete()
+
+        assertTrue(runtime.serviceRunning)
+        assertEquals(state().endAtElapsedRealtimeMs, runtime.armedDeadlineMs)
+        assertEquals(0, runtime.finishedNotificationCount)
+    }
+
+    @Test
+    fun `resetting releases the runtime`() = runTest {
+        start()
+        advance(60_000L)
+        reset()
+
+        assertFalse(runtime.serviceRunning)
+        assertEquals(null, runtime.armedDeadlineMs)
+    }
+
+    /**
+     * Level 3 of the degradation ladder in ADR 002: the OEM refuses the foreground start, and the timer
+     * still works off the persisted state plus the alarm.
+     */
+    @Test
+    fun `a refused foreground start still leaves the alarm armed`() = runTest {
+        runtime.serviceStartAllowed = false
+
+        assertTrue(start())
+
+        assertFalse(runtime.serviceRunning)
+        assertEquals(state().endAtElapsedRealtimeMs, runtime.armedDeadlineMs)
+        assertEquals(TimerStatus.RUNNING, state().status)
+    }
+
+    @Test
+    fun `reconciling a live slot rearms the runtime after the process was killed`() = runTest {
+        start()
+        runtime.cancel()
+        runtime.stop()
+        advance(60_000L)
+
+        assertFalse(reconcile())
+
+        assertEquals(state().endAtElapsedRealtimeMs, runtime.armedDeadlineMs)
+        assertTrue(runtime.serviceRunning)
     }
 
     @Test

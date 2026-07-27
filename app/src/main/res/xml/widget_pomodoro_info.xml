@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The 1×1 widget: the reason this project exists. targetCellWidth/Height pin it to a single cell and
+  resizeMode="none" stops the user from stretching it into the 2×2 thing every other pomodoro app ships.
+
+  updatePeriodMillis="0" because the system's minimum is 30 minutes, which is useless for a countdown.
+  We refresh it ourselves from the state collector, and the seconds are ticked by the Chronometer inside
+  the launcher's own process. See docs/decisions/001-widget-con-remoteviews-y-chronometer.md.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:configure="false"
+    android:description="@string/widget_description"
+    android:initialLayout="@layout/widget_tomate"
+    android:minHeight="40dp"
+    android:minResizeHeight="40dp"
+    android:minResizeWidth="40dp"
+    android:minWidth="40dp"
+    android:previewImage="@drawable/widget_preview_tomate"
+    android:previewLayout="@layout/widget_tomate_preview"
+    android:resizeMode="none"
+    android:targetCellHeight="1"
+    android:targetCellWidth="1"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen" />

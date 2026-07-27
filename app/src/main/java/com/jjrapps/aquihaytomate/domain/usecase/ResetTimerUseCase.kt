@@ -18,6 +18,7 @@ class ResetTimerUseCase @Inject constructor(
     private val timerStateRepository: TimerStateRepository,
     private val settingsRepository: SettingsRepository,
     private val recordFocusSlot: RecordFocusSlotUseCase,
+    private val syncTimerRuntime: SyncTimerRuntimeUseCase,
     private val clock: Clock,
     private val elapsedRealtime: ElapsedRealtimeSource,
 ) {
@@ -51,12 +52,14 @@ class ResetTimerUseCase @Inject constructor(
         // row for the retried slot, and a pomodoro the user did finish would go unrecorded.
         val nextSlotIndex = if (recorded) state.slotIndex + 1 else state.slotIndex
 
-        return timerStateRepository.update { current ->
+        val changed = timerStateRepository.update { current ->
             if (current.status == TimerStatus.IDLE) {
                 null
             } else {
                 TimerTransitions.resetSlot(current, settings, nextSlotIndex)
             }
         }
+        if (changed) syncTimerRuntime()
+        return changed
     }
 }

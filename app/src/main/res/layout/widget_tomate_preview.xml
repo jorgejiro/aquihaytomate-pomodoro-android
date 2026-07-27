@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  What the launcher's widget picker shows. `previewLayout` is what targetSdk 36 uses; it has to be a
+  separate layout because the real one starts out empty — its bitmap arrives at runtime.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_plate"
+    android:padding="2dp">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:contentDescription="@string/widget_label"
+        android:scaleType="fitCenter"
+        android:src="@drawable/widget_preview_tomate" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="@font/space_grotesk_variable"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="@string/widget_preview_time"
+        android:textColor="#FFF5F2EF"
+        android:textSize="13sp" />
+
+</FrameLayout>

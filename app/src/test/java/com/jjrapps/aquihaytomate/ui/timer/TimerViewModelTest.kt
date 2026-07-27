@@ -13,10 +13,12 @@ import com.jjrapps.aquihaytomate.domain.usecase.RecordFocusSlotUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.ResetTimerUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.SkipSlotUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.StartTimerUseCase
+import com.jjrapps.aquihaytomate.domain.usecase.SyncTimerRuntimeUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.ToggleTimerUseCase
 import com.jjrapps.aquihaytomate.testing.FakeAlertPlayer
 import com.jjrapps.aquihaytomate.testing.FakeSettingsRepository
 import com.jjrapps.aquihaytomate.testing.FakeStatsRepository
+import com.jjrapps.aquihaytomate.testing.FakeTimerRuntime
 import com.jjrapps.aquihaytomate.testing.FakeTimerStateRepository
 import com.jjrapps.aquihaytomate.testing.MutableClock
 import com.jjrapps.aquihaytomate.testing.MutableElapsedRealtime
@@ -60,19 +62,28 @@ class TimerViewModelTest {
     fun tearDown() = Dispatchers.resetMain()
 
     private fun viewModel(): TimerViewModel {
+        val runtime = FakeTimerRuntime()
         val recordFocusSlot = RecordFocusSlotUseCase(stats, clock)
-        val start = StartTimerUseCase(timerState, settings, clock, elapsed)
-        val pause = PauseTimerUseCase(timerState, clock, elapsed)
+        val sync = SyncTimerRuntimeUseCase(timerState, runtime, runtime, runtime, clock, elapsed)
+        val start = StartTimerUseCase(timerState, settings, sync, clock, elapsed)
+        val pause = PauseTimerUseCase(timerState, sync, clock, elapsed)
         val complete =
-            CompleteSlotUseCase(timerState, settings, recordFocusSlot, alerts, clock, elapsed)
+            CompleteSlotUseCase(timerState, settings, recordFocusSlot, alerts, sync, clock, elapsed)
         return TimerViewModel(
             observeTimerState = ObserveTimerStateUseCase(timerState),
             observeSettings = ObserveSettingsUseCase(settings),
             toggleTimer = ToggleTimerUseCase(timerState, start, pause),
-            resetTimer = ResetTimerUseCase(timerState, settings, recordFocusSlot, clock, elapsed),
-            skipSlot = SkipSlotUseCase(timerState, settings, recordFocusSlot, clock, elapsed),
+            resetTimer = ResetTimerUseCase(
+                timerState,
+                settings,
+                recordFocusSlot,
+                sync,
+                clock,
+                elapsed,
+            ),
+            skipSlot = SkipSlotUseCase(timerState, settings, recordFocusSlot, sync, clock, elapsed),
             completeSlot = complete,
-            reconcileTimer = ReconcileTimerUseCase(timerState, complete, clock, elapsed),
+            reconcileTimer = ReconcileTimerUseCase(timerState, complete, sync, clock, elapsed),
             clock = clock,
             elapsedRealtime = elapsed,
         )

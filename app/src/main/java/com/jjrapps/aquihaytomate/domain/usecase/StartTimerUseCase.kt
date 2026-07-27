@@ -16,6 +16,7 @@ import javax.inject.Inject
 class StartTimerUseCase @Inject constructor(
     private val timerStateRepository: TimerStateRepository,
     private val settingsRepository: SettingsRepository,
+    private val syncTimerRuntime: SyncTimerRuntimeUseCase,
     private val clock: Clock,
     private val elapsedRealtime: ElapsedRealtimeSource,
 ) {
@@ -25,7 +26,7 @@ class StartTimerUseCase @Inject constructor(
         val nowEpochMs = clock.millis()
         val nowElapsedRealtimeMs = elapsedRealtime.millis()
 
-        return timerStateRepository.update { state ->
+        val changed = timerStateRepository.update { state ->
             when (state.status) {
                 TimerStatus.IDLE, TimerStatus.RINGING ->
                     TimerTransitions.start(state, settings, nowEpochMs, nowElapsedRealtimeMs)
@@ -36,5 +37,7 @@ class StartTimerUseCase @Inject constructor(
                 TimerStatus.RUNNING -> null
             }
         }
+        if (changed) syncTimerRuntime()
+        return changed
     }
 }

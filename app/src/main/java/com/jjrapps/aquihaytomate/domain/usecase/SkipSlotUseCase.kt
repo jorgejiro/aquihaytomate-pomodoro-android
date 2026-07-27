@@ -18,6 +18,7 @@ class SkipSlotUseCase @Inject constructor(
     private val timerStateRepository: TimerStateRepository,
     private val settingsRepository: SettingsRepository,
     private val recordFocusSlot: RecordFocusSlotUseCase,
+    private val syncTimerRuntime: SyncTimerRuntimeUseCase,
     private val clock: Clock,
     private val elapsedRealtime: ElapsedRealtimeSource,
 ) {
@@ -48,7 +49,7 @@ class SkipSlotUseCase @Inject constructor(
         val nextStatus =
             if (settings.autoStartNext) TimerStatus.RUNNING else TimerStatus.IDLE
 
-        return timerStateRepository.update { current ->
+        val changed = timerStateRepository.update { current ->
             // Bail out if something else moved the timer on while we were reading and recording.
             if (current.slotIndex != state.slotIndex || current.status != state.status) {
                 null
@@ -63,5 +64,7 @@ class SkipSlotUseCase @Inject constructor(
                 )
             }
         }
+        if (changed) syncTimerRuntime()
+        return changed
     }
 }

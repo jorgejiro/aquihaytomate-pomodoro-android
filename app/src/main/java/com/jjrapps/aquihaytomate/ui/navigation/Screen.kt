@@ -10,6 +10,9 @@ sealed class Screen(val route: String) {
 
     /** Reached from Settings → About; not a tab. */
     data object Changelog : Screen("changelog")
+
+    /** The OFL notice for the bundled fonts. Also reached from Settings → About. */
+    data object Licenses : Screen("licenses")
 }
 
 /** The three top-level tabs, in display order. */

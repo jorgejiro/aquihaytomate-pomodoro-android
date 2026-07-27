@@ -3,11 +3,19 @@ package com.jjrapps.aquihaytomate
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import com.jjrapps.aquihaytomate.widget.WidgetStateCollector
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 import timber.log.Timber
 
 @HiltAndroidApp
 class AquiHayTomateApplication : Application() {
+
+    /**
+     * Injected here because the widget has to keep up with the timer whether or not any Activity is alive.
+     * It is the only collector with application scope, and the only place the widget is refreshed from.
+     */
+    @Inject lateinit var widgetStateCollector: WidgetStateCollector
 
     override fun onCreate() {
         super.onCreate()
@@ -15,6 +23,7 @@ class AquiHayTomateApplication : Application() {
             Timber.plant(Timber.DebugTree())
         }
         createNotificationChannels()
+        widgetStateCollector.start()
     }
 
     /**
