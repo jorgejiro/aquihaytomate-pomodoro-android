@@ -28,7 +28,7 @@ object ChangelogCatalog {
         ChangelogRelease(
             versionName = "1.0.0",
             versionCode = 1,
-            releaseDate = LocalDate.of(2026, 7, 27),
+            releaseDate = LocalDate.of(2026, 7, 28),
             highlightsRes = R.array.changelog_1_0_0,
         ),
     )

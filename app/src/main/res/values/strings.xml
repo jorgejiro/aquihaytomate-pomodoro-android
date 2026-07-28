@@ -187,6 +187,7 @@
         <item>One-cell home screen widget: tap to start or pause, double-tap to reset.</item>
         <item>Statistics: completed Pomodoros, time focused, day streak, monthly map and 30-day trend.</item>
         <item>End-of-interval alert with a sound of your choice and vibration for as long as you want.</item>
+        <item>Auto-start each way separately: let the break roll on without the next Pomodoro doing the same.</item>
         <item>Spanish and English.</item>
     </string-array>
 </resources>

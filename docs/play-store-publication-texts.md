@@ -8,14 +8,34 @@
 
 ## 1. Checklist para publicar
 
+> Estado a 2026-07-28: la firma, el bundle y todos los textos están listos. **Lo que falta es
+> verificación en dispositivo real**, que no se puede delegar: los puntos 4 y 5 son la checklist §10 de
+> `CLAUDE.md` y la del widget, y hasta pasarlas esto no debe salir de pruebas internas. Ver
+> `docs/f9-verificacion-en-emulador.md` para lo que ya está cubierto y lo que no.
+
 ### Antes de la primera subida
 
 1. **Enviar la declaración de foreground service `specialUse`** (§14). Es revisión manual y puede
    tardar o rebotar. **Hazlo en la primera subida a pruebas internas, no en la de producción**, para
    que el rechazo, si llega, no bloquee el lanzamiento.
-2. Generar la upload key y guardar `keystore.properties` fuera del repo.
-3. Comprobar que `.gitignore` cubre `*.jks`, `*.pwd.txt`, `keystore.properties`, `*.aab` y
-   `/app/release/`.
+2. ✅ **Firma configurada.** Se reutiliza la **misma upload key que Bebe Agua** — misma cuenta de Play,
+   mismo prefijo `com.jjrapps` — porque una clave de subida puede firmar varias apps y así hay un solo
+   secreto que custodiar en vez de dos:
+
+   | | |
+   |---|---|
+   | Keystore | `/Users/jorge/dev/bebe-agua-android/bebeagua-release.jks` |
+   | Alias | `bebeagua` |
+   | Contraseñas | en `bebeagua-release.jks.pwd.txt`, junto al keystore, **fuera de todo repo** |
+   | Config de este proyecto | `keystore.properties` en la raíz, con **ruta absoluta** al keystore |
+   | Certificado | válido hasta 2051-04-29 |
+
+   `keystore.properties` **no se versiona** y `.gitignore` ya cubre `keystore.properties`, `*.jks`,
+   `*.pwd.txt`, `*.aab` y `/app/release/`. Si algún día mueves el keystore, la ruta absoluta de este
+   fichero es lo único que hay que tocar; conviene entonces llevarlo a un sitio neutral —
+   `~/keys/jjrapps-upload.jks` — y apuntar los dos proyectos ahí.
+3. **Activar Play App Signing** al crear la app en Play Console (viene activado por defecto). Con eso
+   la clave de firma real la custodia Google y esta upload key es reemplazable si se pierde.
 
 ### Antes de cada publicación
 
@@ -30,7 +50,15 @@
    JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew lint test
    JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew connectedDebugAndroidTest
    ```
-9. Generar el `.aab` firmado con la upload key.
+9. Generar el `.aab` firmado con la upload key:
+   ```bash
+   JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew bundleRelease
+   # app/build/outputs/bundle/release/app-release.aab
+   ```
+   Comprobar que sale firmado, que es lo que un `assembleRelease` sin `keystore.properties` no avisa:
+   ```bash
+   "$JAVA_HOME/bin/keytool" -printcert -jarfile app/build/outputs/bundle/release/app-release.aab
+   ```
 10. Subir a **Internal testing** primero. Instalar desde Play en un dispositivo real y repetir 4 y 5:
     la build de Play lleva R8 y puede romper cosas que el debug no.
 11. Promover a producción. Revisar antes: ficha, países, categoría, data safety, content rating,
@@ -162,6 +190,9 @@ El nombre se mantiene en español en ambos idiomas: es la marca.
 **EN (1.0.0)**
 > First release. Pomodoro timer with a one-cell home screen widget, statistics, configurable alerts
 > and a dark theme. No ads, no tracking.
+
+> Los dos textos tienen que decir lo mismo que el `string-array` `changelog_1_0_0` de la app: es la
+> misma versión contada dos veces y el usuario puede leer las dos.
 
 ---
 

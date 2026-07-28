@@ -185,6 +185,7 @@
         <item>Widget de escritorio de una sola casilla: un toque para iniciar o pausar, dos toques para reiniciar.</item>
         <item>Estadísticas: pomodoros completados, tiempo enfocado, racha de días, mapa mensual y tendencia de 30 días.</item>
         <item>Aviso al terminar cada intervalo con sonido a elegir y vibración de la duración que tú decidas.</item>
+        <item>Auto-inicio por separado: que el descanso arranque solo sin que lo haga el pomodoro siguiente.</item>
         <item>Español e inglés.</item>
     </string-array>
 </resources>

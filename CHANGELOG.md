@@ -11,9 +11,9 @@ Al publicar una versión nueva hay que tocar los cuatro sitios: este archivo, lo
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
-## [No publicado] — 1.0.0 (versionCode 1)
+## [1.0.0] — 2026-07-28 (versionCode 1)
 
-Primera versión. En desarrollo; ver el roadmap por fases en `CLAUDE.md` §9.
+Primera versión.
 
 ### Añadido
 
