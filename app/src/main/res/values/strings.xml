@@ -189,25 +189,14 @@
     <string name="changelog_title">What\'s new</string>
     <string name="changelog_current_badge">Current</string>
 
-    <string-array name="changelog_0_9_1">
-        <item>Fixed: the widget could not be dropped on the home screen — the launcher claimed the app was not installed.</item>
-        <item>The timer notification now shows the time left in large type, with pause, reset and skip in reach without expanding it.</item>
-        <item>The figure is red during a Pomodoro and amber during a break.</item>
-        <item>The end-of-interval alert reaches a paired watch with its two actions: start the next one, or dismiss. Dismissing it anywhere stops the vibration.</item>
-        <item>The notification comes back if you swipe it away with an interval still running.</item>
-        <item>When an interval ends, the widget shows the next one ready to go instead of a warning sign.</item>
-        <item>Skip is now on the timer screen too, and tapping the tomato starts or pauses it.</item>
-        <item>Auto-starting the break is on by default. The next Pomodoro still waits for you.</item>
-        <item>The onboarding asks about the shape of your cycle and is clearer about the permissions it needs.</item>
-    </string-array>
-
-    <string-array name="changelog_0_9_0">
+    <string-array name="changelog_1_0_0">
         <item>First release.</item>
         <item>Pomodoro timer with focus, short break and long break every N Pomodoros. Every duration is configurable.</item>
-        <item>One-cell home screen widget: tap to start or pause, double-tap to reset.</item>
+        <item>One-cell home screen widget: tap to start or pause, double-tap to reset. It shows what the tap will do.</item>
+        <item>Timer notification with the time left in large type and pause, reset and skip in reach without expanding it.</item>
+        <item>End-of-interval alert with a sound of your choice and vibration for as long as you want. It reaches a paired watch with two actions: start the next one, or dismiss.</item>
         <item>Statistics: completed Pomodoros, time focused, day streak, monthly map and 30-day trend.</item>
-        <item>End-of-interval alert with a sound of your choice and vibration for as long as you want.</item>
         <item>Auto-start each way separately: let the break roll on without the next Pomodoro doing the same.</item>
-        <item>Spanish and English.</item>
+        <item>Spanish and English. Dark theme only. No ads, no tracking, no accounts.</item>
     </string-array>
 </resources>

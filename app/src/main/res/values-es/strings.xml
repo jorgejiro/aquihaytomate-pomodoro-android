@@ -188,25 +188,14 @@
     <string name="changelog_title">Novedades</string>
     <string name="changelog_current_badge">Actual</string>
 
-    <string-array name="changelog_0_9_1">
-        <item>Corregido: el widget no se podía colocar en el escritorio, el launcher decía que la app no estaba instalada.</item>
-        <item>La notificación del temporizador muestra el tiempo restante en grande, y pausar, reiniciar y saltar están a mano sin desplegarla.</item>
-        <item>La cifra sale en rojo durante un pomodoro y en ámbar durante un descanso.</item>
-        <item>El aviso de fin de intervalo llega al reloj emparejado con sus dos acciones: empezar el siguiente o descartar. Descartarlo en cualquier sitio corta la vibración.</item>
-        <item>La notificación vuelve si la cierras por error con un intervalo en marcha.</item>
-        <item>Al terminar un intervalo, el widget muestra el siguiente listo en vez de un signo de alarma.</item>
-        <item>Saltar está también en la pantalla del temporizador, y tocar el tomate lo inicia o lo pausa.</item>
-        <item>Auto-iniciar el descanso viene activado. El pomodoro siguiente sigue esperándote.</item>
-        <item>El onboarding pregunta por la forma de tu ciclo y es más claro con los permisos que necesita.</item>
-    </string-array>
-
-    <string-array name="changelog_0_9_0">
+    <string-array name="changelog_1_0_0">
         <item>Primera versión.</item>
         <item>Temporizador Pomodoro con enfoque, descanso corto y descanso largo cada N pomodoros. Todas las duraciones son configurables.</item>
-        <item>Widget de escritorio de una sola casilla: un toque para iniciar o pausar, dos toques para reiniciar.</item>
+        <item>Widget de escritorio de una sola casilla: un toque para iniciar o pausar, dos toques para reiniciar. Enseña lo que hará el toque.</item>
+        <item>Notificación del temporizador con el tiempo restante en grande y pausar, reiniciar y saltar a mano sin desplegarla.</item>
+        <item>Aviso al terminar cada intervalo con sonido a elegir y vibración configurable. Llega al reloj emparejado con dos acciones: empezar el siguiente o descartar.</item>
         <item>Estadísticas: pomodoros completados, tiempo enfocado, racha de días, mapa mensual y tendencia de 30 días.</item>
-        <item>Aviso al terminar cada intervalo con sonido a elegir y vibración de la duración que tú decidas.</item>
         <item>Auto-inicio por separado: que el descanso arranque solo sin que lo haga el pomodoro siguiente.</item>
-        <item>Español e inglés.</item>
+        <item>Español e inglés. Solo tema oscuro. Sin anuncios, sin seguimiento y sin cuentas.</item>
     </string-array>
 </resources>

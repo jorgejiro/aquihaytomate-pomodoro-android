@@ -649,7 +649,15 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
 - **Esta es la única notificación que NO lleva `setSilent(true)`.** El canal ya es mudo, así que el flag no aportaba silencio: lo que hacía era marcarla como no alertante, quitarle el heads-up y dejarla fuera de lo que un reloj emparejado reenvía. Las dos acciones se muestran en un Garmin como lista, que es como se controla el temporizador desde la muñeca. Ver `docs/decisions/011-*`.
 - **Descartarla desde cualquier sitio para el sonido y la vibración**, vía `deleteIntent` a `ACTION_DISMISS`: al descartar desde el reloj, el sistema cancela la notificación sin pasar por la acción, y la vibración seguía hasta 30 s.
 
-Si el slot siguiente arranca solo —`autoStartBreak` al acabar un pomodoro, `autoStartFocus` al acabar un descanso— no se publica alerta separada: se actualiza la ongoing con el nuevo slot y **el sonido y la vibración se disparan igual**. Auto-iniciar significa no tener que tocar, no enterarse de nada.
+**Con auto-inicio también se publica**, con el cuerpo diciendo que el slot ya está en marcha, la acción de saltarlo en vez de empezarlo y `setTimeoutAfter` de 2 min para que no se acumule. Sin eso, el fin de un pomodoro no llegaba al reloj emparejado, que es justo cuando el móvil está lejos. Auto-iniciar significa no tener que tocar, no enterarse de nada.
+
+El copy se escribe **para una pantalla de reloj**, que muestra título y cuerpo y nada más:
+
+| Situación | Título | Cuerpo |
+|---|---|---|
+| Fin de pomodoro, esperando | `Pomodoro 3 de 4 completado` | `Descanso de 5 min · toca para empezar` |
+| Fin de pomodoro, encadenado | `Pomodoro 3 de 4 completado` | `Descanso de 5 min ya en marcha` |
+| Fin de descanso | `Descanso terminado` | `Pomodoro de 25 min · toca para empezar` |
 
 > **Los dos canales son mudos** (`setSound(null, null)`, `enableVibration(false)`). El sonido y la vibración los toca `AlertPlayer`, porque un canal no permite cambiarlos después de creado y ambos son ajustes de primera línea. Ver ADR 004.
 

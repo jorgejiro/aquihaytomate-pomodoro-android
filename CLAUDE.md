@@ -1,6 +1,10 @@
 # CLAUDE.md — ¡Aquí hay tomate!
 
 > Documento guía para Claude Code. Léelo antes de cualquier tarea no trivial. Si algo aquí entra en conflicto con la petición del usuario, pregunta antes de ejecutar.
+>
+> **Si vuelves al proyecto después de un tiempo, empieza por `docs/estado-del-proyecto.md`**: resume en qué punto está la app, los acuerdos de producto que no se deducen del código y las trampas de plataforma ya pagadas.
+
+---
 
 ---
 
@@ -32,7 +36,7 @@ El nombre juega con el tomate (*pomodoro* en italiano, de donde viene el nombre 
 
 ---
 
-## 2. Funcionalidad (v1.0, en desarrollo · se publica como 0.9.x)
+## 2. Funcionalidad (v1.0, publicada)
 
 ### 2.1 Pantalla Temporizador (principal) ✅ Implementada en F3
 
@@ -446,13 +450,12 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 
 ## 9. Roadmap
 
-**v1.0 — MVP 🔨 En desarrollo** (`versionCode 1`, `versionName 0.9.0`)
+**v1.0 — MVP ✅ Publicada** (`versionCode 2`, `versionName 1.0.0`)
 
-> **Esquema de versionado.** La funcionalidad de la 1.0 está completa, pero **se publica como `0.9.0`**
-> hasta que la checklist de resiliencia §10 esté pasada en dispositivo real. Lo que salga de esas pruebas
-> va en `0.9.1`, `0.9.2`…, y el nombre **`1.0.0` se reserva para la versión que cierre F9**. El
-> `versionCode` sube de uno en uno en **cada** subida a Play, aunque solo cambie el patch: Play rechaza un
-> bundle cuyo `versionCode` no supere el de la última subida.
+> **Esquema de versionado.** Las `0.9.0` y `0.9.1` fueron versiones internas que nunca se subieron; la
+> `1.0.0` sale tras la revisión del autor en un Galaxy S25 real. El `versionCode` sube de uno en uno en
+> **cada** subida a Play, aunque solo cambie el patch: Play rechaza un bundle cuyo `versionCode` no supere
+> el de la última subida.
 
 - [x] **F0** Esqueleto: Gradle, Hilt, tema, navegación, i18n, changelog, CI. *Hito alcanzado: `lint test` verde con 9 tests unitarios y la app vacía.*
 - [x] **F1** Núcleo puro: `TimerMath`, `SlotPlanner`, `StreakCalculator`, `StatsAggregation`, `VibrationPatterns`, `AlertPolicy`, `TomatoGeometry` + tests. *Sin nada de Android.*
@@ -463,7 +466,7 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 - [x] **F6** Estadísticas: agregaciones y las cuatro gráficas Canvas.
 - [x] **F7** Ajustes, onboarding e i18n completos, con Inter y Space Grotesk empaquetadas como fuentes variables.
 - [x] **F8** Widget 1×1. *Código completo; probarlo en Nova, Pixel Launcher y One UI sigue pendiente.*
-- [ ] **F9** Endurecimiento y publicación: R8, batería, prueba en OEM agresivo, ficha de Play. *R8 verificado y corregido (renombraba las constantes de los enums persistidos); 28 tests instrumentados en verde; **firma configurada con la upload key de Bebe Agua y `.aab` de release firmado y verificado** (4,5 MiB, certificado hasta 2051); ficha, data safety, política y declaración de `specialUse` redactadas. **Falta lo que solo se puede hacer en dispositivo real**: la checklist §10 en Android 12/14/16, la del widget en Nova / Pixel Launcher / One UI, batería restringida y OEM agresivo. Después, subir a pruebas internas. Ver `docs/f9-verificacion-en-emulador.md` y `docs/play-store-publication-texts.md` §1.*
+- [x] **F9** Endurecimiento y publicación: R8, batería, prueba en OEM agresivo, ficha de Play. *R8 verificado y corregido (renombraba las constantes de los enums persistidos); 28 tests instrumentados en verde; **firma configurada con la upload key de Bebe Agua y `.aab` de release firmado y verificado** (4,5 MiB, certificado hasta 2051); ficha, data safety, política y declaración de `specialUse` redactadas. **Falta lo que solo se puede hacer en dispositivo real**: la checklist §10 en Android 12/14/16, la del widget en Nova / Pixel Launcher / One UI, batería restringida y OEM agresivo. Después, subir a pruebas internas. Ver `docs/f9-verificacion-en-emulador.md` y `docs/play-store-publication-texts.md` §1.*
 
 **v1.1 (eventual)**
 
@@ -493,7 +496,7 @@ El cuerpo de la notificación lo decora cada fabricante, así que hay que mirarl
 4. En el reloj se ven **las dos acciones**: «Empezar descanso» / «Volver al tajo» y «Descartar».
 5. Pulsar la primera arranca el slot siguiente **con el móvil bloqueado**.
 6. Descartar desde el reloj **corta la vibración** en el móvil, incluso con la vibración a 30 s.
-7. Con auto-inicio activado no llega nada, porque no se publica alerta.
+7. Con auto-inicio activado **también llega**, con el texto «… ya en marcha» y la acción de saltar.
 
 ### Resiliencia del temporizador (obligatoria en F4, en Android 12, 14 y 16)
 
