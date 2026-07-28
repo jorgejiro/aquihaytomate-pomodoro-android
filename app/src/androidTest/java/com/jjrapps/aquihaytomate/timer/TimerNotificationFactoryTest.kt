@@ -144,21 +144,31 @@ class TimerNotificationFactoryTest {
     }
 
     /**
-     * The alert must stay "alerting": that is what earns it a heads-up and what gets it handed to a paired
-     * watch. The channel is already mute, so this costs no sound. See ADR 011.
+     * Only the alert is handed to a paired watch.
+     *
+     * The countdown is republished on every transition and a permanent entry in a watch's notification list
+     * is noise, so both ongoing forms are `localOnly`. The alert is not, and it is also the only one that
+     * stays "alerting" — `setSilent(true)` would drop it out of what a watch is handed. The channel does the
+     * muting, so this costs no sound. See ADR 011.
      */
     @Test
-    fun theAlertIsNotMarkedSilentButTheOngoingOnesAre() {
+    fun onlyTheAlertReachesAPairedWatch() {
         val alert = factory.slotFinished(running.copy(slotType = SlotType.SHORT_BREAK))
-        val ongoing = factory.ongoingRunning(running)
+        val whileRunning = factory.ongoingRunning(running)
+        val whilePaused = factory.ongoingPaused(running.copy(status = TimerStatus.PAUSED), 60_000L)
 
-        assertEquals(0, alert.flags and NotificationCompat.FLAG_LOCAL_ONLY)
-        assertNull("The channel does the muting; the builder must not", alert.sound)
-        assertTrue(
-            "The ongoing one is republished on every transition and must never chirp",
-            ongoing.extras.getBoolean("android.silent", false) ||
-                ongoing.flags and android.app.Notification.FLAG_ONGOING_EVENT != 0,
+        assertEquals(
+            "The alert is the whole point of pairing a watch with this app",
+            0,
+            alert.flags and NotificationCompat.FLAG_LOCAL_ONLY,
         )
+        assertNull("The channel does the muting; the builder must not", alert.sound)
+
+        assertTrue(
+            "A permanent countdown on the wrist is noise",
+            whileRunning.flags and NotificationCompat.FLAG_LOCAL_ONLY != 0,
+        )
+        assertTrue(whilePaused.flags and NotificationCompat.FLAG_LOCAL_ONLY != 0)
     }
 
     /** Two actions on the wrist: start the next slot, or dismiss. */

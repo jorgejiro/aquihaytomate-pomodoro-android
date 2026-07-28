@@ -44,8 +44,7 @@ class TimerNotificationFactory @Inject constructor(
         base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
             .setContentTitle(titleFor(state))
             .setOngoing(true)
-            // Republished on every transition, so it must never make a sound of its own.
-            .setSilent(true)
+            .asPhoneOnly()
             .withRestoreOnDismissal()
             .withBody(state, TimerActionReceiver.ACTION_PAUSE) { chronometerOf(state) }
             // Without IMMEDIATE, Android 12+ holds the notification back for up to ten seconds and the
@@ -62,13 +61,27 @@ class TimerNotificationFactory @Inject constructor(
         base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
             .setContentTitle(titleFor(state))
             .setOngoing(true)
-            .setSilent(true)
+            .asPhoneOnly()
             .withRestoreOnDismissal()
             .withBody(state, TimerActionReceiver.ACTION_RESUME, R.string.notification_paused_label) {
                 frozenFigureOf(remainingMs)
             }
             .withTimerActions(pauseOrResume = TimerActionReceiver.ACTION_RESUME)
             .build()
+
+    /**
+     * Silent and phone-only, which is what the two ongoing forms have in common.
+     *
+     * **Silent** because they are republished on every transition and must never make a sound of their own —
+     * the alert is `AlertPlayer`'s job, see ADR 004.
+     *
+     * **Phone-only** because a paired watch has no business holding a permanent countdown in its
+     * notification list. It is a deliberate trade: it also gives up pausing from the wrist, and the wrist
+     * gets the one notification that matters there — the end-of-slot alert, which is *not* marked either
+     * way and carries its two actions. See ADR 011.
+     */
+    private fun NotificationCompat.Builder.asPhoneOnly(): NotificationCompat.Builder =
+        setSilent(true).setLocalOnly(true)
 
     /**
      * Brings the notification back if the user swipes it away with a slot still under way.

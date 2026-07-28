@@ -43,14 +43,24 @@ Ese `deleteIntent` **no republica nada**, a diferencia del de las ongoing (ADR 0
 `RestoreOngoingNotificationUseCase` se niega a restaurar mientras el estado sea `RINGING`, que es
 precisamente el estado en el que vive esta alerta.
 
+**3. Las dos formas ongoing van `setLocalOnly(true)`: al reloj llega solo el aviso de fin.** Un
+temporizador en marcha es una notificación permanente, y permanente en la lista de notificaciones de un
+reloj es ruido — se acumula, hay que descartarla y vuelve en la transición siguiente. Es un intercambio
+explícito y aceptado: **se renuncia a pausar desde la muñeca** y a cambio la muñeca solo vibra cuando hay
+algo que decidir. Para el control rápido ya está el widget de una casilla, que es la razón de ser del
+proyecto.
+
+Las dos cosas van juntas en `asPhoneOnly()`, porque las dos ongoing comparten los dos motivos: silenciosas
+por republicarse en cada transición, y locales por ser permanentes.
+
 ## Alternativas descartadas
 
 - **Una app Connect IQ** en el reloj hablando con la app por el SDK de Garmin. Es la vía para controlar el
   temporizador desde la muñeca *sin* notificación —un widget con la cifra, por ejemplo—, y no hace falta
   para lo que se pedía. Queda para una v1.x si alguna vez se quiere el temporizador en la esfera.
-- **`setLocalOnly(true)` en las ongoing**, para que el reloj reciba solo el aviso de fin y no el cronómetro
-  persistente. Es una decisión de gusto —quita ruido de la muñeca, pero también quita poder pausar desde
-  ella— y se deja al autor.
+- **Dejar que el cronómetro persistente llegue también al reloj**, para poder pausar desde la muñeca. Se
+  descartó: un temporizador en marcha es una notificación permanente, y permanente en la lista de un reloj
+  es ruido. Ver el punto 3 de la decisión.
 
 ## Consecuencias
 

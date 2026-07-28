@@ -486,11 +486,12 @@ El cuerpo de la notificación lo decora cada fabricante, así que hay que mirarl
 ### Aviso en el reloj emparejado (Garmin, tras el ADR 011)
 
 1. La app aparece habilitada en Garmin Connect → Notificaciones inteligentes.
-2. Al terminar un slot con el auto-inicio desactivado, el aviso llega al reloj.
-3. En el reloj se ven **las dos acciones**: «Empezar descanso» / «Volver al tajo» y «Descartar».
-4. Pulsar la primera arranca el slot siguiente **con el móvil bloqueado**.
-5. Descartar desde el reloj **corta la vibración** en el móvil, incluso con la vibración a 30 s.
-6. Con auto-inicio activado no llega nada, porque no se publica alerta.
+2. **Con el temporizador corriendo, en el reloj no hay ninguna notificación**: la persistente va `localOnly`.
+3. Al terminar un slot con el auto-inicio desactivado, el aviso llega al reloj.
+4. En el reloj se ven **las dos acciones**: «Empezar descanso» / «Volver al tajo» y «Descartar».
+5. Pulsar la primera arranca el slot siguiente **con el móvil bloqueado**.
+6. Descartar desde el reloj **corta la vibración** en el móvil, incluso con la vibración a 30 s.
+7. Con auto-inicio activado no llega nada, porque no se publica alerta.
 
 ### Resiliencia del temporizador (obligatoria en F4, en Android 12, 14 y 16)
 

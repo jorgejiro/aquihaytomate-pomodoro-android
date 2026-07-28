@@ -641,6 +641,7 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
 
 `CATEGORY_ALARM`, `setAutoCancel(true)`. Título `¡Tiempo!`, texto `25 min de enfoque completados · 3 de 4`. Acciones **Empezar descanso** / **Volver al tajo** y **Descartar**.
 
+- **Es la única que llega a un reloj emparejado**: las dos ongoing van `setLocalOnly(true)`, porque un cronómetro permanente en la lista de un reloj es ruido. Se renuncia así a pausar desde la muñeca, a cambio de que la muñeca solo avise cuando hay algo que decidir; para el control rápido está el widget.
 - **Esta es la única notificación que NO lleva `setSilent(true)`.** El canal ya es mudo, así que el flag no aportaba silencio: lo que hacía era marcarla como no alertante, quitarle el heads-up y dejarla fuera de lo que un reloj emparejado reenvía. Las dos acciones se muestran en un Garmin como lista, que es como se controla el temporizador desde la muñeca. Ver `docs/decisions/011-*`.
 - **Descartarla desde cualquier sitio para el sonido y la vibración**, vía `deleteIntent` a `ACTION_DISMISS`: al descartar desde el reloj, el sistema cancela la notificación sin pasar por la acción, y la vibración seguía hasta 30 s.
 
