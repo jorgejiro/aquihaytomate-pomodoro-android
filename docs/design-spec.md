@@ -603,17 +603,24 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
 ### 8.1 Ongoing (canal `timer_running`, IMPORTANCE_LOW)
 
 - Icono pequeño `ic_notif_tomate`, `setColor(TomateFill)`.
-- **Cuerpo propio** (`res/layout/notification_timer.xml`) con `DecoratedCustomViewStyle`, para que la cifra sea lo más grande de la notificación:
+- **Dos cuerpos propios** con `DecoratedCustomViewStyle`, para que la cifra sea lo más grande de la notificación y los controles estén desde que se abre la cortinilla:
 
   ```
+  COLAPSADA · notification_timer_collapsed.xml · 48 dp de tope
+  ┌──────────────────────────────────────┐
+  │ 🍅  24:58  ENFOQUE    ❚❚   ↺   ▶│    │  24 sp · 12 sp · iconos 44 dp
+  └──────────────────────────────────────┘
+
+  EXPANDIDA · notification_timer.xml
   ┌──────────────────────────────────────┐
   │ 🍅 ¡Aquí hay tomate!                 │  encabezado del sistema
-  │                                      │
   │   24:58     ENFOQUE · 2/4            │  26 sp · 13 sp
-  │                                      │
   │  PAUSAR   │   REINICIAR   │  SALTAR  │  fila de acciones del sistema
   └──────────────────────────────────────┘
   ```
+
+- **La fila de acciones del sistema solo se dibuja expandida**, así que la colapsada lleva tres iconos propios con los mismos `PendingIntent`. Son iconos y no etiquetas porque **el contenido propio de una notificación colapsada está limitado a 48 dp** con `targetSdk` ≥ 31 (antes 106 dp): no hay dos filas, y en una no caben la cifra y tres palabras. Por lo mismo, la colapsada muestra el nombre de la fase sin el `2/4`.
+- Las acciones de `addAction` se mantienen aunque en colapsada no se usen: son las que ven Wear, el asistente y la pantalla de bloqueo.
 
 - Descuento: `Chronometer` con `setChronometerCountDown(true)` **dentro del cuerpo propio**, con base en el reloj monotónico. Sigue ticando en el proceso de SystemUI: **cero `notify()` por segundo**. Ver `docs/decisions/009-*`.
 - La plantilla estándar daba la cifra al hueco del timestamp — 11 sp, arriba a la derecha, inmodificable — y todo el peso al título, donde estaba el `2/4`. Con el cuerpo propio se invierte: la cifra manda y la fase con el ciclo bajan a 13 sp.

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The collapsed body: cifra, fase y los tres controles, **todo en una fila**.
+
+  **48 dp es todo lo que hay.** Para apps con `targetSdk` 31 o mayor, el contenido propio de una
+  notificación colapsada está limitado a 48 dp — bajó de los 106 dp anteriores —, así que una segunda fila
+  con los botones no se recorta: desaparece. De ahí que los controles sean iconos y no etiquetas: tres
+  palabras («PAUSAR REINICIAR SALTAR») más la cifra no caben en el ancho, y en 48 dp no hay dos filas.
+
+  Es el precio de tener los controles sin desplegar. La alternativa era `setRequestPromotedOngoing` de
+  Android 16, que los deja visibles con la plantilla del sistema pero prohíbe las vistas propias, y con
+  ellas la cifra grande. Ver docs/decisions/009-*.
+
+  La fila expandida (`notification_timer.xml`) sí usa la fila de acciones del sistema, con sus etiquetas de
+  texto, porque allí hay sitio.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:baselineAligned="false"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <Chronometer
+        android:id="@+id/notification_chronometer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/space_grotesk_variable"
+        android:fontFeatureSettings="tnum"
+        android:includeFontPadding="false"
+        android:textColor="@color/notification_time"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/notification_static_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/space_grotesk_variable"
+        android:fontFeatureSettings="tnum"
+        android:includeFontPadding="false"
+        android:textColor="@color/notification_time"
+        android:textSize="24sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/notification_phase"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/notification_phase"
+        android:textSize="12sp" />
+
+    <ImageView
+        android:id="@+id/notification_action_primary"
+        style="@style/NotificationIconAction"
+        android:src="@drawable/ic_notif_pause" />
+
+    <ImageView
+        android:id="@+id/notification_action_reset"
+        style="@style/NotificationIconAction"
+        android:src="@drawable/ic_notif_reset" />
+
+    <ImageView
+        android:id="@+id/notification_action_skip"
+        style="@style/NotificationIconAction"
+        android:src="@drawable/ic_notif_skip" />
+
+</LinearLayout>

@@ -3,4 +3,5 @@
 <resources>
     <color name="notification_time">#FFFFFFFF</color>
     <color name="notification_phase">#B3FFFFFF</color>
+    <color name="notification_action">#FFFF6B5A</color>
 </resources>

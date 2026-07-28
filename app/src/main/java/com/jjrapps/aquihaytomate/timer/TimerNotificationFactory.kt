@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.SystemClock
 import android.view.View
 import android.widget.RemoteViews
+import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
@@ -17,6 +18,7 @@ import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerState
 import com.jjrapps.aquihaytomate.domain.time.ElapsedRealtimeSource
 import com.jjrapps.aquihaytomate.domain.usecase.TimerMath
+import com.jjrapps.aquihaytomate.ui.common.phaseNameRes
 import com.jjrapps.aquihaytomate.ui.theme.TomateFill
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Clock
@@ -42,7 +44,7 @@ class TimerNotificationFactory @Inject constructor(
         base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
             .setContentTitle(titleFor(state))
             .setOngoing(true)
-            .withBody(runningBody(state))
+            .withBody(state, TimerActionReceiver.ACTION_PAUSE) { chronometerOf(state) }
             // Without IMMEDIATE, Android 12+ holds the notification back for up to ten seconds and the
             // user thinks the timer never started.
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
@@ -57,7 +59,9 @@ class TimerNotificationFactory @Inject constructor(
         base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
             .setContentTitle(titleFor(state))
             .setOngoing(true)
-            .withBody(pausedBody(state, remainingMs))
+            .withBody(state, TimerActionReceiver.ACTION_RESUME, R.string.notification_paused_label) {
+                frozenFigureOf(remainingMs)
+            }
             .withTimerActions(pauseOrResume = TimerActionReceiver.ACTION_RESUME)
             .build()
 
@@ -73,48 +77,105 @@ class TimerNotificationFactory @Inject constructor(
      * `setContentTitle` stays set even though nothing shows it: it is the fallback for surfaces that refuse
      * custom views, and it is what a screen reader announces.
      */
-    private fun NotificationCompat.Builder.withBody(body: RemoteViews): NotificationCompat.Builder =
-        setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            .setCustomContentView(body)
-            .setCustomBigContentView(body)
+    private fun NotificationCompat.Builder.withBody(
+        state: TimerState,
+        pauseOrResume: String,
+        @StringRes suffixRes: Int? = null,
+        applyFigure: RemoteViews.() -> Unit,
+    ): NotificationCompat.Builder = setStyle(NotificationCompat.DecoratedCustomViewStyle())
+        // Two bodies, because the collapsed one is capped at 48 dp and gets no system action row: there the
+        // controls are icons of ours, and expanded they are the system's own labelled row from `addAction`.
+        .setCustomContentView(
+            // Just the phase name here: with the figure at 24 sp and three 44 dp controls beside it, the
+            // cycle position is what gets ellipsised. It is one tap away in the expanded body.
+            body(
+                layout = R.layout.notification_timer_collapsed,
+                phase = context.getString(phaseNameRes(state.slotType)),
+                applyFigure = applyFigure,
+            ).apply { applyIconActions(pauseOrResume) },
+        )
+        .setCustomBigContentView(
+            body(
+                layout = R.layout.notification_timer,
+                phase = expandedPhaseText(state, suffixRes),
+                applyFigure = applyFigure,
+            ),
+        )
 
-    private fun runningBody(state: TimerState): RemoteViews =
-        body(state).apply {
-            setViewVisibility(R.id.notification_chronometer, View.VISIBLE)
-            setViewVisibility(R.id.notification_static_time, View.GONE)
-            // Counted down by SystemUI from a point on the monotonic clock, so this process sleeps
-            // through the whole slot exactly as it did before. Same mechanism as the widget.
-            setChronometer(
-                R.id.notification_chronometer,
-                SystemClock.elapsedRealtime() + remainingMsOf(state),
-                null,
-                true,
-            )
-            setChronometerCountDown(R.id.notification_chronometer, true)
-        }
+    private fun body(
+        @LayoutRes layout: Int,
+        phase: String,
+        applyFigure: RemoteViews.() -> Unit,
+    ): RemoteViews = RemoteViews(context.packageName, layout).apply {
+        setTextViewText(R.id.notification_phase, phase)
+        applyFigure()
+    }
 
-    private fun pausedBody(state: TimerState, remainingMs: Long): RemoteViews =
-        body(state, suffixRes = R.string.notification_paused_label).apply {
-            setViewVisibility(R.id.notification_chronometer, View.GONE)
-            setViewVisibility(R.id.notification_static_time, View.VISIBLE)
-            setTextViewText(
-                R.id.notification_static_time,
-                TimerMath.formatRemaining(remainingMs),
-            )
-        }
-
-    private fun body(state: TimerState, @StringRes suffixRes: Int? = null): RemoteViews {
+    /** `Enfoque · 2/4`, plus `· Pausado` when the clock is stopped. */
+    private fun expandedPhaseText(state: TimerState, @StringRes suffixRes: Int?): String {
         val phase = titleFor(state)
-        return RemoteViews(context.packageName, R.layout.notification_timer).apply {
-            setTextViewText(
-                R.id.notification_phase,
-                if (suffixRes == null) {
-                    phase
-                } else {
-                    context.getString(R.string.notification_phase_suffix, phase, context.getString(suffixRes))
-                },
-            )
+        return if (suffixRes == null) {
+            phase
+        } else {
+            context.getString(R.string.notification_phase_suffix, phase, context.getString(suffixRes))
         }
+    }
+
+    /**
+     * The three icon controls of the collapsed body, with the same intents as the labelled row.
+     *
+     * They exist because the system only draws its own row when the notification is expanded, which meant
+     * a tap to reach Pause. `contentDescription` carries the label a screen reader would have read off that
+     * row.
+     */
+    private fun RemoteViews.applyIconActions(pauseOrResume: String) {
+        val resuming = pauseOrResume == TimerActionReceiver.ACTION_RESUME
+        setImageViewResource(
+            R.id.notification_action_primary,
+            if (resuming) R.drawable.ic_notif_play else R.drawable.ic_notif_pause,
+        )
+        setContentDescription(
+            R.id.notification_action_primary,
+            context.getString(labelFor(pauseOrResume)),
+        )
+        setOnClickPendingIntent(R.id.notification_action_primary, actionIntent(pauseOrResume))
+
+        setContentDescription(
+            R.id.notification_action_reset,
+            context.getString(R.string.notification_action_reset),
+        )
+        setOnClickPendingIntent(
+            R.id.notification_action_reset,
+            actionIntent(TimerActionReceiver.ACTION_RESET),
+        )
+
+        setContentDescription(
+            R.id.notification_action_skip,
+            context.getString(R.string.notification_action_skip),
+        )
+        setOnClickPendingIntent(
+            R.id.notification_action_skip,
+            actionIntent(TimerActionReceiver.ACTION_SKIP),
+        )
+    }
+
+    /** Counted down by SystemUI from a point on the monotonic clock: this process sleeps through the slot. */
+    private fun RemoteViews.chronometerOf(state: TimerState) {
+        setViewVisibility(R.id.notification_chronometer, View.VISIBLE)
+        setViewVisibility(R.id.notification_static_time, View.GONE)
+        setChronometer(
+            R.id.notification_chronometer,
+            SystemClock.elapsedRealtime() + remainingMsOf(state),
+            null,
+            true,
+        )
+        setChronometerCountDown(R.id.notification_chronometer, true)
+    }
+
+    private fun RemoteViews.frozenFigureOf(remainingMs: Long) {
+        setViewVisibility(R.id.notification_chronometer, View.GONE)
+        setViewVisibility(R.id.notification_static_time, View.VISIBLE)
+        setTextViewText(R.id.notification_static_time, TimerMath.formatRemaining(remainingMs))
     }
 
     /**

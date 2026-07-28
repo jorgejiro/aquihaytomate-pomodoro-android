@@ -5,6 +5,7 @@ import android.os.SystemClock
 import androidx.core.app.NotificationCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.jjrapps.aquihaytomate.R
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerState
 import com.jjrapps.aquihaytomate.domain.model.TimerStatus
@@ -53,6 +54,24 @@ class TimerNotificationFactoryTest {
             notification.contentView,
         )
         assertNotNull("The expanded form needs it too, or it falls back", notification.bigContentView)
+    }
+
+    /**
+     * The collapsed form gets the layout with the icon controls, the expanded one the layout without them.
+     *
+     * Not interchangeable: the collapsed body is capped at 48 dp and gets no system action row, so it has
+     * to carry its own controls; the expanded body would then show them twice. Getting these two the wrong
+     * way round is invisible until the shade is open.
+     */
+    @Test
+    fun eachFormGetsItsOwnLayout() {
+        val notification = factory.ongoingRunning(running)
+
+        assertEquals(
+            R.layout.notification_timer_collapsed,
+            notification.contentView.layoutId,
+        )
+        assertEquals(R.layout.notification_timer, notification.bigContentView.layoutId)
     }
 
     /** The line that used to say «A continuación: Descanso · 5 min» was dropped on purpose. */
