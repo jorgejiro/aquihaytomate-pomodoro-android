@@ -40,21 +40,33 @@
    `~/keys/jjrapps-upload.jks` — y apuntar los dos proyectos ahí.
 3. **Activar Play App Signing** al crear la app en Play Console (viene activado por defecto). Con eso
    la clave de firma real la custodia Google y esta upload key es reemplazable si se pierde.
+5. **Rellenar la ficha con lo que ya está hecho.** Todo lo gráfico y todos los textos están en el repo,
+   así que este paso es copiar y subir:
+
+   | Campo de Play Console | De dónde sale |
+   |---|---|
+   | Icono de la aplicación | `docs/store-assets/icono-play-512.png` (§9) |
+   | Gráfico de funciones | `docs/store-assets/grafico-de-funciones-1024x500.png` (§9) |
+   | Capturas de teléfono | las cuatro de `docs/store-assets/` (§8); **falta la de Estadísticas**, que hay que hacer con datos reales |
+   | Nombre, descripción corta y completa | §2, §3 y §4, en ES y EN |
+   | Política de privacidad | la URL de `docs/web/aqui-hay-tomate.html` una vez subida (§11) |
+   | Data safety | §10 |
+   | Declaración de permisos | §14 |
 
 ### Antes de cada publicación
 
-4. Pasar la **checklist de resiliencia** de `CLAUDE.md` §10 en Android 12, 14 y 16.
-5. Pasar la **checklist del widget** en Nova Launcher, Pixel Launcher y One UI.
-6. Probar manualmente los ocho escenarios: onboarding · permiso de notificaciones · permiso de
+5. Pasar la **checklist de resiliencia** de `CLAUDE.md` §10 en Android 12, 14 y 16.
+6. Pasar la **checklist del widget** en Nova Launcher, Pixel Launcher y One UI.
+7. Probar manualmente los ocho escenarios: onboarding · permiso de notificaciones · permiso de
    alarmas exactas denegado · ciclo completo de 4 pomodoros · acciones de la notificación · widget
    con toque simple y doble · cambio de idioma en caliente · estadísticas con datos y vacías.
-7. Probar los avisos con silencio, modo vibración, DND total y DND prioritario.
-8. Verde en:
+8. Probar los avisos con silencio, modo vibración, DND total y DND prioritario.
+9. Verde en:
    ```bash
    JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew lint test
    JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew connectedDebugAndroidTest
    ```
-9. Generar el `.aab` firmado con la upload key:
+10. Generar el `.aab` firmado con la upload key:
    ```bash
    JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew bundleRelease
    # app/build/outputs/bundle/release/app-release.aab
@@ -63,11 +75,11 @@
    ```bash
    "$JAVA_HOME/bin/keytool" -printcert -jarfile app/build/outputs/bundle/release/app-release.aab
    ```
-10. Subir a **Internal testing** primero. Instalar desde Play en un dispositivo real y repetir 4 y 5:
+11. Subir a **Internal testing** primero. Instalar desde Play en un dispositivo real y repetir 5 y 6:
     la build de Play lleva R8 y puede romper cosas que el debug no.
-11. Promover a producción. Revisar antes: ficha, países, categoría, data safety, content rating,
+12. Promover a producción. Revisar antes: ficha, países, categoría, data safety, content rating,
     declaración de permisos y precio.
-12. Enviar a revisión.
+13. Enviar a revisión.
 
 ---
 
@@ -232,11 +244,41 @@ teléfono, así que se puede subir sin ella.
 
 ---
 
-## 9. Feature graphic (1024 × 500)
+## 9. Icono de la ficha y gráfico de funciones — **ya generados**
 
-Especificado al detalle en `docs/design-spec.md` §9. Resumen: fondo negro a sangre, tomate de 560 px
-cortado por abajo a la izquierda con la cifra `18:42` en negativo, y a la derecha el nombre en Inter
-SemiBold 68 px sobre el subtítulo «Pomodoro de una sola casilla» / "Pomodoro in a single cell".
+Los dos están hechos, con las medidas y el formato que Play valida al subirlos:
+
+| Asset | Fichero | Formato |
+|---|---|---|
+| Icono de la app | `docs/store-assets/icono-play-512.png` | 512 × 512, PNG de 32 bits con el alfa opaco, 33 KiB (el máximo es 1 MB) |
+| Gráfico de funciones | `docs/store-assets/grafico-de-funciones-1024x500.png` | 1024 × 500, PNG sin alfa, 60 KiB (el máximo es 15 MB) |
+
+Los sube en Play Console → **Presencia en Play → Ficha de Play principal**, en «Icono de la aplicación»
+y «Gráfico de funciones».
+
+**No son un diseño paralelo: los genera el código de la app.**
+
+```bash
+python3 docs/store-assets/generar-assets.py
+```
+
+El script reproduce los `pathData` de `res/drawable/ic_launcher_*.xml` y la onda de
+`domain/render/TomatoGeometry.kt`, con los colores de `ui/theme/Color.kt`, y al terminar comprueba
+tamaño, modo y peso de los dos ficheros. Si cambia el icono o la paleta, se ejecuta otra vez en vez de
+repintarlos a mano. Solo necesita Pillow.
+
+Dos cosas que conviene saber si se toca:
+
+- **El icono recorta la ventana visible de 72 dp** del lienzo de 108, no escala el lienzo entero. Un
+  icono adaptativo solo muestra esos 72 dp centrales, así que escalando los 108 el tomate saldría un
+  tercio más pequeño en la ficha que en el escritorio del móvil, y es en la lista de Play donde se
+  comparan los dos.
+- **El alfa se conserva pero opaco.** Play pide «PNG de 32 bits» y aplica su propia máscara redondeada:
+  sin canal alfa unas herramientas se quejan, y con un píxel translúcido en una esquina se vería una
+  muesca. El script falla si detecta transparencia.
+
+La composición está especificada en `docs/design-spec.md` §9, incluida la única desviación —el nombre en
+dos líneas, porque a 68 px no cabe en una— y por qué se resolvió así.
 
 ---
 

@@ -679,8 +679,8 @@ El copy se escribe **para una pantalla de reloj**, que muestra título y cuerpo 
 | Fuentes | `font/inter_*.ttf`, `font/space_grotesk_*.ttf` | ~230 KB tras subsetting. SIL OFL 1.1 |
 | Sonidos | `raw/bell.ogg`, `bowl.ogg`, `digital.ogg`, `soft.ogg` | OGG Vorbis mono 44,1 kHz, < 3 s, < 30 KB cada uno |
 | Licencias | `raw/licenses_ofl.txt` | Texto de la OFL de ambas familias |
-| Feature graphic | PNG 24 bits | **1024 × 500**, ver abajo |
-| Icono de Play | PNG 32 bits | 512 × 512, render del adaptativo sobre `#0A0908` |
+| Feature graphic | PNG sin alfa | **1024 × 500**, ver abajo. `docs/store-assets/grafico-de-funciones-1024x500.png` |
+| Icono de Play | PNG 32 bits, alfa opaco | 512 × 512, render del adaptativo recortado a la ventana visible de 72 dp. `docs/store-assets/icono-play-512.png` |
 | Capturas | PNG | 1080 × 2400, 5 unidades, **el widget primero** |
 
 **Splash** con `androidx.core.splashscreen`:
@@ -695,7 +695,11 @@ El copy se escribe **para una pantalla de reloj**, que muestra título y cuerpo 
 
 Sin `windowSplashScreenIconBackgroundColor`: el tomate flota directamente sobre negro y enlaza con la pantalla principal.
 
-**Feature graphic 1024 × 500**: fondo `#000000` a sangre. Tomate de 560 px de diámetro centrado en `(300, 330)`, cortado por abajo, relleno al 62 % con la superficie ondulada. Sobre el líquido, en negativo, `18:42` en Space Grotesk Medium a 112 px. A la derecha, alineado a la izquierda en `x = 620`: en `y = 205` **¡Aquí hay tomate!** en Inter SemiBold 68 px `#F5F2EF`; en `y = 285` «Pomodoro de una sola casilla» en Inter Regular 30 px `#A8A09B`; en `y = 345` una barrita de 96 × 4 px en `TomateFill`. Sin capturas dentro, sin marcos de móvil, sin badges. Zona segura de 40 px en los bordes.
+**Feature graphic 1024 × 500**: fondo `#000000` a sangre. Tomate de 560 px de diámetro centrado en `(300, 330)`, cortado por abajo, relleno al 62 % con la superficie ondulada. Sobre el líquido, en negativo, `18:42` en Space Grotesk Medium a 112 px. A la derecha, alineado a la izquierda en `x = 620`: **¡Aquí hay tomate!** en Inter SemiBold 68 px `#F5F2EF`, **en dos líneas**, con el borde superior de la tinta en `y = 150` y `y = 225`; en `y = 318` «Pomodoro de una sola casilla» en Inter Regular 26 px `#A8A09B`; en `y = 378` una barrita de 96 × 4 px en `TomateFill`. Sin capturas dentro, sin marcos de móvil, sin badges. Zona segura de 40 px en los bordes.
+
+> Este párrafo se escribió primero con el nombre en una línea a 68 px, en `y = 205`, y el subtítulo a 30 px. **No cabe**: en `x = 620`, con la zona segura, quedan 364 px, y en Inter SemiBold 68 px el nombre ocupa 573 y el subtítulo a 30 px ocupa 412. De las tres formas de cuadrarlo —encoger el título, encoger el tomate o partir el nombre— se eligió partirlo, que es la única que no toca ninguna de las cifras de la composición y además cae en las dos mitades naturales del nombre. Medido, no estimado: lo comprueba el generador.
+
+**Los dos assets no se dibujan a mano**: los genera `docs/store-assets/generar-assets.py`, que reproduce los `pathData` del icono y la onda de `TomatoGeometry` en vez de mantener un diseño paralelo que se desincronice. Si cambia el icono o la paleta, se actualiza el script y se vuelve a ejecutar.
 
 ---
 
