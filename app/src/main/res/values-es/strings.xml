@@ -185,6 +185,17 @@
     <string name="changelog_title">Novedades</string>
     <string name="changelog_current_badge">Actual</string>
 
+    <string-array name="changelog_0_9_1">
+        <item>Corregido: el widget no se podía colocar en el escritorio, el launcher decía que la app no estaba instalada.</item>
+        <item>La notificación del temporizador muestra el tiempo restante en grande, y pausar, reiniciar y saltar están a mano sin desplegarla.</item>
+        <item>El aviso de fin de intervalo llega al reloj emparejado con sus dos acciones: empezar el siguiente o descartar. Descartarlo en cualquier sitio corta la vibración.</item>
+        <item>La notificación vuelve si la cierras por error con un intervalo en marcha.</item>
+        <item>Al terminar un intervalo, el widget muestra el siguiente listo en vez de un signo de alarma.</item>
+        <item>Saltar está también en la pantalla del temporizador, y tocar el tomate lo inicia o lo pausa.</item>
+        <item>Auto-iniciar el descanso viene activado. El pomodoro siguiente sigue esperándote.</item>
+        <item>El onboarding pregunta por la forma de tu ciclo y es más claro con los permisos que necesita.</item>
+    </string-array>
+
     <string-array name="changelog_0_9_0">
         <item>Primera versión.</item>
         <item>Temporizador Pomodoro con enfoque, descanso corto y descanso largo cada N pomodoros. Todas las duraciones son configurables.</item>

@@ -15,6 +15,39 @@ reutilizar ni bajando la versión.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
+## [0.9.1] — 2026-07-28 (versionCode 2)
+
+Primera tanda de correcciones salidas de usar la app en un dispositivo real.
+
+### Corregido
+
+- **El widget no se podía colocar en el escritorio**: el launcher respondía «la app no está instalada».
+  `widget_pomodoro_info.xml` declaraba `android:configure="false"`, y ese atributo no es un booleano sino
+  el nombre de la Activity de configuración, así que el sistema intentaba abrir una clase llamada `false`.
+- Los glifos del widget eran los caracteres `▸` y `❚❚` en una fuente que no los contiene, y el sistema
+  pintaba una mota ilegible. Ahora se dibujan.
+- Al terminar un slot, el widget mostraba un círculo vacío con un signo de exclamación que se leía como un
+  error. Ahora muestra el slot siguiente listo: su color, su duración y el `▶`.
+- La notificación del temporizador no volvía si se descartaba por error, aunque el pomodoro siguiera
+  corriendo. Desde Android 13 se puede descartar la de un servicio en primer plano.
+- Descartar el aviso de fin de slot desde un reloj emparejado no cortaba la vibración, que podía seguir
+  hasta 30 segundos.
+- La barra de pestañas y el onboarding se metían debajo de la barra de estado.
+
+### Cambiado
+
+- **La notificación del temporizador enseña el tiempo restante en grande** y los tres controles —pausar,
+  reiniciar y saltar— sin necesidad de desplegarla.
+- El aviso de fin de slot **llega al reloj emparejado** con sus dos acciones: empezar el siguiente o
+  descartar. La notificación del cronómetro en curso ya no se envía al reloj.
+- La pantalla del temporizador ofrece las tres acciones, con `SALTAR` que antes solo estaba en la
+  notificación, y tocar el tomate inicia o pausa.
+- **Auto-iniciar el descanso viene activado de fábrica.**
+- El onboarding gana una página para la forma del ciclo, y la de permisos dice con claridad cuáles están
+  concedidos y cuáles faltan.
+
+---
+
 ## [0.9.0] — 2026-07-28 (versionCode 1)
 
 Primera versión, publicada como **0.9.0** para pruebas: la funcionalidad de la 1.0 está completa,
