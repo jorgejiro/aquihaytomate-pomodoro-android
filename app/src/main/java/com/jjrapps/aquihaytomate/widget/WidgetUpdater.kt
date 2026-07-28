@@ -19,7 +19,6 @@ import com.jjrapps.aquihaytomate.domain.time.ElapsedRealtimeSource
 import com.jjrapps.aquihaytomate.domain.usecase.TimerMath
 import com.jjrapps.aquihaytomate.ui.theme.DoradoBright
 import com.jjrapps.aquihaytomate.ui.theme.TextPrimary
-import com.jjrapps.aquihaytomate.ui.theme.phaseColorsOf
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Clock
 import javax.inject.Inject
@@ -104,6 +103,10 @@ class WidgetUpdater @Inject constructor(
             },
         )
 
+        // The glyph names the action a tap performs, exactly like the primary control of the app: play when
+        // the clock is stopped, pause while it runs. It is what makes a 40 dp square read as a button
+        // rather than as a readout.
+        val glyphLarge = state.status == TimerStatus.IDLE
         views.setImageViewBitmap(
             R.id.widget_tomato,
             renderer.render(
@@ -111,6 +114,8 @@ class WidgetUpdater @Inject constructor(
                 fillFraction = fillFraction,
                 dimmed = state.status == TimerStatus.PAUSED,
                 showCalyx = state.slotType.isBreak,
+                glyph = glyphFor(state.status),
+                glyphLarge = glyphLarge,
             ),
         )
 
@@ -120,10 +125,21 @@ class WidgetUpdater @Inject constructor(
     }
 
     /**
+     * What a tap does from each state. Pausing and resuming are the *action*, not the state: a paused timer
+     * is already saying so with its liquid at 45%, so the glyph is free to say "resume" instead of
+     * repeating "paused". See docs/design-spec.md §7.3.
+     */
+    private fun glyphFor(status: TimerStatus): WidgetGlyph = when (status) {
+        TimerStatus.RUNNING -> WidgetGlyph.PAUSE
+        TimerStatus.IDLE, TimerStatus.PAUSED, TimerStatus.RINGING -> WidgetGlyph.PLAY
+    }
+
+    /**
      * Picks between the self-ticking chronometer and a static figure.
      *
      * A `Chronometer` cannot be frozen at an arbitrary value, so every state other than `RUNNING` uses the
-     * plain `TextView`: a glyph when idle or ringing, and the remaining time when paused.
+     * plain `TextView`: the remaining time when paused, the alert mark when ringing, and nothing at all
+     * when idle — there the large play glyph on the tomato is the whole readout.
      */
     private fun applyReadout(
         views: RemoteViews,
@@ -131,13 +147,10 @@ class WidgetUpdater @Inject constructor(
         remainingMs: Long,
         ringingHighlight: Boolean,
     ) {
-        val accent = phaseColorsOf(state.slotType).bright.toArgb()
-
         when (state.status) {
             TimerStatus.RUNNING -> {
                 views.setViewVisibility(R.id.widget_chronometer, View.VISIBLE)
                 views.setViewVisibility(R.id.widget_static_text, View.GONE)
-                views.setViewVisibility(R.id.widget_paused_glyph, View.GONE)
                 // The base is a point in the future on the monotonic clock; SystemUI counts down to it
                 // on its own, without ever waking this process.
                 views.setChronometer(
@@ -150,24 +163,18 @@ class WidgetUpdater @Inject constructor(
                 views.setTextColor(R.id.widget_chronometer, TextPrimary.toArgb())
             }
 
-            TimerStatus.PAUSED -> {
+            TimerStatus.PAUSED ->
                 staticReadout(views, TimerMath.formatRemaining(remainingMs), TextPrimary.toArgb())
-                views.setViewVisibility(R.id.widget_paused_glyph, View.VISIBLE)
-            }
 
-            TimerStatus.IDLE -> {
-                staticReadout(views, context.getString(R.string.widget_idle_glyph), accent)
-                views.setViewVisibility(R.id.widget_paused_glyph, View.GONE)
-            }
+            // No figure at all: a stopped timer has no time to report, and the duration it *would* run for
+            // is already one tap away. The play glyph gets the whole tomato to itself.
+            TimerStatus.IDLE -> staticReadout(views, "", TextPrimary.toArgb())
 
-            TimerStatus.RINGING -> {
-                staticReadout(
-                    views,
-                    context.getString(R.string.widget_ringing_glyph),
-                    if (ringingHighlight) DoradoBright.toArgb() else TextPrimary.toArgb(),
-                )
-                views.setViewVisibility(R.id.widget_paused_glyph, View.GONE)
-            }
+            TimerStatus.RINGING -> staticReadout(
+                views,
+                context.getString(R.string.widget_ringing_glyph),
+                if (ringingHighlight) DoradoBright.toArgb() else TextPrimary.toArgb(),
+            )
         }
     }
 

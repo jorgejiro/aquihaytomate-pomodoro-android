@@ -6,9 +6,14 @@
   updatePeriodMillis="0" because the system's minimum is 30 minutes, which is useless for a countdown.
   We refresh it ourselves from the state collector, and the seconds are ticked by the Chronometer inside
   the launcher's own process. See docs/decisions/001-widget-con-remoteviews-y-chronometer.md.
+
+  **There is no android:configure attribute here, and there must not be one.** It is not a boolean: it
+  holds the class name of a configuration Activity. `android:configure="false"` compiles to the literal
+  class name `false`, so the launcher tries to start a component that does not exist and reports "app
+  isn't installed" the moment the widget is dropped on the home screen — it still lists fine in the
+  picker, which is what makes the bug so confusing. This widget has nothing to configure.
 -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:configure="false"
     android:description="@string/widget_description"
     android:initialLayout="@layout/widget_tomate"
     android:minHeight="40dp"

@@ -11,11 +11,22 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.withClip
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.render.TomatoGeometry
+import com.jjrapps.aquihaytomate.ui.theme.TextPrimary
 import com.jjrapps.aquihaytomate.ui.theme.phaseColorsOf
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.math.min
+
+/**
+ * What a tap on the widget will do right now, drawn on the tomato itself.
+ *
+ * **Drawn, not typed.** The glyphs used to be the characters `▸` and `❚❚` in a `TextView` that asks for
+ * Space Grotesk — a font that contains neither, so the system fell back to something else and rendered a
+ * 13 sp `▸` that read as a dark speck rather than a play button. Two `Path`s on the bitmap cost nothing,
+ * cannot go missing, and can be sized properly. Same reasoning as `ControlGlyph` in the app.
+ */
+enum class WidgetGlyph { NONE, PLAY, PAUSE }
 
 /**
  * Rasterises the tomato for the widget.
@@ -42,12 +53,16 @@ class TomatoBitmapRenderer @Inject constructor(
      * @param fillFraction 1 is brim-full, 0 is empty.
      * @param dimmed true while paused: the liquid drops to 45% so a stopped timer reads as stopped even
      *   before the pause glyph is noticed.
+     * @param glyph what the tap does. Drawn large and centred when there is no figure to share the space
+     *   with — a stopped timer — and small underneath it otherwise.
      */
     fun render(
         slotType: SlotType,
         fillFraction: Float,
         dimmed: Boolean,
         showCalyx: Boolean,
+        glyph: WidgetGlyph = WidgetGlyph.NONE,
+        glyphLarge: Boolean = false,
         sizeDp: Int = DEFAULT_SIZE_DP,
     ): Bitmap {
         val density = context.resources.displayMetrics.density
@@ -89,7 +104,60 @@ class TomatoBitmapRenderer @Inject constructor(
         // for a label, so colour alone would be the only signal without it.
         if (showCalyx) drawCalyx(canvas, size, colors.bright.toArgb())
 
+        drawGlyph(canvas, size, glyph, glyphLarge)
+
         return bitmap
+    }
+
+    /**
+     * The action glyph, in `TextPrimary`.
+     *
+     * Bone rather than black or the phase accent, because it has to read over both the liquid and the
+     * hollow: an accent glyph on `TomateFill` is a contrast ratio of 1.1, and black disappears into the
+     * hollow of an almost-empty tomato. Bone is 3.6:1 over the fill and 18:1 over the hollow, and at these
+     * sizes it is a graphic, not body text.
+     */
+    private fun drawGlyph(canvas: Canvas, size: Float, glyph: WidgetGlyph, large: Boolean) {
+        if (glyph == WidgetGlyph.NONE) return
+
+        val height = size * if (large) GLYPH_LARGE_FRACTION else GLYPH_SMALL_FRACTION
+        val centreX = size / 2f
+        // Large glyphs own the middle; small ones sit under the figure, clear of the digits above them.
+        val centreY = if (large) size / 2f else size * GLYPH_SMALL_CENTRE_Y
+
+        fillPaint.color = TextPrimary.toArgb()
+
+        when (glyph) {
+            WidgetGlyph.PLAY -> {
+                val width = height * PLAY_ASPECT
+                val path = Path()
+                // Shifted left by a twelfth of its width: a triangle's mass sits behind its tip, so a
+                // geometrically centred play glyph looks pushed to the right.
+                val left = centreX - width / 2f - width / 12f
+                path.moveTo(left, centreY - height / 2f)
+                path.lineTo(left + width, centreY)
+                path.lineTo(left, centreY + height / 2f)
+                path.close()
+                canvas.drawPath(path, fillPaint)
+            }
+
+            WidgetGlyph.PAUSE -> {
+                val barWidth = height * PAUSE_BAR_ASPECT
+                val gap = barWidth
+                val left = centreX - (barWidth * 2 + gap) / 2f
+                val top = centreY - height / 2f
+                canvas.drawRect(left, top, left + barWidth, top + height, fillPaint)
+                canvas.drawRect(
+                    left + barWidth + gap,
+                    top,
+                    left + barWidth * 2 + gap,
+                    top + height,
+                    fillPaint,
+                )
+            }
+
+            WidgetGlyph.NONE -> Unit
+        }
     }
 
     /**
@@ -153,5 +221,15 @@ class TomatoBitmapRenderer @Inject constructor(
         const val PAUSED_ALPHA = 115 // ~45%
         const val MIN_SIZE_PX = 24
         const val MAX_SIZE_PX = 256
+
+        /** A third of the tomato: unmistakable at 40 dp, which the old 13 sp character was not. */
+        const val GLYPH_LARGE_FRACTION = 0.34f
+        const val GLYPH_SMALL_FRACTION = 0.15f
+
+        /** Below the figure, which is vertically centred on the plate. */
+        const val GLYPH_SMALL_CENTRE_Y = 0.83f
+
+        const val PLAY_ASPECT = 0.88f
+        const val PAUSE_BAR_ASPECT = 0.34f
     }
 }

@@ -1,5 +1,7 @@
 package com.jjrapps.aquihaytomate
 
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProviderInfo
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
@@ -94,6 +96,48 @@ class ManifestGuardTest {
             service!!.flags and ServiceInfo.FLAG_STOP_WITH_TASK,
         )
     }
+
+    /**
+     * The widget must not claim a configuration Activity.
+     *
+     * `android:configure` is not a boolean: it holds a class name. `android:configure="false"` compiled to
+     * the literal class name `false`, the launcher tried to start it when the widget was dropped, and
+     * Nova reported **"the app isn't installed"** — while still listing the widget in its picker. That was
+     * a real bug in the shipped provider, and a string typo cannot be caught by the compiler, so it is
+     * pinned here.
+     */
+    @Test
+    fun theWidgetDeclaresNoConfigurationActivity() {
+        assertEquals(
+            "android:configure holds a class name, not a boolean. Anything here and the launcher " +
+                "fails to place the widget; see docs/decisions/001-*.",
+            null,
+            widgetProvider.configure,
+        )
+    }
+
+    /** One cell is the whole point of the project; see CLAUDE.md §2.5. */
+    @Test
+    fun theWidgetIsOneCellAndNotResizable() {
+        assertEquals(1, widgetProvider.targetCellWidth)
+        assertEquals(1, widgetProvider.targetCellHeight)
+        assertEquals(
+            "resizeMode must stay none, or the user can stretch it into the 2×2 thing every other " +
+                "pomodoro app ships",
+            AppWidgetProviderInfo.RESIZE_NONE,
+            widgetProvider.resizeMode,
+        )
+    }
+
+    private val widgetProvider: AppWidgetProviderInfo
+        get() {
+            val provider = AppWidgetManager.getInstance(context)
+                .getInstalledProvidersForPackage(context.packageName, null)
+                .firstOrNull { it.provider.className.endsWith("PomodoroWidgetProvider") }
+
+            assertNotNull("PomodoroWidgetProvider is not registered", provider)
+            return provider!!
+        }
 
     @Test
     fun theBootReceiverIsDeclared() {
