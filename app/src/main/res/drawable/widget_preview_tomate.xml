@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Fallback preview for hosts that predate `previewLayout`. A tomato filled to about 60%, matching what
+  the rasteriser produces at runtime.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+
+    <!-- The hollow above the liquid. -->
+    <path
+        android:fillColor="#FF1C0D0B"
+        android:pathData="M20,3a17,17 0 1,0 0.01,0z" />
+
+    <!-- Liquid up to 60%, with the surface flat: a still frame does not need the wave. -->
+    <path
+        android:fillColor="#FFE23B2B"
+        android:pathData="M4.1,16.6a17,17 0 0,0 31.8,0z" />
+
+    <!-- Outline, only where the liquid is gone. -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M20,3.5a16.5,16.5 0 1,0 0.01,0z"
+        android:strokeColor="#FF7A2018"
+        android:strokeWidth="1.6" />
+</vector>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  allowBackup is false, so nothing here is exercised today. The file exists to make the intent
+  explicit: the timer state must never be restored onto another device or after a reinstall.
+  A restored deadline would be in the past and would fire immediately.
+-->
+<full-backup-content>
+    <exclude domain="file" path="datastore/timer_state.preferences_pb" />
+</full-backup-content>

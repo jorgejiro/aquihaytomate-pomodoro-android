@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Navigation -->
+    <string name="tab_timer">Temporizador</string>
+    <string name="tab_stats">Estadísticas</string>
+    <string name="tab_settings">Ajustes</string>
+
+    <!-- Timer phases -->
+    <string name="phase_focus">Enfoque</string>
+    <string name="phase_short_break">Descanso</string>
+    <string name="phase_long_break">Descanso largo</string>
+    <string name="phase_ringing">¡Tiempo!</string>
+
+    <!-- Timer controls -->
+    <string name="control_start">Iniciar</string>
+    <string name="control_pause">Pausar</string>
+    <string name="control_resume">Reanudar</string>
+    <string name="control_start_break">Empezar descanso</string>
+    <string name="control_back_to_work">Volver al tajo</string>
+    <string name="control_reset">Reiniciar</string>
+    <string name="control_skip">Saltar</string>
+    <!-- Shared by the timer screen and the ongoing notification: phase, then its length. -->
+    <string name="next_up">A continuación: %1$s · %2$s</string>
+
+    <!-- Cycle readout, e.g. 2/4 -->
+    <string name="cycle_progress">%1$d/%2$d</string>
+
+    <!-- Timer accessibility -->
+    <plurals name="a11y_minutes">
+        <item quantity="one">%d minuto</item>
+        <item quantity="many">%d minutos</item>
+        <item quantity="other">%d minutos</item>
+    </plurals>
+    <plurals name="a11y_seconds">
+        <item quantity="one">%d segundo</item>
+        <item quantity="many">%d segundos</item>
+        <item quantity="other">%d segundos</item>
+    </plurals>
+    <string name="a11y_remaining_with_minutes">%1$s y %2$s restantes</string>
+    <string name="a11y_remaining_seconds_only">%1$s restantes</string>
+    <string name="a11y_tomato_progress">%1$s, %2$d%% transcurrido</string>
+    <string name="a11y_cycle_position">Pomodoro %1$d de %2$d</string>
+
+    <!-- Statistics -->
+    <string name="stats_today">Hoy</string>
+    <string name="stats_focused">enfocado</string>
+    <string name="stats_streak">racha</string>
+    <string name="stats_best_streak">mejor racha</string>
+    <string name="stats_this_week">Esta semana</string>
+    <string name="stats_week_range">%1$s – %2$s</string>
+    <string name="stats_day_detail">%1$s · %2$s · %3$s</string>
+    <string name="heatmap_less">menos</string>
+    <string name="heatmap_more">más</string>
+    <string name="duration_hours_minutes">%1$d h %2$d m</string>
+    <string name="duration_minutes">%1$d m</string>
+
+    <plurals name="stats_last_days">
+        <item quantity="one">Último día</item>
+        <item quantity="many">Últimos %d días</item>
+        <item quantity="other">Últimos %d días</item>
+    </plurals>
+    <plurals name="stats_pomodoros_label">
+        <item quantity="one">pomodoro</item>
+        <item quantity="many">pomodoros</item>
+        <item quantity="other">pomodoros</item>
+    </plurals>
+    <plurals name="stats_pomodoros_short">
+        <item quantity="one">%d pom.</item>
+        <item quantity="many">%d pom.</item>
+        <item quantity="other">%d pom.</item>
+    </plurals>
+
+    <!-- Statistics accessibility -->
+    <string name="a11y_streak_strip" tools:ignore="PluralsCandidate">%1$d días activos de los últimos %2$d</string>
+    <string name="a11y_trend" tools:ignore="PluralsCandidate">%1$d pomodoros en los últimos %2$d días</string>
+    <string name="a11y_previous_period">Anterior</string>
+    <string name="a11y_next_period">Siguiente</string>
+
+    <!-- Settings -->
+    <string name="settings_section_durations">Duraciones</string>
+    <string name="settings_section_behaviour">Comportamiento</string>
+    <string name="settings_section_alerts">Avisos</string>
+    <string name="settings_section_widget">Widget</string>
+    <string name="settings_section_appearance">Apariencia</string>
+    <string name="settings_section_system">Sistema</string>
+    <string name="settings_section_about">Acerca de</string>
+
+    <string name="settings_focus">Enfoque</string>
+    <string name="settings_short_break">Descanso corto</string>
+    <string name="settings_long_break">Descanso largo</string>
+    <string name="settings_pomodoros_per_cycle">Pomodoros por ciclo</string>
+    <string name="settings_auto_start_break">Auto-iniciar el descanso</string>
+    <string name="settings_auto_start_break_sublabel">Al terminar un pomodoro</string>
+    <string name="settings_auto_start_focus">Auto-iniciar el pomodoro</string>
+    <string name="settings_auto_start_focus_sublabel">Al terminar un descanso</string>
+    <string name="settings_keep_screen_on">Mantener pantalla encendida</string>
+    <string name="settings_daily_goal">Objetivo diario</string>
+    <string name="settings_alert_sound">Sonido al terminar</string>
+    <string name="settings_vibration">Vibración</string>
+    <string name="settings_vibration_off">Desactivada</string>
+    <string name="settings_widget_background">Fondo</string>
+    <string name="settings_liquid_animation">Animación del líquido</string>
+    <string name="settings_liquid_animation_sublabel">El nivel sigue bajando de todas formas</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_notifications">Avisos</string>
+    <string name="settings_exact_alarms">Alarmas exactas</string>
+    <string name="settings_exact_alarms_denied_sublabel">El temporizador funciona igual, pero es menos puntual con la pantalla apagada</string>
+    <string name="settings_granted">OK</string>
+    <string name="settings_denied">Denegado</string>
+    <string name="settings_licenses">Licencias</string>
+    <string name="settings_version">Versión</string>
+    <string name="settings_version_value">%1$s (%2$d)</string>
+
+    <plurals name="settings_minutes">
+        <item quantity="one">%d min</item>
+        <item quantity="many">%d min</item>
+        <item quantity="other">%d min</item>
+    </plurals>
+    <plurals name="settings_seconds">
+        <item quantity="one">%d s</item>
+        <item quantity="many">%d s</item>
+        <item quantity="other">%d s</item>
+    </plurals>
+
+    <!-- Onboarding -->
+    <string name="onboarding_next">Siguiente</string>
+    <string name="onboarding_start">Empezar</string>
+    <string name="onboarding_page1_title">¡Aquí hay tomate!</string>
+    <string name="onboarding_page1_body">25 minutos de trabajo, 5 de descanso, y un widget de una sola casilla.</string>
+    <string name="onboarding_page2_title">Tus duraciones</string>
+    <string name="onboarding_page2_focus">Enfoque</string>
+    <string name="onboarding_page2_break">Descanso</string>
+    <string name="onboarding_page2_hint">Lo puedes cambiar luego en Ajustes.</string>
+    <string name="onboarding_page3_title">En tu escritorio</string>
+    <string name="onboarding_page3_body">Un toque inicia y pausa. Dos toques reinician.</string>
+    <string name="onboarding_page3_permissions">Ajusta tu móvil</string>
+    <string name="onboarding_page3_required">Necesario</string>
+    <string name="onboarding_page3_pending">Pendiente</string>
+    <string name="onboarding_page3_ready">Activado</string>
+    <string name="onboarding_page3_permissions_hint">Sin ellos el temporizador puede retrasarse con la pantalla apagada y no puede avisarte al terminar un slot.</string>
+    <string name="onboarding_continue_without">Continuar sin ellos</string>
+
+    <!-- Alert sounds -->
+    <string name="sound_silent">Silencio</string>
+    <string name="sound_bell">Campana</string>
+    <string name="sound_bowl">Cuenco tibetano</string>
+    <string name="sound_digital">Digital</string>
+    <string name="sound_soft">Suave</string>
+
+    <!-- Widget background -->
+    <string name="widget_background_solid">Sólido</string>
+    <string name="widget_background_transparent">Transparente</string>
+
+    <!-- Language -->
+    <string name="language_auto">Auto</string>
+
+    <!-- Notification channels -->
+    <string name="channel_timer_running_name">Temporizador en marcha</string>
+    <string name="channel_timer_running_description">Muestra la cuenta atrás mientras corre un intervalo, con controles para pausarlo o saltarlo.</string>
+    <string name="channel_timer_alerts_name">Fin de intervalo</string>
+    <string name="channel_timer_alerts_description">Te avisa cuando termina un intervalo de enfoque o un descanso.</string>
+
+    <!-- Notifications -->
+    <string name="notification_title_focus">Enfoque · %1$d/%2$d</string>
+    <string name="notification_paused">Pausado · %1$s</string>
+    <string name="notification_focus_finished">Enfoque completado · %1$d de %2$d</string>
+    <string name="notification_break_finished">Se acabó el descanso.</string>
+    <string name="notification_action_pause">Pausar</string>
+    <string name="notification_action_resume">Reanudar</string>
+    <string name="notification_action_skip">Saltar</string>
+    <string name="notification_action_reset">Reiniciar</string>
+    <string name="notification_action_dismiss">Descartar</string>
+
+    <!-- Widget -->
+    <string name="widget_label">Pomodoro</string>
+    <string name="widget_description">Temporizador de una casilla. Un toque para iniciar o pausar, dos para reiniciar.</string>
+
+    <!-- Changelog -->
+    <string name="changelog_title">Novedades</string>
+    <string name="changelog_current_badge">Actual</string>
+
+    <string-array name="changelog_0_9_0">
+        <item>Primera versión.</item>
+        <item>Temporizador Pomodoro con enfoque, descanso corto y descanso largo cada N pomodoros. Todas las duraciones son configurables.</item>
+        <item>Widget de escritorio de una sola casilla: un toque para iniciar o pausar, dos toques para reiniciar.</item>
+        <item>Estadísticas: pomodoros completados, tiempo enfocado, racha de días, mapa mensual y tendencia de 30 días.</item>
+        <item>Aviso al terminar cada intervalo con sonido a elegir y vibración de la duración que tú decidas.</item>
+        <item>Auto-inicio por separado: que el descanso arranque solo sin que lo haga el pomodoro siguiente.</item>
+        <item>Español e inglés.</item>
+    </string-array>
+</resources>

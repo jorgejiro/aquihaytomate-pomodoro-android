@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Splash icon: a 288 dp canvas with the artwork inside the centred 192 dp, as the splash screen API
+  expects. See docs/design-spec.md §9.
+-->
+<!--
+  The 288 dp canvas is what the splash screen API requires — it renders the inner 192 dp and masks the
+  rest — so the usual "keep vectors under 200 dp" advice does not apply here. It is drawn once, at
+  launch, and never again.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:width="288dp"
+    android:height="288dp"
+    android:viewportWidth="288"
+    android:viewportHeight="288"
+    tools:ignore="VectorRaster">
+
+    <!-- Body, 168 dp across, centred at (144, 156). -->
+    <path android:pathData="M144,72c46.4,0 84,37.6 84,84c0,46.4 -37.6,84 -84,84c-46.4,0 -84,-37.6 -84,-84C60,109.6 97.6,72 144,72z">
+        <aapt:attr name="android:fillColor" xmlns:aapt="http://schemas.android.com/aapt">
+            <gradient
+                android:endX="216"
+                android:endY="228"
+                android:startX="72"
+                android:startY="84"
+                android:type="linear">
+                <item android:color="#FFFF4433" android:offset="0" />
+                <item android:color="#FFE23B2B" android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Calyx: three leaves over the dimple. -->
+    <path
+        android:fillColor="#FF3E7D2E"
+        android:pathData="M144,48l10,22l24,-8l-8,24l-26,8l-26,-8l-8,-24l24,8z" />
+
+    <!-- Highlight, top left, white at 22%. -->
+    <path
+        android:fillAlpha="0.22"
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M110,104c14,-10 30,-12 36,-6c6,6 -2,18 -16,26c-14,8 -28,8 -32,2c-4,-6 -2,-14 12,-22z" />
+</vector>
