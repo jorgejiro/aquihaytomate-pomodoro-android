@@ -24,11 +24,13 @@
     font-size: 17px;
     line-height: 1.6;
     -webkit-text-size-adjust: 100%;
+    overflow-wrap: break-word;
   }
   .envoltorio { max-width: 720px; margin: 0 auto; }
   header { padding: 48px 0 24px; border-bottom: 1px solid var(--linea); }
   h1 { margin: 0; font-size: 1.75rem; line-height: 1.25; letter-spacing: -0.01em; }
   .subtitulo { margin: 6px 0 0; color: var(--suave); font-size: 1rem; }
+  .paquete { margin: 10px 0 0; }
   .idiomas { margin-top: 20px; display: flex; gap: 8px; }
   .idiomas button {
     font: inherit;
@@ -69,6 +71,9 @@
     background: #f4f1ef;
     padding: 1px 5px;
     border-radius: 4px;
+    /* `com.jjrapps.aquihaytomate` y `android.permission.INTERNET` no tienen espacios donde
+       romper: sin esto ensanchan la página y el texto se sale del móvil. */
+    overflow-wrap: anywhere;
   }
   footer {
     margin-top: 56px;
@@ -100,6 +105,7 @@
   <header>
     <h1>¡Aquí hay tomate!</h1>
     <p class="subtitulo">Temporizador Pomodoro · Pomodoro timer</p>
+    <p class="paquete"><code>com.jjrapps.aquihaytomate</code></p>
     <div class="idiomas" role="group" aria-label="Idioma / Language">
       <button type="button" data-idioma="es" aria-pressed="true">Español</button>
       <button type="button" data-idioma="en" aria-pressed="false">English</button>
@@ -115,10 +121,9 @@
 
       <div class="destacado">
         <p>
-          <strong>¡Aquí hay tomate!</strong> (<code>com.jjrapps.aquihaytomate</code>) está diseñada para
-          funcionar de manera completamente privada: sin cuentas de usuario, sin almacenamiento en la nube,
-          sin publicidad, sin analítica y sin herramientas de seguimiento. La aplicación <strong>no tiene
-          acceso a internet</strong>.
+          <strong>¡Aquí hay tomate!</strong> está diseñada para funcionar de manera completamente privada:
+          sin cuentas de usuario, sin almacenamiento en la nube, sin publicidad, sin analítica y sin
+          herramientas de seguimiento. La aplicación <strong>no tiene acceso a internet</strong>.
         </p>
       </div>
 
@@ -148,9 +153,9 @@
 
       <h2>Acceso a la red</h2>
       <p>
-        La aplicación <strong>no declara el permiso de internet</strong> (<code>android.permission.INTERNET</code>),
-        de modo que técnicamente no puede enviar ni recibir nada a través de la red. Puedes comprobarlo en la
-        sección de permisos de la ficha de Google Play.
+        La aplicación <strong>no declara el permiso de internet</strong>,
+        <code>android.permission.INTERNET</code>, de modo que técnicamente no puede enviar ni recibir nada a
+        través de la red. Puedes comprobarlo en la sección de permisos de la ficha de Google Play.
       </p>
 
       <h2>Compartición de datos</h2>
@@ -208,9 +213,9 @@
 
       <div class="destacado">
         <p>
-          <strong>¡Aquí hay tomate!</strong> (<code>com.jjrapps.aquihaytomate</code>) is designed to work
-          entirely privately: no user accounts, no cloud storage, no advertising, no analytics and no
-          tracking tools. The app <strong>has no internet access</strong>.
+          <strong>¡Aquí hay tomate!</strong> is designed to work entirely privately: no user accounts, no
+          cloud storage, no advertising, no analytics and no tracking tools. The app <strong>has no
+          internet access</strong>.
         </p>
       </div>
 
@@ -238,9 +243,9 @@
 
       <h2>Network access</h2>
       <p>
-        The app <strong>does not declare the internet permission</strong>
-        (<code>android.permission.INTERNET</code>), so it technically cannot send or receive anything over
-        the network. You can verify this in the permissions section of its Google Play listing.
+        The app <strong>does not declare the internet permission</strong>,
+        <code>android.permission.INTERNET</code>, so it technically cannot send or receive anything over the
+        network. You can verify this in the permissions section of its Google Play listing.
       </p>
 
       <h2>Data sharing</h2>
