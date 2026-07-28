@@ -257,7 +257,22 @@ La app no tiene red. No declara el permiso `INTERNET`.
 
 ## 11. Política de privacidad
 
-Hay que alojarla en una URL pública (GitHub Pages del repo sirve). Texto base:
+**Ya está hecha y lista para subir**: `docs/web/aqui-hay-tomate.html`, un HTML autocontenido —sin
+dependencias externas, sin fuentes remotas— con la misma estructura bilingüe que la de Bebe Agua en
+`jorgejiro.es`, selector Español/English y enlace de vuelta al sitio.
+
+1. Súbela a tu web como `aqui-hay-tomate.html`, junto a `bebe-agua.html`.
+2. En Play Console → Contenido de la aplicación → Política de privacidad, pon la URL resultante:
+   **`https://www.jorgejiro.es/aqui-hay-tomate.html`**.
+3. Si algún día cambia cómo se tratan los datos, actualiza la página **y** la fecha de entrada en vigor que
+   figura en las dos versiones.
+
+Detalles que conviene no romper al editarla: enumera **los siete permisos exactos del manifest** y afirma
+que la app no declara `INTERNET`, que es comprobable por cualquiera en la propia ficha de Play. Si en el
+futuro se añadiera un permiso, hay que añadirlo aquí. Como en la de Bebe Agua, no aparece ningún correo: se
+remite al que Play muestra en la ficha.
+
+Texto base, por si hiciera falta reescribirla:
 
 ### EN
 
