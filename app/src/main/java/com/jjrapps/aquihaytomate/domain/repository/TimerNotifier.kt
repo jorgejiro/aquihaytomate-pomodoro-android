@@ -12,6 +12,14 @@ import com.jjrapps.aquihaytomate.domain.model.TimerState
  */
 interface TimerNotifier {
 
+    /**
+      * Publishes the ongoing notification for a running slot.
+      *
+      * Normally the service does this itself through `startForeground`; this exists for the case where the
+      * user swiped the notification away and it has to come back without disturbing the service.
+      */
+     fun showRunning(state: TimerState)
+
     /** Publishes the ongoing notification for a paused slot, with a Resume action. */
     fun showPaused(state: TimerState, remainingMs: Long)
 

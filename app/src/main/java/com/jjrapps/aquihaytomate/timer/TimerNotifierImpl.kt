@@ -31,6 +31,10 @@ class TimerNotifierImpl @Inject constructor(
     private val canPost: Boolean
         get() = manager.areNotificationsEnabled()
 
+    override fun showRunning(state: TimerState) {
+        notify(TimerNotificationFactory.NOTIFICATION_ID_ONGOING) { factory.ongoingRunning(state) }
+    }
+
     override fun showPaused(state: TimerState, remainingMs: Long) {
         notify(
             TimerNotificationFactory.NOTIFICATION_ID_ONGOING,

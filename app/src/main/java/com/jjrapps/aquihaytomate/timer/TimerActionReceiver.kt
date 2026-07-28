@@ -7,6 +7,7 @@ import com.jjrapps.aquihaytomate.domain.repository.AlertPlayer
 import com.jjrapps.aquihaytomate.domain.repository.TimerNotifier
 import com.jjrapps.aquihaytomate.domain.usecase.PauseTimerUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.ResetTimerUseCase
+import com.jjrapps.aquihaytomate.domain.usecase.RestoreOngoingNotificationUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.ResumeTimerUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.SkipSlotUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.StartTimerUseCase
@@ -37,6 +38,8 @@ class TimerActionReceiver : BroadcastReceiver() {
 
     @Inject lateinit var resetTimer: ResetTimerUseCase
 
+    @Inject lateinit var restoreOngoingNotification: RestoreOngoingNotificationUseCase
+
     @Inject lateinit var notifier: TimerNotifier
 
     @Inject lateinit var alertPlayer: AlertPlayer
@@ -57,6 +60,10 @@ class TimerActionReceiver : BroadcastReceiver() {
                         alertPlayer.stop()
                         startTimer()
                     }
+
+                    // The user swiped the ongoing notification away. From Android 13 that is allowed
+                    // even for a foreground service, and the timer would keep running unseen.
+                    ACTION_ONGOING_DISMISSED -> restoreOngoingNotification()
 
                     ACTION_DISMISS -> {
                         alertPlayer.stop()
@@ -80,5 +87,6 @@ class TimerActionReceiver : BroadcastReceiver() {
         const val ACTION_RESET = "com.jjrapps.aquihaytomate.RESET"
         const val ACTION_START_NEXT = "com.jjrapps.aquihaytomate.START_NEXT"
         const val ACTION_DISMISS = "com.jjrapps.aquihaytomate.DISMISS"
+        const val ACTION_ONGOING_DISMISSED = "com.jjrapps.aquihaytomate.ONGOING_DISMISSED"
     }
 }

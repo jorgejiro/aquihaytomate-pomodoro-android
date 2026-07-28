@@ -53,6 +53,8 @@ class TimerEngineTest {
     private val complete =
         CompleteSlotUseCase(timerState, settings, recordFocusSlot, alerts, sync, clock, elapsed)
     private val reconcile = ReconcileTimerUseCase(timerState, complete, sync, clock, elapsed)
+    private val restoreNotification =
+        RestoreOngoingNotificationUseCase(timerState, runtime, clock, elapsed)
 
     private fun advance(millis: Long) {
         clock.advanceBy(millis)
@@ -432,6 +434,49 @@ class TimerEngineTest {
 
         assertEquals(TimerStatus.RUNNING, state().status)
         assertEquals(SlotType.SHORT_BREAK, state().slotType)
+    }
+
+    // ─── The ongoing notification coming back ───────────────────────────────
+
+    // From Android 13 the user can swipe away the notification of a foreground service and the service
+    // survives it: the countdown would keep running with nothing on screen and no controls to reach.
+    @Test
+    fun `a dismissed notification comes back while the slot runs`() = runTest {
+        start()
+        advance(60_000L)
+
+        restoreNotification()
+
+        assertEquals(1, runtime.runningNotificationCount)
+    }
+
+    @Test
+    fun `a dismissed notification comes back while the slot is paused`() = runTest {
+        start()
+        advance(60_000L)
+        pause()
+        val afterPausing = runtime.pausedNotificationCount
+
+        restoreNotification()
+
+        assertEquals(afterPausing + 1, runtime.pausedNotificationCount)
+    }
+
+    // Dismissing the end-of-slot alert is the user acknowledging it, and an idle timer has nothing to
+    // report. Bringing either back would be the notification that will not die.
+    @Test
+    fun `nothing comes back when ringing or idle`() = runTest {
+        start()
+        advance(focusMs)
+        complete()
+        val ringingCounts = runtime.runningNotificationCount to runtime.pausedNotificationCount
+
+        restoreNotification()
+        assertEquals(ringingCounts, runtime.runningNotificationCount to runtime.pausedNotificationCount)
+
+        reset()
+        restoreNotification()
+        assertEquals(ringingCounts, runtime.runningNotificationCount to runtime.pausedNotificationCount)
     }
 
     // ─── Resetting ──────────────────────────────────────────────────────────

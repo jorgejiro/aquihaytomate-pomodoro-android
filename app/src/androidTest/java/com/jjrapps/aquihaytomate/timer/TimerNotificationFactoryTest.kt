@@ -115,6 +115,29 @@ class TimerNotificationFactoryTest {
         assertEquals(whileRunning.actions[2].title, whilePaused.actions[2].title)
     }
 
+    /**
+     * Both ongoing forms carry a delete intent, which is what brings them back after a swipe.
+     *
+     * `setOngoing(true)` stopped being enough in Android 13: the user can dismiss the notification of a
+     * foreground service and the service carries on regardless.
+     */
+    @Test
+    fun bothOngoingFormsComeBackIfDismissed() {
+        assertNotNull(factory.ongoingRunning(running).deleteIntent)
+        assertNotNull(
+            factory.ongoingPaused(running.copy(status = TimerStatus.PAUSED), 60_000L).deleteIntent,
+        )
+    }
+
+    /** The alert is meant to be dismissable: swiping it away is how the user acknowledges it. */
+    @Test
+    fun theEndOfSlotAlertStaysDismissable() {
+        val alert = factory.slotFinished(running.copy(slotType = SlotType.SHORT_BREAK))
+
+        assertNull("The alert must not resurrect itself", alert.deleteIntent)
+        assertTrue(alert.flags and android.app.Notification.FLAG_AUTO_CANCEL != 0)
+    }
+
     @Test
     fun theRunningNotificationIsOngoingAndSilent() {
         val notification = factory.ongoingRunning(running)

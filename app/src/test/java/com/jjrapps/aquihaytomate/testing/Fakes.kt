@@ -189,6 +189,8 @@ class FakeTimerRuntime : TimerAlarmScheduler, TimerServiceController, TimerNotif
         private set
     var startCount: Int = 0
         private set
+    var runningNotificationCount: Int = 0
+        private set
     var pausedNotificationCount: Int = 0
         private set
     var finishedNotificationCount: Int = 0
@@ -221,6 +223,10 @@ class FakeTimerRuntime : TimerAlarmScheduler, TimerServiceController, TimerNotif
 
     override fun stop() {
         serviceRunning = false
+    }
+
+    override fun showRunning(state: TimerState) {
+        runningNotificationCount++
     }
 
     override fun showPaused(state: TimerState, remainingMs: Long) {

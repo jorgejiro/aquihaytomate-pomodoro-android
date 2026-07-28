@@ -44,6 +44,7 @@ class TimerNotificationFactory @Inject constructor(
         base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
             .setContentTitle(titleFor(state))
             .setOngoing(true)
+            .withRestoreOnDismissal()
             .withBody(state, TimerActionReceiver.ACTION_PAUSE) { chronometerOf(state) }
             // Without IMMEDIATE, Android 12+ holds the notification back for up to ten seconds and the
             // user thinks the timer never started.
@@ -59,11 +60,23 @@ class TimerNotificationFactory @Inject constructor(
         base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
             .setContentTitle(titleFor(state))
             .setOngoing(true)
+            .withRestoreOnDismissal()
             .withBody(state, TimerActionReceiver.ACTION_RESUME, R.string.notification_paused_label) {
                 frozenFigureOf(remainingMs)
             }
             .withTimerActions(pauseOrResume = TimerActionReceiver.ACTION_RESUME)
             .build()
+
+    /**
+     * Brings the notification back if the user swipes it away with a slot still under way.
+     *
+     * `setOngoing(true)` used to make a notification undismissable; from Android 13 it does not, and the
+     * countdown would carry on with nothing on screen to prove it and no controls to reach. The delete
+     * intent republishes it — `RestoreOngoingNotificationUseCase` decides whether there is anything to
+     * restore, so dismissing the end-of-slot alert or an idle timer still works normally.
+     */
+    private fun NotificationCompat.Builder.withRestoreOnDismissal(): NotificationCompat.Builder =
+        setDeleteIntent(actionIntent(TimerActionReceiver.ACTION_ONGOING_DISMISSED))
 
     /**
      * The countdown as the biggest thing in the notification, with the phase and the cycle position
