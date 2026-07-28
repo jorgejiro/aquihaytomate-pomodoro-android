@@ -177,6 +177,8 @@ class TimerViewModelTest {
     /** The F3 milestone: a whole pomodoro completes with the app open. */
     @Test
     fun `a slot that runs out completes itself and offers the break`() = runTest(dispatcher) {
+        // Auto-starting the break is the default; this test is about the slot waiting for a tap instead.
+        settings.set(TimerSettings(autoStartBreak = false))
         val vm = viewModel()
         vm.uiState.test {
             skipItems(1)
@@ -201,6 +203,7 @@ class TimerViewModelTest {
 
     @Test
     fun `after a break ends the control invites going back to work`() = runTest(dispatcher) {
+        settings.set(TimerSettings(autoStartBreak = false))
         val vm = viewModel()
         vm.uiState.test {
             skipItems(1)
@@ -248,6 +251,7 @@ class TimerViewModelTest {
 
     @Test
     fun `skipping a focus slot moves to the break`() = runTest(dispatcher) {
+        settings.set(TimerSettings(autoStartBreak = false))
         val vm = viewModel()
         vm.uiState.test {
             skipItems(1)
@@ -327,6 +331,7 @@ class TimerViewModelTest {
     // Ringing already points at the next slot, so a readout here would name the one after it.
     @Test
     fun `there is no up next readout while ringing`() = runTest(dispatcher) {
+        settings.set(TimerSettings(autoStartBreak = false))
         val vm = viewModel()
         vm.uiState.test {
             skipItems(1)
@@ -346,6 +351,7 @@ class TimerViewModelTest {
     @Test
     fun `skip is hidden on the first idle focus and offered on an idle break`() =
         runTest(dispatcher) {
+            settings.set(TimerSettings(autoStartBreak = false))
             val vm = viewModel()
             vm.uiState.test {
                 skipItems(1)

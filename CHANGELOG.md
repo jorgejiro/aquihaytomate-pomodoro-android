@@ -38,11 +38,12 @@ checklist esté cerrada.
   `docs/decisions/004-alerta-propia-en-vez-de-sonido-de-canal.md`.
 - Notificación persistente con el descuento, el aviso de lo que viene a continuación y las mismas tres
   acciones que la pantalla: pausar o reanudar, reiniciar y saltar.
-- Auto-inicio en dos ajustes independientes: **auto-iniciar el descanso** al terminar un pomodoro y
-  **auto-iniciar el pomodoro** al terminar un descanso. Las dos direcciones no son la misma decisión:
+- Auto-inicio en dos ajustes independientes: **auto-iniciar el descanso** al terminar un pomodoro —
+  **activado por defecto** — y **auto-iniciar el pomodoro** al terminar un descanso, desactivado. Las dos direcciones no son la misma decisión:
   el descanso conviene que arranque solo, y el pomodoro siguiente casi nunca, porque un descanso se
   alarga a propósito. En ambos casos el aviso suena y vibra igual.
-- Onboarding en el primer arranque.
+- Onboarding de cuatro páginas en el primer arranque, con las duraciones, la forma del ciclo y los dos
+  permisos que el temporizador necesita.
 - Pantalla «Novedades» accesible desde Ajustes → Acerca de.
 - Interfaz en español e inglés, con selector de idioma en Ajustes.
 

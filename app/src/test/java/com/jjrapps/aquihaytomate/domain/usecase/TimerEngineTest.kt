@@ -160,6 +160,8 @@ class TimerEngineTest {
 
     @Test
     fun `a finished focus slot is recorded, rings and plans the short break`() = runTest {
+        // Auto-starting the break is the default now, and this test is about the slot *waiting* instead.
+        settings.set(TimerSettings(autoStartBreak = false))
         start()
         advance(focusMs)
 
@@ -358,6 +360,7 @@ class TimerEngineTest {
 
     @Test
     fun `skipping a focus slot does not advance the cycle and leads to a short break`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
         start()
         advance(10 * 60_000L)
 
@@ -466,6 +469,7 @@ class TimerEngineTest {
     // report. Bringing either back would be the notification that will not die.
     @Test
     fun `nothing comes back when ringing or idle`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
         start()
         advance(focusMs)
         complete()
@@ -761,6 +765,7 @@ class TimerEngineTest {
 
     @Test
     fun `ringing tears the service down and posts the alert notification`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
         start()
         advance(focusMs)
         complete()

@@ -131,13 +131,17 @@
     <string name="onboarding_page2_focus">Enfoque</string>
     <string name="onboarding_page2_break">Descanso</string>
     <string name="onboarding_page2_hint">Lo puedes cambiar luego en Ajustes.</string>
-    <string name="onboarding_page3_title">En tu escritorio</string>
-    <string name="onboarding_page3_body">Un toque inicia y pausa. Dos toques reinician.</string>
-    <string name="onboarding_page3_permissions">Concede los permisos necesarios</string>
-    <string name="onboarding_page3_required">Necesario</string>
-    <string name="onboarding_page3_pending">Pendiente</string>
-    <string name="onboarding_page3_ready">Activado</string>
-    <string name="onboarding_page3_permissions_hint">Sin ellos el temporizador puede retrasarse con la pantalla apagada y no puede avisarte al terminar un slot.</string>
+    <string name="onboarding_cycle_title">Tu ciclo</string>
+    <string name="onboarding_cycle_pomodoros">Pomodoros por ciclo</string>
+    <string name="onboarding_cycle_long_break">Descanso largo</string>
+    <string name="onboarding_cycle_chaining">Encadenado</string>
+    <string name="onboarding_permissions_title">En tu escritorio</string>
+    <string name="onboarding_permissions_body">Un toque inicia y pausa. Dos toques reinician.</string>
+    <string name="onboarding_permissions_label">Concede los permisos necesarios</string>
+    <string name="onboarding_permissions_required">Necesario</string>
+    <string name="onboarding_permissions_pending">Pendiente</string>
+    <string name="onboarding_permissions_ready">Activado</string>
+    <string name="onboarding_permissions_hint">Sin ellos el temporizador puede retrasarse con la pantalla apagada y no puede avisarte al terminar un slot.</string>
     <string name="onboarding_continue_without">Continuar sin ellos</string>
 
     <!-- Alert sounds -->

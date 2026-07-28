@@ -368,7 +368,9 @@ Fila estándar: **52 dp** de alto, padding horizontal 16 dp. Etiqueta `rowLabel`
 
 ### 5.4 Onboarding (`OnboardingScreen`)
 
-Tres páginas en `HorizontalPager`, sin barra de pestañas, sin botón «saltar».
+Cuatro páginas en `HorizontalPager`, sin barra de pestañas, sin botón «saltar».
+
+La tercera —**Tu ciclo**— lleva `pomodorosPerCycle` y el descanso largo como filas de chips (`2 · 3 · 4 · 6` y `10 · 15 · 20 · 30 min`) y los dos auto-inicios como `SettingsToggleRow` dentro de un `SettingsGroup`, con los mismos textos que Ajustes. Son los cuatro ajustes que deciden cómo se comporta la app a lo largo de una mañana, y por eso se preguntan antes del primer pomodoro. Los valores por defecto se ven ya marcados: ciclo de 4, descanso largo de 15 min, **auto-iniciar el descanso activado** y auto-iniciar el pomodoro desactivado.
 
 ```
 Página 1 — Qué es          Página 2 — Tus duraciones   Página 3 — Widget y permisos

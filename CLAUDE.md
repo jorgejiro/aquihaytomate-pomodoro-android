@@ -62,7 +62,7 @@ Todo dibujado con Compose `Canvas`. **Sin librería de gráficos** — ver `docs
 | Descanso corto | **5 min** | 1–60 |
 | Descanso largo | **15 min** | 1–120 |
 | Pomodoros por ciclo | **4** | 2–12 |
-| **Auto-iniciar el descanso** (al terminar un pomodoro) | desactivado | — |
+| **Auto-iniciar el descanso** (al terminar un pomodoro) | **activado** | — |
 | **Auto-iniciar el pomodoro** (al terminar un descanso) | desactivado | — |
 | Sonido al terminar | Campana | `silent`, `bell`, `bowl`, `digital`, `soft` |
 | **Duración de la vibración** | **5 s** | 0 (= desactivada) – 30 |
@@ -75,7 +75,9 @@ Más: estado de los permisos (notificaciones y alarmas exactas) con botón a los
 
 ### 2.4 Pantalla Onboarding ✅ Implementada
 
-Tres páginas: qué es la técnica pomodoro · elige tus duraciones · el widget y los dos permisos.
+Cuatro páginas: qué es la técnica pomodoro · elige tus duraciones · **tu ciclo** · el widget y los dos permisos.
+
+La tercera reúne los cuatro ajustes que deciden cómo se siente la app a lo largo de una mañana —pomodoros por ciclo, descanso largo y los dos auto-inicios— porque son los que conviene preguntar antes del primer pomodoro y no dejar enterrados en Ajustes. **Auto-iniciar el descanso viene activado**; el pomodoro siguiente, no.
 
 En la tercera página los permisos son **filas con su estado escrito** (`Pendiente` en ámbar con `Necesario` debajo, o `Activado`), no botones planos, y **`EMPEZAR` está deshabilitado hasta que los dos estén concedidos**, con un `CONTINUAR SIN ELLOS` discreto como válvula de escape obligatoria. Ver `docs/decisions/008-el-onboarding-exige-los-dos-permisos.md`.
 

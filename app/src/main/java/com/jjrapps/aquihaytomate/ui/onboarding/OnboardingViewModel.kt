@@ -64,6 +64,24 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
+    fun onLongBreakMinutesSelected(minutes: Int) {
+        viewModelScope.launch {
+            settingsRepository.setDurationMinutes(SlotType.LONG_BREAK, minutes)
+        }
+    }
+
+    fun onPomodorosPerCycleSelected(count: Int) {
+        viewModelScope.launch { settingsRepository.setPomodorosPerCycle(count) }
+    }
+
+    fun onAutoStartBreakChanged(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.setAutoStartBreak(enabled) }
+    }
+
+    fun onAutoStartFocusChanged(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.setAutoStartFocus(enabled) }
+    }
+
     /** Marks onboarding done. `MainViewModel` reads this to decide the start destination. */
     fun onFinished() {
         viewModelScope.launch { settingsRepository.setOnboardingDone(true) }

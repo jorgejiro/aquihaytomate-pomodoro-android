@@ -56,6 +56,7 @@ import com.jjrapps.aquihaytomate.ui.common.RefreshPermissionsOnResume
 import com.jjrapps.aquihaytomate.ui.common.SectionLabel
 import com.jjrapps.aquihaytomate.ui.common.SettingsGroup
 import com.jjrapps.aquihaytomate.ui.common.SettingsRow
+import com.jjrapps.aquihaytomate.ui.common.SettingsToggleRow
 import com.jjrapps.aquihaytomate.ui.common.TextControl
 import com.jjrapps.aquihaytomate.ui.common.ValueChip
 import com.jjrapps.aquihaytomate.ui.theme.AlertAmber
@@ -72,7 +73,7 @@ import com.jjrapps.aquihaytomate.ui.theme.TomateBright
 import com.jjrapps.aquihaytomate.ui.theme.phaseColorsOf
 import kotlinx.coroutines.launch
 
-private const val PAGE_COUNT = 3
+private const val PAGE_COUNT = 4
 private const val DRAIN_LOOP_MS = 6000
 private const val REDUCED_MOTION_FILL = 0.55f
 
@@ -91,6 +92,8 @@ private val PERMISSIONS_LABEL_GAP = 14.dp
 
 private val FOCUS_CHOICES = listOf(20, 25, 30, 45)
 private val BREAK_CHOICES = listOf(3, 5, 10, 15)
+private val CYCLE_CHOICES = listOf(2, 3, 4, 6)
+private val LONG_BREAK_CHOICES = listOf(10, 15, 20, 30)
 
 @Composable
 fun OnboardingScreen(
@@ -119,6 +122,10 @@ fun OnboardingScreen(
         state = state,
         onFocusMinutesSelected = viewModel::onFocusMinutesSelected,
         onBreakMinutesSelected = viewModel::onBreakMinutesSelected,
+        onPomodorosPerCycleSelected = viewModel::onPomodorosPerCycleSelected,
+        onLongBreakMinutesSelected = viewModel::onLongBreakMinutesSelected,
+        onAutoStartBreakChanged = viewModel::onAutoStartBreakChanged,
+        onAutoStartFocusChanged = viewModel::onAutoStartFocusChanged,
         onRequestNotifications = {
             val canAsk = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                 !notificationDialogShown
@@ -140,6 +147,10 @@ private fun OnboardingContent(
     state: OnboardingUiState,
     onFocusMinutesSelected: (Int) -> Unit,
     onBreakMinutesSelected: (Int) -> Unit,
+    onPomodorosPerCycleSelected: (Int) -> Unit,
+    onLongBreakMinutesSelected: (Int) -> Unit,
+    onAutoStartBreakChanged: (Boolean) -> Unit,
+    onAutoStartFocusChanged: (Boolean) -> Unit,
     onRequestNotifications: () -> Unit,
     onRequestExactAlarms: () -> Unit,
     onFinished: () -> Unit,
@@ -156,6 +167,13 @@ private fun OnboardingContent(
             when (page) {
                 0 -> WhatItIsPage()
                 1 -> DurationsPage(state.settings, onFocusMinutesSelected, onBreakMinutesSelected)
+                2 -> CyclePage(
+                    settings = state.settings,
+                    onPomodorosPerCycleSelected = onPomodorosPerCycleSelected,
+                    onLongBreakMinutesSelected = onLongBreakMinutesSelected,
+                    onAutoStartBreakChanged = onAutoStartBreakChanged,
+                    onAutoStartFocusChanged = onAutoStartFocusChanged,
+                )
                 else -> WidgetAndPermissionsPage(
                     state = state,
                     onRequestNotifications = onRequestNotifications,
@@ -309,6 +327,63 @@ private fun DurationsPage(
     }
 }
 
+/**
+ * Page 3: the shape of a cycle, and whether the timer chains on its own.
+ *
+ * These four are the settings that decide how the app *feels* over a whole morning, and they are the ones
+ * worth asking about before the first pomodoro rather than leaving buried in Settings. The two switches are
+ * the same rows as Settings, defaults included: the break starts by itself, the next pomodoro does not.
+ */
+@Composable
+private fun CyclePage(
+    settings: TimerSettings,
+    onPomodorosPerCycleSelected: (Int) -> Unit,
+    onLongBreakMinutesSelected: (Int) -> Unit,
+    onAutoStartBreakChanged: (Boolean) -> Unit,
+    onAutoStartFocusChanged: (Boolean) -> Unit,
+) {
+    Page {
+        Title(stringResource(R.string.onboarding_cycle_title))
+        Spacer(Modifier.height(28.dp))
+
+        SectionLabel(stringResource(R.string.onboarding_cycle_pomodoros))
+        Spacer(Modifier.height(8.dp))
+        ChoiceRow(
+            options = CYCLE_CHOICES.map { PickerOption(it, it.toString()) },
+            selected = settings.pomodorosPerCycle,
+            onSelect = onPomodorosPerCycleSelected,
+        )
+
+        Spacer(Modifier.height(20.dp))
+        SectionLabel(stringResource(R.string.onboarding_cycle_long_break))
+        Spacer(Modifier.height(8.dp))
+        ChoiceRow(
+            options = LONG_BREAK_CHOICES.map { PickerOption(it, minutesLabel(it)) },
+            selected = settings.longBreakMinutes,
+            onSelect = onLongBreakMinutesSelected,
+        )
+
+        Spacer(Modifier.height(28.dp))
+        SectionLabel(stringResource(R.string.onboarding_cycle_chaining))
+        Spacer(Modifier.height(8.dp))
+        SettingsGroup {
+            SettingsToggleRow(
+                label = stringResource(R.string.settings_auto_start_break),
+                sublabel = stringResource(R.string.settings_auto_start_break_sublabel),
+                checked = settings.autoStartBreak,
+                onCheckedChange = onAutoStartBreakChanged,
+            )
+            Divider()
+            SettingsToggleRow(
+                label = stringResource(R.string.settings_auto_start_focus),
+                sublabel = stringResource(R.string.settings_auto_start_focus_sublabel),
+                checked = settings.autoStartFocus,
+                onCheckedChange = onAutoStartFocusChanged,
+            )
+        }
+    }
+}
+
 @Composable
 private fun WidgetAndPermissionsPage(
     state: OnboardingUiState,
@@ -323,12 +398,12 @@ private fun WidgetAndPermissionsPage(
             modifier = Modifier.size(WIDGET_TOMATO_SIZE),
         )
         Spacer(Modifier.height(24.dp))
-        Title(stringResource(R.string.onboarding_page3_title))
+        Title(stringResource(R.string.onboarding_permissions_title))
         Spacer(Modifier.height(12.dp))
-        Body(stringResource(R.string.onboarding_page3_body))
+        Body(stringResource(R.string.onboarding_permissions_body))
 
         Spacer(Modifier.height(32.dp))
-        SectionLabel(stringResource(R.string.onboarding_page3_permissions))
+        SectionLabel(stringResource(R.string.onboarding_permissions_label))
         Spacer(Modifier.height(PERMISSIONS_LABEL_GAP))
         SettingsGroup {
             PermissionRow(
@@ -349,7 +424,7 @@ private fun WidgetAndPermissionsPage(
         if (!state.permissionsGranted) {
             Spacer(Modifier.height(12.dp))
             Text(
-                text = stringResource(R.string.onboarding_page3_permissions_hint),
+                text = stringResource(R.string.onboarding_permissions_hint),
                 style = Caption,
                 color = TextMuted,
                 textAlign = TextAlign.Center,
@@ -376,9 +451,9 @@ private fun PermissionRow(
         // Taller than in Settings: here the two rows are the whole content of the page and at 52 dp they
         // sat on top of each other.
         minHeight = PERMISSION_ROW_HEIGHT,
-        sublabel = if (granted) null else stringResource(R.string.onboarding_page3_required),
+        sublabel = if (granted) null else stringResource(R.string.onboarding_permissions_required),
         value = stringResource(
-            if (granted) R.string.onboarding_page3_ready else R.string.onboarding_page3_pending,
+            if (granted) R.string.onboarding_permissions_ready else R.string.onboarding_permissions_pending,
         ),
         valueColor = if (granted) TomateBright else AlertAmber,
         showChevron = !granted,
@@ -460,10 +535,33 @@ private fun OnboardingPage1Preview() {
             state = OnboardingUiState(),
             onFocusMinutesSelected = {},
             onBreakMinutesSelected = {},
+            onPomodorosPerCycleSelected = {},
+            onLongBreakMinutesSelected = {},
+            onAutoStartBreakChanged = {},
+            onAutoStartFocusChanged = {},
             onRequestNotifications = {},
             onRequestExactAlarms = {},
             onFinished = {},
         )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000, widthDp = 360, heightDp = 720)
+@Composable
+private fun OnboardingCyclePreview() {
+    AquiHayTomateTheme {
+        Column(Modifier.fillMaxSize()) {
+            Box(Modifier.weight(1f)) {
+                CyclePage(
+                    settings = TimerSettings(),
+                    onPomodorosPerCycleSelected = {},
+                    onLongBreakMinutesSelected = {},
+                    onAutoStartBreakChanged = {},
+                    onAutoStartFocusChanged = {},
+                )
+            }
+            Footer(currentPage = 2, permissionsGranted = false, onNext = {}, onFinished = {})
+        }
     }
 }
 

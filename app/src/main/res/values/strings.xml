@@ -127,13 +127,17 @@
     <string name="onboarding_page2_focus">Focus</string>
     <string name="onboarding_page2_break">Break</string>
     <string name="onboarding_page2_hint">You can change all of this later in Settings.</string>
-    <string name="onboarding_page3_title">On your home screen</string>
-    <string name="onboarding_page3_body">One tap starts and pauses. Two taps reset.</string>
-    <string name="onboarding_page3_permissions">Grant the required permissions</string>
-    <string name="onboarding_page3_required">Required</string>
-    <string name="onboarding_page3_pending">Pending</string>
-    <string name="onboarding_page3_ready">On</string>
-    <string name="onboarding_page3_permissions_hint">Without them the timer can be late with the screen off and cannot tell you when a slot is over.</string>
+    <string name="onboarding_cycle_title">Your cycle</string>
+    <string name="onboarding_cycle_pomodoros">Pomodoros per cycle</string>
+    <string name="onboarding_cycle_long_break">Long break</string>
+    <string name="onboarding_cycle_chaining">Chaining</string>
+    <string name="onboarding_permissions_title">On your home screen</string>
+    <string name="onboarding_permissions_body">One tap starts and pauses. Two taps reset.</string>
+    <string name="onboarding_permissions_label">Grant the required permissions</string>
+    <string name="onboarding_permissions_required">Required</string>
+    <string name="onboarding_permissions_pending">Pending</string>
+    <string name="onboarding_permissions_ready">On</string>
+    <string name="onboarding_permissions_hint">Without them the timer can be late with the screen off and cannot tell you when a slot is over.</string>
     <string name="onboarding_continue_without">Continue without them</string>
 
     <!-- Alert sounds -->
