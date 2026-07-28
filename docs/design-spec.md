@@ -397,7 +397,7 @@ Página 1 — Qué es          Página 2 — Tus duraciones   Página 3 — Widg
 - **En la página 1 el tomate se drena de lleno a vacío en bucle de 6 s.** Es la demostración del concepto.
 - Al terminar se marca `onboarding_done`; `MainViewModel` decide el destino inicial.
 
-**Página 3: los permisos son filas de estado, no botones.** Cada uno es un `SettingsRow` dentro de un `SettingsGroup`, igual que en Ajustes:
+**Página 3: los permisos son filas de estado, no botones.** Cada uno es un `SettingsRow` dentro de un `SettingsGroup`, igual que en Ajustes, pero **con 64 dp de alto en vez de 52** y 14 dp entre la cabecera y el grupo: aquí las dos filas son todo el contenido de la página, y con las medidas de Ajustes —donde una fila es una de treinta— se leían apelotonadas. La cabecera dice `CONCEDE LOS PERMISOS NECESARIOS`, que es una instrucción y no una etiqueta de sección.
 
 | Estado | Valor | Color | Sublabel | Chevron |
 |---|---|---|---|---|

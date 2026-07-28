@@ -133,7 +133,7 @@
     <string name="onboarding_page2_hint">Lo puedes cambiar luego en Ajustes.</string>
     <string name="onboarding_page3_title">En tu escritorio</string>
     <string name="onboarding_page3_body">Un toque inicia y pausa. Dos toques reinician.</string>
-    <string name="onboarding_page3_permissions">Ajusta tu móvil</string>
+    <string name="onboarding_page3_permissions">Concede los permisos necesarios</string>
     <string name="onboarding_page3_required">Necesario</string>
     <string name="onboarding_page3_pending">Pendiente</string>
     <string name="onboarding_page3_ready">Activado</string>

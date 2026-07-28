@@ -85,6 +85,10 @@ private val FOOTER_PADDING = 24.dp
 /** Reserved on every page so the pager does not shift when the escape hatch appears on page 3. */
 private val ESCAPE_SLOT_HEIGHT = 40.dp
 
+/** The permission rows own page 3, so they get more room than the 52 dp of a Settings row. */
+private val PERMISSION_ROW_HEIGHT = 64.dp
+private val PERMISSIONS_LABEL_GAP = 14.dp
+
 private val FOCUS_CHOICES = listOf(20, 25, 30, 45)
 private val BREAK_CHOICES = listOf(3, 5, 10, 15)
 
@@ -323,9 +327,9 @@ private fun WidgetAndPermissionsPage(
         Spacer(Modifier.height(12.dp))
         Body(stringResource(R.string.onboarding_page3_body))
 
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(32.dp))
         SectionLabel(stringResource(R.string.onboarding_page3_permissions))
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(PERMISSIONS_LABEL_GAP))
         SettingsGroup {
             PermissionRow(
                 label = stringResource(R.string.settings_notifications),
@@ -369,6 +373,9 @@ private fun PermissionRow(
 ) {
     SettingsRow(
         label = label,
+        // Taller than in Settings: here the two rows are the whole content of the page and at 52 dp they
+        // sat on top of each other.
+        minHeight = PERMISSION_ROW_HEIGHT,
         sublabel = if (granted) null else stringResource(R.string.onboarding_page3_required),
         value = stringResource(
             if (granted) R.string.onboarding_page3_ready else R.string.onboarding_page3_pending,

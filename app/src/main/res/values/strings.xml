@@ -129,7 +129,7 @@
     <string name="onboarding_page2_hint">You can change all of this later in Settings.</string>
     <string name="onboarding_page3_title">On your home screen</string>
     <string name="onboarding_page3_body">One tap starts and pauses. Two taps reset.</string>
-    <string name="onboarding_page3_permissions">Set up your phone</string>
+    <string name="onboarding_page3_permissions">Grant the required permissions</string>
     <string name="onboarding_page3_required">Required</string>
     <string name="onboarding_page3_pending">Pending</string>
     <string name="onboarding_page3_ready">On</string>
