@@ -51,7 +51,7 @@ class TimerEngineTest {
         ResetTimerUseCase(timerState, settings, recordFocusSlot, sync, clock, elapsed)
     private val skip = SkipSlotUseCase(timerState, settings, recordFocusSlot, sync, clock, elapsed)
     private val complete =
-        CompleteSlotUseCase(timerState, settings, recordFocusSlot, alerts, sync, clock, elapsed)
+        CompleteSlotUseCase(timerState, settings, recordFocusSlot, alerts, runtime, sync, clock, elapsed)
     private val reconcile = ReconcileTimerUseCase(timerState, complete, sync, clock, elapsed)
     private val restoreNotification =
         RestoreOngoingNotificationUseCase(timerState, runtime, clock, elapsed)
@@ -784,7 +784,40 @@ class TimerEngineTest {
 
         assertTrue(runtime.serviceRunning)
         assertEquals(state().endAtElapsedRealtimeMs, runtime.armedDeadlineMs)
-        assertEquals(0, runtime.finishedNotificationCount)
+    }
+
+    /**
+     * Chaining still tells you the pomodoro ended.
+     *
+     * It used not to: with auto-start on there was no `RINGING` state, so no alert was published and the
+     * phone just buzzed. On a paired watch — the reason this changed — a pomodoro would end with nothing on
+     * the wrist to say so, which is precisely when the phone is in another room.
+     */
+    @Test
+    fun `chaining into the break still publishes the alert`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = true))
+        start()
+        advance(focusMs)
+
+        complete()
+
+        assertEquals(TimerStatus.RUNNING, state().status)
+        assertEquals(SlotType.SHORT_BREAK, state().slotType)
+        assertEquals(1, runtime.finishedNotificationCount)
+        assertEquals("It has to know the slot is already under way", 1, runtime.chainedNotificationCount)
+        assertEquals(1, alerts.playCount)
+    }
+
+    @Test
+    fun `a slot that waits for the user is not announced as chained`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
+        start()
+        advance(focusMs)
+
+        complete()
+
+        assertEquals(1, runtime.finishedNotificationCount)
+        assertEquals(0, runtime.chainedNotificationCount)
     }
 
     @Test

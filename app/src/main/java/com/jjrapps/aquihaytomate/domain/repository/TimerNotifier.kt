@@ -23,8 +23,14 @@ interface TimerNotifier {
     /** Publishes the ongoing notification for a paused slot, with a Resume action. */
     fun showPaused(state: TimerState, remainingMs: Long)
 
-    /** Publishes the end-of-slot alert. [state] already describes the slot coming up. */
-    fun showSlotFinished(state: TimerState)
+    /**
+     * Publishes the end-of-slot alert. [state] already describes the slot coming up.
+     *
+     * @param chained true when that slot started by itself. It still gets an alert: auto-starting means not
+     *   having to tap, not being kept in the dark — and on a paired watch this is the only way to know a
+     *   pomodoro ended when the phone is in another room.
+     */
+    fun showSlotFinished(state: TimerState, chained: Boolean = false)
 
     /** Clears the ongoing notification. The alert is dismissed by the user or auto-cancelled. */
     fun clearOngoing()

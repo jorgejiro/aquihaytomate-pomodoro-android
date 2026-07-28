@@ -68,7 +68,7 @@ class TimerViewModelTest {
         val start = StartTimerUseCase(timerState, settings, sync, clock, elapsed)
         val pause = PauseTimerUseCase(timerState, sync, clock, elapsed)
         val complete =
-            CompleteSlotUseCase(timerState, settings, recordFocusSlot, alerts, sync, clock, elapsed)
+            CompleteSlotUseCase(timerState, settings, recordFocusSlot, alerts, runtime, sync, clock, elapsed)
         return TimerViewModel(
             observeTimerState = ObserveTimerStateUseCase(timerState),
             observeSettings = ObserveSettingsUseCase(settings),

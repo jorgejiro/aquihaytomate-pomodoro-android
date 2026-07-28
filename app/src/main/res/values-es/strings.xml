@@ -169,8 +169,11 @@
     <string name="notification_paused_label">Pausado</string>
     <!-- Phase line of the ongoing notification: phase, then a state such as Paused. -->
     <string name="notification_phase_suffix">%1$s · %2$s</string>
-    <string name="notification_focus_finished">Enfoque completado · %1$d de %2$d</string>
-    <string name="notification_break_finished">Se acabó el descanso.</string>
+    <string name="notification_focus_done_title">Pomodoro %1$d de %2$d completado</string>
+    <string name="notification_break_done_title">Descanso terminado</string>
+    <string name="notification_next_waiting">%1$s · toca para empezar</string>
+    <string name="notification_next_running">%1$s ya en marcha</string>
+    <string name="notification_slot_of">%1$s de %2$s</string>
     <string name="notification_action_pause">Pausar</string>
     <string name="notification_action_resume">Reanudar</string>
     <string name="notification_action_skip">Saltar</string>

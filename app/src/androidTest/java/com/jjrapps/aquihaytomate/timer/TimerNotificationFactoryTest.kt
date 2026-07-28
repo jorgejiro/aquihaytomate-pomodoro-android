@@ -221,6 +221,66 @@ class TimerNotificationFactoryTest {
         )
     }
 
+    /**
+     * The copy of the alert, which is the only thing a paired watch shows: no app name, no icon of ours.
+     *
+     * It used to read «¡Tiempo!» over «Se acabó el descanso», which on a wrist says neither what ended nor
+     * what is waiting. The title now names what was completed — with the cycle position, the one thing the
+     * state cannot imply once it has moved on — and the body names the next slot and its length.
+     */
+    @Test
+    fun theAlertSaysWhatEndedAndWhatIsNext() {
+        // A break carries the position of the pomodoro just finished, which here is the first one.
+        val afterFocus = factory.slotFinished(running.copy(slotType = SlotType.SHORT_BREAK))
+        val minutes = 25
+
+        assertEquals(
+            context.getString(R.string.notification_focus_done_title, 1, 4),
+            afterFocus.extras.getCharSequence(NotificationCompat.EXTRA_TITLE).toString(),
+        )
+        assertEquals(
+            context.getString(
+                R.string.notification_next_waiting,
+                context.getString(
+                    R.string.notification_slot_of,
+                    context.getString(R.string.phase_short_break),
+                    context.resources.getQuantityString(R.plurals.settings_minutes, minutes, minutes),
+                ),
+            ),
+            afterFocus.extras.getCharSequence(NotificationCompat.EXTRA_TEXT).toString(),
+        )
+    }
+
+    /**
+     * A slot that started by itself still gets an alert, and says so.
+     *
+     * Auto-starting means not having to tap, not being kept in the dark: with the phone in another room, this
+     * notification is the only way the wrist hears that a pomodoro ended. It offers skipping rather than
+     * starting, because there is nothing left to start, and expires on its own.
+     */
+    @Test
+    fun theChainedAlertOffersSkipAndExpires() {
+        val chained = factory.slotFinished(running.copy(slotType = SlotType.SHORT_BREAK), chained = true)
+
+        assertEquals(2, chained.actions.size)
+        assertEquals(
+            context.getString(R.string.notification_action_skip),
+            chained.actions[0].title.toString(),
+        )
+        assertTrue("It must not pile up on the wrist", chained.timeoutAfter > 0)
+    }
+
+    @Test
+    fun theWaitingAlertOffersStartingTheNextSlot() {
+        val waiting = factory.slotFinished(running.copy(slotType = SlotType.SHORT_BREAK))
+
+        assertEquals(
+            context.getString(R.string.control_start_break),
+            waiting.actions[0].title.toString(),
+        )
+        assertEquals("Nothing to expire: it is waiting for the user", 0L, waiting.timeoutAfter)
+    }
+
     @Test
     fun theRunningNotificationIsOngoingAndSilent() {
         val notification = factory.ongoingRunning(running)

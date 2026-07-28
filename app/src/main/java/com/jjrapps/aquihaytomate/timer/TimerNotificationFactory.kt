@@ -15,6 +15,7 @@ import com.jjrapps.aquihaytomate.AquiHayTomateApplication
 import com.jjrapps.aquihaytomate.MainActivity
 import com.jjrapps.aquihaytomate.R
 import com.jjrapps.aquihaytomate.domain.model.SlotType
+import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.TimerState
 import com.jjrapps.aquihaytomate.domain.time.ElapsedRealtimeSource
 import com.jjrapps.aquihaytomate.domain.usecase.TimerMath
@@ -275,33 +276,42 @@ class TimerNotificationFactory @Inject constructor(
     /**
      * The end-of-slot alert. [state] already describes the slot coming up, so what just finished is
      * implied by it.
+     *
+     * The copy has to stand on its own, because **a paired watch shows the title and the body and nothing
+     * else** — no app name, no icon of ours. `¡Tiempo!` over `Se acabó el descanso` told the wrist neither
+     * what had ended nor what came next. Now the title says what was completed and the body says what is
+     * waiting, with its length.
+     *
+     * @param chained true when the next slot started by itself. There is nothing to tap then, so the body
+     *   says it is already running and the actions offer skipping it instead of starting it.
      */
-    fun slotFinished(state: TimerState): Notification {
+    fun slotFinished(state: TimerState, chained: Boolean = false): Notification {
         val nextIsBreak = state.slotType.isBreak
-        // The length of the slot that just ended is not in the state any more — the snapshot has moved
-        // on to the next one — and reading it back off Settings would lie whenever the user had changed
-        // it mid-run. The cycle position is what the user actually wants to see here anyway.
-        val body = if (nextIsBreak) {
+        val nextMinutes = (state.slotDurationMs / TimerSettings.MINUTE_MS).toInt()
+        val nextSlot = context.getString(
+            R.string.notification_slot_of,
+            context.getString(phaseNameRes(state.slotType)),
+            context.resources.getQuantityString(R.plurals.settings_minutes, nextMinutes, nextMinutes),
+        )
+
+        // The cycle position is the one thing the state cannot imply: the length of the slot that just
+        // ended has already been replaced by the next one's.
+        val title = if (nextIsBreak) {
             context.getString(
-                R.string.notification_focus_finished,
+                R.string.notification_focus_done_title,
                 state.cyclePosition,
                 state.pomodorosPerCycle,
             )
         } else {
-            context.getString(R.string.notification_break_finished)
+            context.getString(R.string.notification_break_done_title)
         }
-        val actionLabel = if (nextIsBreak) {
-            R.string.control_start_break
-        } else {
-            R.string.control_back_to_work
-        }
+        val body = context.getString(
+            if (chained) R.string.notification_next_running else R.string.notification_next_waiting,
+            nextSlot,
+        )
 
-        // Deliberately NOT silent, unlike the ongoing ones. The channel is already mute — the sound and the
-        // vibration are `AlertPlayer`'s job, see ADR 004 — but `setSilent(true)` does more than mute: it
-        // marks the notification as non-alerting, which costs the heads-up that CLAUDE.md §3 counts on and,
-        // measured on a paired Garmin, stops it being handed to the watch at all. See ADR 011.
-        return base(AquiHayTomateApplication.CHANNEL_TIMER_ALERTS)
-            .setContentTitle(context.getString(R.string.phase_ringing))
+        val builder = base(AquiHayTomateApplication.CHANNEL_TIMER_ALERTS)
+            .setContentTitle(title)
             .setContentText(body)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -310,17 +320,39 @@ class TimerNotificationFactory @Inject constructor(
             // can be vibrating for up to 30 seconds. Without this, a dismissal from the wrist cancelled the
             // notification and left the phone buzzing.
             .setDeleteIntent(actionIntent(TimerActionReceiver.ACTION_DISMISS))
-            .addAction(
-                0,
-                context.getString(actionLabel),
-                actionIntent(TimerActionReceiver.ACTION_START_NEXT),
-            )
-            .addAction(
-                0,
-                context.getString(R.string.notification_action_dismiss),
-                actionIntent(TimerActionReceiver.ACTION_DISMISS),
-            )
-            .build()
+
+        return if (chained) {
+            // Nothing to start, so the useful action is refusing the slot that just began. It also expires
+            // on its own: nobody should have to dismiss a notice about something already under way.
+            builder
+                .setTimeoutAfter(CHAINED_ALERT_TIMEOUT_MS)
+                .addAction(
+                    0,
+                    context.getString(R.string.notification_action_skip),
+                    actionIntent(TimerActionReceiver.ACTION_SKIP),
+                )
+                .addAction(
+                    0,
+                    context.getString(R.string.notification_action_dismiss),
+                    actionIntent(TimerActionReceiver.ACTION_DISMISS),
+                )
+                .build()
+        } else {
+            builder
+                .addAction(
+                    0,
+                    context.getString(
+                        if (nextIsBreak) R.string.control_start_break else R.string.control_back_to_work,
+                    ),
+                    actionIntent(TimerActionReceiver.ACTION_START_NEXT),
+                )
+                .addAction(
+                    0,
+                    context.getString(R.string.notification_action_dismiss),
+                    actionIntent(TimerActionReceiver.ACTION_DISMISS),
+                )
+                .build()
+        }
     }
 
     private fun base(channelId: String) = NotificationCompat.Builder(context, channelId)
@@ -360,6 +392,9 @@ class TimerNotificationFactory @Inject constructor(
     )
 
     companion object {
+        /** Two minutes: long enough to notice on a wrist, short enough not to pile up. */
+        private const val CHAINED_ALERT_TIMEOUT_MS = 2 * 60_000L
+
         const val NOTIFICATION_ID_ONGOING = 1
         const val NOTIFICATION_ID_ALERT = 2
         private const val REQUEST_OPEN_APP = 2001

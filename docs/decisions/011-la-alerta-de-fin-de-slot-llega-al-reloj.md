@@ -62,6 +62,26 @@ por republicarse en cada transición, y locales por ser permanentes.
   descartó: un temporizador en marcha es una notificación permanente, y permanente en la lista de un reloj
   es ruido. Ver el punto 3 de la decisión.
 
+**4. Con auto-inicio también se avisa.** El diseño original no publicaba alerta cuando el slot siguiente
+arrancaba solo: se actualizaba la ongoing y ya. Visto en uso, eso significa que **el fin de un pomodoro no
+llega al reloj**, que es justo cuando el móvil está en otra habitación. Ahora se publica igual, con el cuerpo
+diciendo que el slot ya está en marcha, la acción de saltarlo en vez de empezarlo, y un `setTimeoutAfter` de
+dos minutos para que no se acumule algo que nadie tiene que atender.
+
+Se publica **después** de `syncTimerRuntime()` a propósito: ese paso, al pasar por `RUNNING`, llama a
+`clearAlert()`, así que publicar antes sería publicar para nada.
+
+**5. El copy se escribe para una pantalla de reloj.** Un Garmin muestra el título y el cuerpo, sin nombre de
+app ni icono propio. `¡Tiempo!` sobre `Se acabó el descanso` no decía ni qué había acabado ni qué venía. El
+título nombra lo completado con su posición en el ciclo —lo único que el estado ya no puede implicar, porque
+ha avanzado— y el cuerpo nombra el slot siguiente con su duración:
+
+| Situación | Título | Cuerpo |
+|---|---|---|
+| Fin de pomodoro, esperando | `Pomodoro 3 de 4 completado` | `Descanso de 5 min · toca para empezar` |
+| Fin de pomodoro, encadenado | `Pomodoro 3 de 4 completado` | `Descanso de 5 min ya en marcha` |
+| Fin de descanso | `Descanso terminado` | `Pomodoro de 25 min · toca para empezar` |
+
 ## Consecuencias
 
 - Al terminar un slot, el sistema puede mostrar heads-up. Con un canal mudo no está garantizado en todas
@@ -71,5 +91,6 @@ por republicarse en cada transición, y locales por ser permanentes.
   esté habilitada en Garmin Connect → Notificaciones inteligentes, y que pulsar «Empezar descanso» desde
   la muñeca arranque el slot con el móvil bloqueado — las acciones de notificación no piden desbloqueo,
   pero conviene comprobarlo.
-- Con auto-inicio activado **no hay alerta separada** y por tanto no llega nada al reloj: el slot siguiente
-  ya está corriendo. Es coherente con lo que el ajuste significa, y es también lo que el autor pidió.
+- Con auto-inicio activado **también se avisa**, con el texto adaptado. Verificado en el emulador con la app
+  en segundo plano, que es el caso que importa: se publica `id=2` con «Pomodoro 3 de 4 completado · Descanso
+  de 5 min ya en marcha» mientras el descanso ya corre en la notificación `id=1`.
