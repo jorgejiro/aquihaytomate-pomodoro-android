@@ -37,7 +37,8 @@ Primera tanda de correcciones salidas de usar la app en un dispositivo real.
 ### Cambiado
 
 - **La notificación del temporizador enseña el tiempo restante en grande** y los tres controles —pausar,
-  reiniciar y saltar— sin necesidad de desplegarla.
+  reiniciar y saltar— sin necesidad de desplegarla. La cifra va en rojo durante un pomodoro y en ámbar
+  durante un descanso, porque el nombre de la fase no cabe sin cortarse.
 - El aviso de fin de slot **llega al reloj emparejado** con sus dos acciones: empezar el siguiente o
   descartar. La notificación del cronómetro en curso ya no se envía al reloj.
 - La pantalla del temporizador ofrece las tres acciones, con `SALTAR` que antes solo estaba en la

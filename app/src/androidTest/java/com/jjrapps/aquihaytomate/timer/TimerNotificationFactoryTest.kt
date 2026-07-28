@@ -171,6 +171,40 @@ class TimerNotificationFactoryTest {
         assertTrue(whilePaused.flags and NotificationCompat.FLAG_LOCAL_ONLY != 0)
     }
 
+    /**
+     * The phase travels in the header's `subText`, not in the collapsed body.
+     *
+     * In the collapsed body there is no width for it: on One UI it was cut to «En…», and that form does not
+     * even draw the header. The figure's colour carries the phase there, and the text is still in the
+     * subText and the title, which is what a screen reader reads.
+     */
+    @Test
+    fun thePhaseTravelsInTheSubText() {
+        val subText = factory.ongoingRunning(running)
+            .extras
+            .getCharSequence(NotificationCompat.EXTRA_SUB_TEXT)
+            ?.toString()
+
+        assertNotNull("Without this the phase is nowhere to be read", subText)
+        assertTrue("Expected the phase and the cycle, got: $subText", subText!!.contains("2/4"))
+    }
+
+    /**
+     * Every view in the bodies has to be one RemoteViews is allowed to inflate.
+     *
+     * A `Space` used as spacer got as far as running: `RemoteViews` refuses it with «Class not allowed to be
+     * inflated», the foreground service notification then fails to inflate, and the system kills the app
+     * with `BadForegroundServiceNotificationException`. Inflating both bodies here is the cheapest way to
+     * catch that before a device does.
+     */
+    @Test
+    fun bothBodiesInflate() {
+        val notification = factory.ongoingRunning(running)
+
+        assertNotNull(notification.contentView.apply { apply(context, null) })
+        assertNotNull(notification.bigContentView.apply { apply(context, null) })
+    }
+
     /** Two actions on the wrist: start the next slot, or dismiss. */
     @Test
     fun theAlertOffersStartNextAndDismiss() {

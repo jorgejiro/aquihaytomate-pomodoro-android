@@ -188,6 +188,7 @@
     <string-array name="changelog_0_9_1">
         <item>Corregido: el widget no se podía colocar en el escritorio, el launcher decía que la app no estaba instalada.</item>
         <item>La notificación del temporizador muestra el tiempo restante en grande, y pausar, reiniciar y saltar están a mano sin desplegarla.</item>
+        <item>La cifra sale en rojo durante un pomodoro y en ámbar durante un descanso.</item>
         <item>El aviso de fin de intervalo llega al reloj emparejado con sus dos acciones: empezar el siguiente o descartar. Descartarlo en cualquier sitio corta la vibración.</item>
         <item>La notificación vuelve si la cierras por error con un intervalo en marcha.</item>
         <item>Al terminar un intervalo, el widget muestra el siguiente listo en vez de un signo de alarma.</item>

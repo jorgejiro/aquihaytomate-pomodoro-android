@@ -100,6 +100,13 @@ de acciones.
 - **Un `Chronometer` no se puede formatear.** Muestra `MM:SS` mientras queda menos de una hora, que es todo
   el rango del temporizador, así que no hace falta; pero si alguna vez se permitieran slots de más de una
   hora, la cifra pasaría a `H:MM:SS` sola.
+- **En la forma colapsada la fase la lleva el color, no el texto.** Medido en un Galaxy S25: con la cifra
+  a 24 sp y tres controles de 44 dp, `Enfoque` se corta a `En…`. La fase pasa al `subText` del encabezado
+  —que One UI no dibuja en colapsado, pero sí al expandir— y la cifra y los iconos toman el color de la
+  fase. El texto sigue existiendo para los lectores de pantalla en `subText` y `contentTitle`.
+- **`RemoteViews` solo infla una lista blanca de vistas.** Un `Space` de espaciador cuesta un crash del
+  proceso entero: la notificación del FGS no se puede inflar y el sistema responde con
+  `BadForegroundServiceNotificationException`. Espaciar con un `TextView` vacío.
 - **Hay una superficie nueva que revisar en cada Android y en cada OEM.** El cuerpo lo decora el sistema y
   One UI no lo hace igual que Pixel. Queda añadido a la checklist de §10: **mirar la notificación en
   Android 12, 14 y 16 y en One UI**, en tema claro y oscuro, colapsada y expandida, y en la pantalla de

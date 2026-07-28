@@ -625,6 +625,8 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
   └──────────────────────────────────────┘
   ```
 
+- **En la forma colapsada no hay texto de fase.** No cabe: con la cifra y los tres controles, en One UI se cortaba a `En…`, y ese estado ni siquiera dibuja el encabezado. La fase va en el `subText` —que se lee al expandir— y **en la forma colapsada la lleva el color de la cifra**: rojo en enfoque, ámbar en descanso, con los tres iconos del mismo color. No queda como único indicador: el `subText` y el `contentTitle` la llevan escrita, que es lo que lee un lector de pantalla.
+- **Todas las vistas de los dos cuerpos tienen que estar en la lista blanca de `RemoteViews`.** Un `Space` usado de espaciador llegó a ejecución: `RemoteViews` lo rechaza con «Class not allowed to be inflated», la notificación del servicio en primer plano no se puede inflar y **el sistema mata la app** con `BadForegroundServiceNotificationException`. El espaciador es un `TextView` vacío con `weight`, y `TimerNotificationFactoryTest.bothBodiesInflate` infla los dos cuerpos para que no vuelva a pasar.
 - **La fila de acciones del sistema solo se dibuja expandida**, así que la colapsada lleva tres iconos propios con los mismos `PendingIntent`. Son iconos y no etiquetas porque **el contenido propio de una notificación colapsada está limitado a 48 dp** con `targetSdk` ≥ 31 (antes 106 dp): no hay dos filas, y en una no caben la cifra y tres palabras. Por lo mismo, la colapsada muestra el nombre de la fase sin el `2/4`.
 - Las acciones de `addAction` se mantienen aunque en colapsada no se usen: son las que ven Wear, el asistente y la pantalla de bloqueo.
 

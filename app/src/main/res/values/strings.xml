@@ -189,6 +189,7 @@
     <string-array name="changelog_0_9_1">
         <item>Fixed: the widget could not be dropped on the home screen — the launcher claimed the app was not installed.</item>
         <item>The timer notification now shows the time left in large type, with pause, reset and skip in reach without expanding it.</item>
+        <item>The figure is red during a Pomodoro and amber during a break.</item>
         <item>The end-of-interval alert reaches a paired watch with its two actions: start the next one, or dismiss. Dismissing it anywhere stops the vibration.</item>
         <item>The notification comes back if you swipe it away with an interval still running.</item>
         <item>When an interval ends, the widget shows the next one ready to go instead of a warning sign.</item>

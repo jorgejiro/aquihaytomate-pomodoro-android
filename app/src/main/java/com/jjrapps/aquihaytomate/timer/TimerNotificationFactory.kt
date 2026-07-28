@@ -43,6 +43,7 @@ class TimerNotificationFactory @Inject constructor(
     fun ongoingRunning(state: TimerState): Notification =
         base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
             .setContentTitle(titleFor(state))
+            .setSubText(titleFor(state))
             .setOngoing(true)
             .asPhoneOnly()
             .withRestoreOnDismissal()
@@ -60,11 +61,12 @@ class TimerNotificationFactory @Inject constructor(
     fun ongoingPaused(state: TimerState, remainingMs: Long): Notification =
         base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
             .setContentTitle(titleFor(state))
+            .setSubText(expandedPhaseText(state, R.string.notification_paused_label))
             .setOngoing(true)
             .asPhoneOnly()
             .withRestoreOnDismissal()
             .withBody(state, TimerActionReceiver.ACTION_RESUME, R.string.notification_paused_label) {
-                frozenFigureOf(remainingMs)
+                frozenFigureOf(state, remainingMs)
             }
             .withTimerActions(pauseOrResume = TimerActionReceiver.ACTION_RESUME)
             .build()
@@ -115,13 +117,14 @@ class TimerNotificationFactory @Inject constructor(
         // Two bodies, because the collapsed one is capped at 48 dp and gets no system action row: there the
         // controls are icons of ours, and expanded they are the system's own labelled row from `addAction`.
         .setCustomContentView(
-            // Just the phase name here: with the figure at 24 sp and three 44 dp controls beside it, the
-            // cycle position is what gets ellipsised. It is one tap away in the expanded body.
+            // No phase text here at all: with the figure and three controls there is no room for it — in
+            // One UI it was cut to "En…" — so the phase lives in the header's subText and the figure's
+            // colour carries it in this form. The view stays as the spacer that pushes the controls right.
             body(
                 layout = R.layout.notification_timer_collapsed,
-                phase = context.getString(phaseNameRes(state.slotType)),
+                phase = "",
                 applyFigure = applyFigure,
-            ).apply { applyIconActions(pauseOrResume) },
+            ).apply { applyIconActions(pauseOrResume, state.slotType) },
         )
         .setCustomBigContentView(
             body(
@@ -136,9 +139,25 @@ class TimerNotificationFactory @Inject constructor(
         phase: String,
         applyFigure: RemoteViews.() -> Unit,
     ): RemoteViews = RemoteViews(context.packageName, layout).apply {
+        // Empty in the collapsed body, where this view is only a spacer.
         setTextViewText(R.id.notification_phase, phase)
         applyFigure()
     }
+
+    /**
+     * El color de la fase: rojo en enfoque, ámbar en descanso.
+     *
+     * En la forma colapsada es lo único que distingue una fase de otra, porque el texto no cabe — en One UI
+     * se cortaba a «En…» y ese estado ni siquiera dibuja el encabezado. No queda como único indicador en
+     * absoluto: el `subText` y el `contentTitle` llevan la fase escrita, que es lo que lee un lector de
+     * pantalla, y la forma expandida la muestra entera.
+     *
+     * Los tonos salen de `values/colors.xml` y `values-night/colors.xml`, oscurecidos en tema claro para que
+     * el ámbar no baje de 4,5:1 sobre un fondo casi blanco.
+     */
+    private fun figureColour(slotType: SlotType): Int = context.getColor(
+        if (slotType.isBreak) R.color.notification_time_break else R.color.notification_time_focus,
+    )
 
     /** `Enfoque · 2/4`, plus `· Pausado` when the clock is stopped. */
     private fun expandedPhaseText(state: TimerState, @StringRes suffixRes: Int?): String {
@@ -157,7 +176,14 @@ class TimerNotificationFactory @Inject constructor(
      * a tap to reach Pause. `contentDescription` carries the label a screen reader would have read off that
      * row.
      */
-    private fun RemoteViews.applyIconActions(pauseOrResume: String) {
+    private fun RemoteViews.applyIconActions(pauseOrResume: String, slotType: SlotType) {
+        val tint = figureColour(slotType)
+        listOf(
+            R.id.notification_action_primary,
+            R.id.notification_action_reset,
+            R.id.notification_action_skip,
+        ).forEach { setInt(it, "setColorFilter", tint) }
+
         val resuming = pauseOrResume == TimerActionReceiver.ACTION_RESUME
         setImageViewResource(
             R.id.notification_action_primary,
@@ -199,12 +225,14 @@ class TimerNotificationFactory @Inject constructor(
             true,
         )
         setChronometerCountDown(R.id.notification_chronometer, true)
+        setTextColor(R.id.notification_chronometer, figureColour(state.slotType))
     }
 
-    private fun RemoteViews.frozenFigureOf(remainingMs: Long) {
+    private fun RemoteViews.frozenFigureOf(state: TimerState, remainingMs: Long) {
         setViewVisibility(R.id.notification_chronometer, View.GONE)
         setViewVisibility(R.id.notification_static_time, View.VISIBLE)
         setTextViewText(R.id.notification_static_time, TimerMath.formatRemaining(remainingMs))
+        setTextColor(R.id.notification_static_time, figureColour(state.slotType))
     }
 
     /**
