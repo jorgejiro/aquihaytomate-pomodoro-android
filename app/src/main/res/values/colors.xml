@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Text colours for the body of the ongoing notification, and the only place in the app where a light
+  scheme exists.
+
+  **The notification is the one surface whose background is not ours.** SystemUI draws it near-white in a
+  light theme and near-black in a dark one, so the figure has to follow. `?android:attr/textColorPrimary`
+  looks like the answer and is not: measured on API 37, it resolves dark in both themes, even after
+  restarting SystemUI. Resource qualifiers do work, because the values are picked by configuration
+  (`uiMode`) rather than by whichever theme happens to inflate the view. See docs/decisions/009-*.
+
+  These are the Material on-surface opacities, not brand colours: the tomato palette lives in
+  `ui/theme/Color.kt` and has no business here.
+-->
+<resources>
+    <color name="notification_time">#DE000000</color>
+    <color name="notification_phase">#99000000</color>
+</resources>

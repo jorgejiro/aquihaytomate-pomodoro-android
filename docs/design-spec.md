@@ -603,10 +603,24 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
 ### 8.1 Ongoing (canal `timer_running`, IMPORTANCE_LOW)
 
 - Icono pequeño `ic_notif_tomate`, `setColor(TomateFill)`.
-- Título: `Enfoque · 2/4` / `Descanso` / `Descanso largo`.
-- Descuento: `setWhen(endAtEpochMs)` + `setShowWhen(true)` + `setUsesChronometer(true)` + `setChronometerCountDown(true)`. **Cero `notify()` por segundo.**
-- Texto en RUNNING: **`A continuación: Descanso · 5 min`**, con el mismo string y el mismo `SlotPlanner.upcomingSlot` que la línea de la pantalla. Es información que no cambia dentro del slot, así que no cuesta ni un repintado extra.
-- Pausado: `setUsesChronometer(false)` y texto estático `Pausado · 12:34`; ahí el tiempo que queda importa más que lo que viene después.
+- **Cuerpo propio** (`res/layout/notification_timer.xml`) con `DecoratedCustomViewStyle`, para que la cifra sea lo más grande de la notificación:
+
+  ```
+  ┌──────────────────────────────────────┐
+  │ 🍅 ¡Aquí hay tomate!                 │  encabezado del sistema
+  │                                      │
+  │   24:58     ENFOQUE · 2/4            │  26 sp · 13 sp
+  │                                      │
+  │  PAUSAR   │   REINICIAR   │  SALTAR  │  fila de acciones del sistema
+  └──────────────────────────────────────┘
+  ```
+
+- Descuento: `Chronometer` con `setChronometerCountDown(true)` **dentro del cuerpo propio**, con base en el reloj monotónico. Sigue ticando en el proceso de SystemUI: **cero `notify()` por segundo**. Ver `docs/decisions/009-*`.
+- La plantilla estándar daba la cifra al hueco del timestamp — 11 sp, arriba a la derecha, inmodificable — y todo el peso al título, donde estaba el `2/4`. Con el cuerpo propio se invierte: la cifra manda y la fase con el ciclo bajan a 13 sp.
+- **Colores del cuerpo por cualificador** (`values/colors.xml` y `values-night/colors.xml`), no de la paleta del tomate ni de `?android:attr/textColorPrimary`, que resuelve oscuro en ambos temas. Es la única superficie de la app con esquema claro, porque su fondo lo pinta SystemUI.
+- Pausado: `TextView` al mismo tamaño con la cifra congelada —un `Chronometer` no se puede detener en un valor arbitrario— y `· Pausado` al final de la línea de fase.
+- **No hay línea de «A continuación».** Ocupaba el renglón que ahora es la cifra y decía algo que el usuario ya sabe. En la pantalla del temporizador se mantiene, donde no compite con nada.
+- `setContentTitle` se sigue rellenando aunque no se vea: es el fallback de las superficies que rechazan vistas propias y lo que lee un lector de pantalla.
 - Flags: `setOngoing`, `setSilent`, `setOnlyAlertOnce`, `CATEGORY_STOPWATCH`, `VISIBILITY_PUBLIC`, y **`setForegroundServiceBehavior(FOREGROUND_SERVICE_IMMEDIATE)`** — sin esto Android 12+ retrasa la aparición hasta 10 s y el usuario cree que no ha arrancado.
 - Acciones: **las mismas tres que la pantalla y en el mismo orden** — `Pausar`/`Reanudar` · `Reiniciar` · `Saltar`. Tres es el máximo que muestra una notificación, y que el juego sea idéntico en RUNNING y en PAUSED significa que **el botón bajo el dedo no se mueve** al pausar desde la persiana.
 - **Nada de `setProgress()`**: obligaría a repintar constantemente. El progreso visual vive en la app y en el widget.

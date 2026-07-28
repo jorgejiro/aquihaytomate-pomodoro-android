@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The body of the ongoing notification, so the countdown can be the biggest thing in it.
+
+  Left to the standard template, the figure is drawn by SystemUI in the slot where a notification's
+  timestamp goes: 11 sp, top right, and no way to change it, while `Enfoque · 2/4` sat in the title and got
+  all the weight. This layout swaps the two round.
+
+  **The Chronometer still ticks inside SystemUI**, exactly as in the widget, so a 25 minute pomodoro costs
+  the same zero wake-ups it did before. See docs/decisions/009-*.
+
+  Colours come from `values/colors.xml` and `values-night/colors.xml`, never from the tomato palette: this
+  view is inflated by SystemUI over ITS background, which is near-white in a light theme, so a bone figure
+  would be invisible half the time. `?android:attr/textColorPrimary` was tried first and resolves dark in
+  both themes — see docs/decisions/009-*.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <!-- Two mutually exclusive readouts: a Chronometer cannot be frozen at an arbitrary value, so a
+         paused slot falls back to a plain TextView at the same size. -->
+    <Chronometer
+        android:id="@+id/notification_chronometer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/space_grotesk_variable"
+        android:fontFeatureSettings="tnum"
+        android:includeFontPadding="false"
+        android:textColor="@color/notification_time"
+        android:textSize="26sp" />
+
+    <TextView
+        android:id="@+id/notification_static_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/space_grotesk_variable"
+        android:fontFeatureSettings="tnum"
+        android:includeFontPadding="false"
+        android:textColor="@color/notification_time"
+        android:textSize="26sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/notification_phase"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textColor="@color/notification_phase"
+        android:textSize="13sp" />
+
+</LinearLayout>

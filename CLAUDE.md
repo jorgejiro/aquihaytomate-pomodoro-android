@@ -364,7 +364,7 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 - **Todo `startForegroundService` va en `try/catch (ForegroundServiceStartNotAllowedException)`** con degradación a «solo estado + alarma». Las exenciones legítimas que sí tenemos: desde la Activity, desde una acción de notificación, desde el toque en el widget y desde una alarma exacta.
 - **Al pausar se detiene el servicio.** No tiene sentido quemar wakelock y notificación foreground con el reloj parado; se publica una notificación normal con «Reanudar».
 - **`reconcile()` nunca simula más de un slot vencido**, aunque el auto-inicio esté activo. Si el móvil estuvo apagado 8 horas, se registra el slot que venció, se pasa a `IDLE` y ya. Sin esta regla, abrir la app por la mañana insertaría 16 pomodoros falsos.
-- **La notificación ongoing no se repinta cada segundo.** Se publica una vez por transición (~4 `notify()` por pomodoro) y el descuento lo dibuja SystemUI con `setUsesChronometer(true)` + `setChronometerCountDown(true)`. Nada de `setProgress()`.
+- **La notificación ongoing no se repinta cada segundo.** Se publica una vez por transición (~4 `notify()` por pomodoro) y el descuento lo tickea un `Chronometer` dentro de **nuestro propio cuerpo de notificación** (`DecoratedCustomViewStyle`), en el proceso de SystemUI. Nada de `setProgress()` ni de minutos en el título, que obligaría a republicar cada minuto. Ver `docs/decisions/009-*`.
 - **El widget se refresca desde un solo sitio**: un colector con scope de aplicación observa `TimerStateRepository.state` con `distinctUntilChangedBy { Triple(status, slotType, endAtEpochMs) }` + `debounce(250)`. **Nunca por segundo** — de eso se encarga el `Chronometer` del widget.
 
 ### Máquina de estados
@@ -470,6 +470,15 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 ---
 
 ## 10. Checklists de verificación manual
+
+### Notificación con cuerpo propio (obligatoria tras el ADR 009)
+
+El cuerpo de la notificación lo decora cada fabricante, así que hay que mirarlo en:
+
+- Android 12, 14 y 16.
+- **One UI** (el móvil de Jorge) además de Pixel Launcher.
+- **Tema claro y tema oscuro** del sistema: la cifra sale de `values-night`, y es la única superficie de la app con esquema claro.
+- Colapsada y expandida, y en la **pantalla de bloqueo**, donde algunos sistemas degradan a la plantilla estándar.
 
 ### Resiliencia del temporizador (obligatoria en F4, en Android 12, 14 y 16)
 

@@ -4,51 +4,45 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.SystemClock
+import android.view.View
+import android.widget.RemoteViews
+import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.app.NotificationCompat
 import com.jjrapps.aquihaytomate.AquiHayTomateApplication
 import com.jjrapps.aquihaytomate.MainActivity
 import com.jjrapps.aquihaytomate.R
 import com.jjrapps.aquihaytomate.domain.model.SlotType
-import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.TimerState
-import com.jjrapps.aquihaytomate.domain.usecase.PlannedSlot
+import com.jjrapps.aquihaytomate.domain.time.ElapsedRealtimeSource
 import com.jjrapps.aquihaytomate.domain.usecase.TimerMath
-import com.jjrapps.aquihaytomate.ui.common.phaseNameRes
 import com.jjrapps.aquihaytomate.ui.theme.TomateFill
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.Clock
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
  * Builds the two notifications. See docs/design-spec.md §8.
  *
- * **The countdown is drawn by SystemUI, not by us.** `setWhen(endAt)` plus `setUsesChronometer(true)`
- * plus `setChronometerCountDown(true)` makes the system tick the figure in its own process, so a
- * pomodoro costs about four `notify()` calls instead of 1500. No `setProgress()` either, for the same
- * reason: it would force a repaint a second.
+ * **The countdown is ticked by SystemUI, not by us.** The figure lives in a `Chronometer` inside our own
+ * body view, counting down in the system's process, so a pomodoro still costs about four `notify()` calls
+ * instead of 1500. No `setProgress()` either, for the same reason: it would force a repaint a second.
  */
 @Singleton
 class TimerNotificationFactory @Inject constructor(
     @param:ApplicationContext private val context: Context,
+    private val clock: Clock,
+    private val elapsedRealtime: ElapsedRealtimeSource,
 ) {
 
-    /**
-     * The foreground notification of a running slot.
-     *
-     * @param nextSlot what follows this one, for the second line. Optional because the service publishes
-     *   a placeholder in the first line of `onStartCommand`, before it has read anything off disk.
-     */
-    fun ongoingRunning(state: TimerState, nextSlot: PlannedSlot? = null): Notification =
+    /** The foreground notification of a running slot. */
+    fun ongoingRunning(state: TimerState): Notification =
         base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
             .setContentTitle(titleFor(state))
-            .setContentText(nextUpText(nextSlot))
             .setOngoing(true)
-            // The system draws the countdown itself from this deadline.
-            .setWhen(state.endAtEpochMs)
-            .setShowWhen(true)
-            .setUsesChronometer(true)
-            .setChronometerCountDown(true)
+            .withBody(runningBody(state))
             // Without IMMEDIATE, Android 12+ holds the notification back for up to ten seconds and the
             // user thinks the timer never started.
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
@@ -57,22 +51,80 @@ class TimerNotificationFactory @Inject constructor(
 
     /**
      * A paused slot. No chronometer — the clock is stopped, so the remaining time is baked into the
-     * text and stays there until something changes.
+     * figure and stays there until something changes.
      */
     fun ongoingPaused(state: TimerState, remainingMs: Long): Notification =
         base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
             .setContentTitle(titleFor(state))
-            .setContentText(
-                context.getString(
-                    R.string.notification_paused,
-                    TimerMath.formatRemaining(remainingMs),
-                ),
-            )
             .setOngoing(true)
-            .setUsesChronometer(false)
-            .setShowWhen(false)
+            .withBody(pausedBody(state, remainingMs))
             .withTimerActions(pauseOrResume = TimerActionReceiver.ACTION_RESUME)
             .build()
+
+    /**
+     * The countdown as the biggest thing in the notification, with the phase and the cycle position
+     * demoted to a line of 13 sp beside it.
+     *
+     * The standard template gives the figure the timestamp slot — 11 sp, top right, unstyleable — and hands
+     * the whole visual weight to the title, which is how `Enfoque · 2/4` ended up shouting over the time
+     * left. So the body is ours, and `DecoratedCustomViewStyle` keeps the system's header and action row
+     * around it. See docs/decisions/009-*.
+     *
+     * `setContentTitle` stays set even though nothing shows it: it is the fallback for surfaces that refuse
+     * custom views, and it is what a screen reader announces.
+     */
+    private fun NotificationCompat.Builder.withBody(body: RemoteViews): NotificationCompat.Builder =
+        setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setCustomContentView(body)
+            .setCustomBigContentView(body)
+
+    private fun runningBody(state: TimerState): RemoteViews =
+        body(state).apply {
+            setViewVisibility(R.id.notification_chronometer, View.VISIBLE)
+            setViewVisibility(R.id.notification_static_time, View.GONE)
+            // Counted down by SystemUI from a point on the monotonic clock, so this process sleeps
+            // through the whole slot exactly as it did before. Same mechanism as the widget.
+            setChronometer(
+                R.id.notification_chronometer,
+                SystemClock.elapsedRealtime() + remainingMsOf(state),
+                null,
+                true,
+            )
+            setChronometerCountDown(R.id.notification_chronometer, true)
+        }
+
+    private fun pausedBody(state: TimerState, remainingMs: Long): RemoteViews =
+        body(state, suffixRes = R.string.notification_paused_label).apply {
+            setViewVisibility(R.id.notification_chronometer, View.GONE)
+            setViewVisibility(R.id.notification_static_time, View.VISIBLE)
+            setTextViewText(
+                R.id.notification_static_time,
+                TimerMath.formatRemaining(remainingMs),
+            )
+        }
+
+    private fun body(state: TimerState, @StringRes suffixRes: Int? = null): RemoteViews {
+        val phase = titleFor(state)
+        return RemoteViews(context.packageName, R.layout.notification_timer).apply {
+            setTextViewText(
+                R.id.notification_phase,
+                if (suffixRes == null) {
+                    phase
+                } else {
+                    context.getString(R.string.notification_phase_suffix, phase, context.getString(suffixRes))
+                },
+            )
+        }
+    }
+
+    /**
+     * What is left of the running slot, for the chronometer's base.
+     *
+     * Derived from the deadline rather than passed in, so the notification cannot disagree with the state
+     * it is describing. See `TimerMath`.
+     */
+    private fun remainingMsOf(state: TimerState): Long =
+        TimerMath.remainingMs(state, clock.millis(), elapsedRealtime.millis())
 
     /**
      * The same three actions as the timer screen, in the same order: hold or release the clock, throw this
@@ -100,18 +152,6 @@ class TimerNotificationFactory @Inject constructor(
         R.string.notification_action_resume
     } else {
         R.string.notification_action_pause
-    }
-
-    /** `A continuación: Descanso · 5 min`, from the same string and the same planner as the screen. */
-    private fun nextUpText(nextSlot: PlannedSlot?): String? {
-        if (nextSlot == null) return null
-        val minutes = (nextSlot.durationMs / TimerSettings.MINUTE_MS).toInt()
-
-        return context.getString(
-            R.string.next_up,
-            context.getString(phaseNameRes(nextSlot.type)),
-            context.resources.getQuantityString(R.plurals.settings_minutes, minutes, minutes),
-        )
     }
 
     /**
