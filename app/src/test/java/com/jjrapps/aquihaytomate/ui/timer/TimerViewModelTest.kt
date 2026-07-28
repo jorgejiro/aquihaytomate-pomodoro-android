@@ -306,6 +306,66 @@ class TimerViewModelTest {
     }
 
     @Test
+    fun `the up next readout announces the break a running focus leads to`() = runTest(dispatcher) {
+        val vm = viewModel()
+        vm.uiState.test {
+            skipItems(1)
+            (awaitItem() as TimerUiState.Success).let { state ->
+                assertEquals(NextSlot(SlotType.SHORT_BREAK, 5), state.nextSlot)
+            }
+
+            vm.onPrimaryControlClick()
+            runCurrent()
+
+            (expectMostRecentItem() as TimerUiState.Success).let { state ->
+                assertEquals(NextSlot(SlotType.SHORT_BREAK, 5), state.nextSlot)
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    // Ringing already points at the next slot, so a readout here would name the one after it.
+    @Test
+    fun `there is no up next readout while ringing`() = runTest(dispatcher) {
+        val vm = viewModel()
+        vm.uiState.test {
+            skipItems(1)
+            awaitItem()
+            vm.onPrimaryControlClick()
+            runCurrent()
+            advanceAll(focusMs)
+
+            val state = expectMostRecentItem() as TimerUiState.Success
+            assertEquals(TimerStatus.RINGING, state.status)
+            assertEquals(null, state.nextSlot)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    // Skip is offered for a break that has not started, but not for the untouched first focus slot.
+    @Test
+    fun `skip is hidden on the first idle focus and offered on an idle break`() =
+        runTest(dispatcher) {
+            val vm = viewModel()
+            vm.uiState.test {
+                skipItems(1)
+                assertFalse((awaitItem() as TimerUiState.Success).showSkip)
+
+                vm.onPrimaryControlClick()
+                runCurrent()
+                vm.onSkipClick()
+                runCurrent()
+
+                (expectMostRecentItem() as TimerUiState.Success).let { state ->
+                    assertEquals(SlotType.SHORT_BREAK, state.slotType)
+                    assertEquals(TimerStatus.IDLE, state.status)
+                    assertTrue(state.showSkip)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `keep screen on only applies while the timer runs`() = runTest(dispatcher) {
         settings.set(TimerSettings(keepScreenOn = true))
         val vm = viewModel()

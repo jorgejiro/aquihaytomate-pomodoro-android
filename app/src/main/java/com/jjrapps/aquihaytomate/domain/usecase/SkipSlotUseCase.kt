@@ -47,7 +47,7 @@ class SkipSlotUseCase @Inject constructor(
             settings = settings,
         )
         val nextStatus =
-            if (settings.autoStartNext) TimerStatus.RUNNING else TimerStatus.IDLE
+            if (settings.autoStartsInto(planned.type)) TimerStatus.RUNNING else TimerStatus.IDLE
 
         val changed = timerStateRepository.update { current ->
             // Bail out if something else moved the timer on while we were reading and recording.

@@ -58,7 +58,7 @@ Detalles que hacen que funcione:
    `-1L`. Sin banderas, sin locks.
 
 4. **Regla anti-encadenado.** `reconcile()` **nunca simula más de un slot vencido**, aunque
-   `autoStartNext` esté activo. Si el móvil estuvo apagado 8 horas, se registra el slot que venció,
+   el auto-inicio esté activo. Si el móvil estuvo apagado 8 horas, se registra el slot que venció,
    se pasa a `IDLE` y se acabó. Si venció hace más de 30 minutos ni siquiera se alerta.
 
 5. **Arranque del FGS solo desde exenciones legítimas**: la Activity, una acción de notificación, un

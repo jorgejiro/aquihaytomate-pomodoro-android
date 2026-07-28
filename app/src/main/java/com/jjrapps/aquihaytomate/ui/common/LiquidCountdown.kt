@@ -1,20 +1,28 @@
 package com.jjrapps.aquihaytomate.ui.common
 
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,6 +48,9 @@ private val DIGITS_OPTICAL_OFFSET = (-2).dp
  *
  * @param contentDescription read instead of the raw `18:42`, which a screen reader would spell out as
  *   a ratio.
+ * @param onClick invoked when the tomato itself is tapped; it is the same action as the primary control,
+ *   so the whole 268 dp circle is a tap target rather than only the label under it.
+ * @param onClickLabel what a screen reader announces the tap does, e.g. "pause".
  */
 @Composable
 fun LiquidCountdown(
@@ -49,12 +60,41 @@ fun LiquidCountdown(
     showCalyx: Boolean,
     contentDescription: String,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    onClickLabel: String? = null,
 ) {
     val phases = rememberLiquidPhases()
     val clipPathHolder = remember { Path() }
+    val interactionSource = remember { MutableInteractionSource() }
+    // Held in a local so the semantics block below can call it without shadowing `onClick` there.
+    val clickAction = onClick
 
     Box(
-        modifier = modifier.clearAndSetSemantics { this.contentDescription = contentDescription },
+        modifier = modifier
+            .clip(CircleShape)
+            .then(
+                if (clickAction == null) {
+                    Modifier
+                } else {
+                    Modifier.clickable(
+                        interactionSource = interactionSource,
+                        indication = LocalIndication.current,
+                        onClick = clickAction,
+                    )
+                },
+            )
+            // The action is declared here as well as on `clickable`: this block replaces the semantics of
+            // the whole subtree, so a bare `clickable` above it would not survive it.
+            .clearAndSetSemantics {
+                this.contentDescription = contentDescription
+                if (clickAction != null) {
+                    this.role = Role.Button
+                    onClick(label = onClickLabel) {
+                        clickAction()
+                        true
+                    }
+                }
+            },
         contentAlignment = Alignment.Center,
     ) {
         LiquidTomato(

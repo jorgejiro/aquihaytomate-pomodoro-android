@@ -93,8 +93,12 @@ class FakeSettingsRepository(initial: TimerSettings = TimerSettings()) : Setting
         )
     }
 
-    override suspend fun setAutoStartNext(enabled: Boolean) {
-        flow.value = flow.value.copy(autoStartNext = enabled)
+    override suspend fun setAutoStartBreak(enabled: Boolean) {
+        flow.value = flow.value.copy(autoStartBreak = enabled)
+    }
+
+    override suspend fun setAutoStartFocus(enabled: Boolean) {
+        flow.value = flow.value.copy(autoStartFocus = enabled)
     }
 
     override suspend fun setAlertSound(sound: AlertSound) {

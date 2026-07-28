@@ -10,8 +10,11 @@ import com.jjrapps.aquihaytomate.AquiHayTomateApplication
 import com.jjrapps.aquihaytomate.MainActivity
 import com.jjrapps.aquihaytomate.R
 import com.jjrapps.aquihaytomate.domain.model.SlotType
+import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.TimerState
+import com.jjrapps.aquihaytomate.domain.usecase.PlannedSlot
 import com.jjrapps.aquihaytomate.domain.usecase.TimerMath
+import com.jjrapps.aquihaytomate.ui.common.phaseNameRes
 import com.jjrapps.aquihaytomate.ui.theme.TomateFill
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -30,10 +33,16 @@ class TimerNotificationFactory @Inject constructor(
     @param:ApplicationContext private val context: Context,
 ) {
 
-    /** The foreground notification of a running slot. */
-    fun ongoingRunning(state: TimerState): Notification =
+    /**
+     * The foreground notification of a running slot.
+     *
+     * @param nextSlot what follows this one, for the second line. Optional because the service publishes
+     *   a placeholder in the first line of `onStartCommand`, before it has read anything off disk.
+     */
+    fun ongoingRunning(state: TimerState, nextSlot: PlannedSlot? = null): Notification =
         base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
             .setContentTitle(titleFor(state))
+            .setContentText(nextUpText(nextSlot))
             .setOngoing(true)
             // The system draws the countdown itself from this deadline.
             .setWhen(state.endAtEpochMs)
@@ -43,16 +52,7 @@ class TimerNotificationFactory @Inject constructor(
             // Without IMMEDIATE, Android 12+ holds the notification back for up to ten seconds and the
             // user thinks the timer never started.
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
-            .addAction(
-                0,
-                context.getString(R.string.notification_action_pause),
-                actionIntent(TimerActionReceiver.ACTION_PAUSE),
-            )
-            .addAction(
-                0,
-                context.getString(R.string.notification_action_skip),
-                actionIntent(TimerActionReceiver.ACTION_SKIP),
-            )
+            .withTimerActions(pauseOrResume = TimerActionReceiver.ACTION_PAUSE)
             .build()
 
     /**
@@ -71,17 +71,48 @@ class TimerNotificationFactory @Inject constructor(
             .setOngoing(true)
             .setUsesChronometer(false)
             .setShowWhen(false)
-            .addAction(
-                0,
-                context.getString(R.string.notification_action_resume),
-                actionIntent(TimerActionReceiver.ACTION_RESUME),
-            )
-            .addAction(
-                0,
-                context.getString(R.string.notification_action_reset),
-                actionIntent(TimerActionReceiver.ACTION_RESET),
-            )
+            .withTimerActions(pauseOrResume = TimerActionReceiver.ACTION_RESUME)
             .build()
+
+    /**
+     * The same three actions as the timer screen, in the same order: hold or release the clock, throw this
+     * slot back to its start, move on to the next one.
+     *
+     * Three is the most a notification shows, and having the set be identical in both states means the
+     * button under the finger does not move when the timer is paused from the shade.
+     */
+    private fun NotificationCompat.Builder.withTimerActions(
+        pauseOrResume: String,
+    ): NotificationCompat.Builder = this
+        .addAction(0, context.getString(labelFor(pauseOrResume)), actionIntent(pauseOrResume))
+        .addAction(
+            0,
+            context.getString(R.string.notification_action_reset),
+            actionIntent(TimerActionReceiver.ACTION_RESET),
+        )
+        .addAction(
+            0,
+            context.getString(R.string.notification_action_skip),
+            actionIntent(TimerActionReceiver.ACTION_SKIP),
+        )
+
+    private fun labelFor(action: String) = if (action == TimerActionReceiver.ACTION_RESUME) {
+        R.string.notification_action_resume
+    } else {
+        R.string.notification_action_pause
+    }
+
+    /** `A continuación: Descanso · 5 min`, from the same string and the same planner as the screen. */
+    private fun nextUpText(nextSlot: PlannedSlot?): String? {
+        if (nextSlot == null) return null
+        val minutes = (nextSlot.durationMs / TimerSettings.MINUTE_MS).toInt()
+
+        return context.getString(
+            R.string.next_up,
+            context.getString(phaseNameRes(nextSlot.type)),
+            context.resources.getQuantityString(R.plurals.settings_minutes, minutes, minutes),
+        )
+    }
 
     /**
      * The end-of-slot alert. [state] already describes the slot coming up, so what just finished is

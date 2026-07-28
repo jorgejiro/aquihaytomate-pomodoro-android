@@ -12,7 +12,10 @@ data class TimerSettings(
     val shortBreakMinutes: Int = DEFAULT_SHORT_BREAK_MINUTES,
     val longBreakMinutes: Int = DEFAULT_LONG_BREAK_MINUTES,
     val pomodorosPerCycle: Int = DEFAULT_POMODOROS_PER_CYCLE,
-    val autoStartNext: Boolean = false,
+    /** Chain straight into the break when a pomodoro ends. */
+    val autoStartBreak: Boolean = false,
+    /** Chain straight into the next pomodoro when a break ends. */
+    val autoStartFocus: Boolean = false,
     val alertSound: AlertSound = AlertSound.DEFAULT,
     val vibrationSeconds: Int = DEFAULT_VIBRATION_SECONDS,
     val keepScreenOn: Boolean = false,
@@ -33,6 +36,20 @@ data class TimerSettings(
 
     /** Vibration disabled is expressed as zero seconds, not as a separate flag. */
     val vibrationEnabled: Boolean get() = vibrationSeconds > 0
+
+    /**
+     * Whether the timer should start [nextType] by itself instead of waiting for the user.
+     *
+     * Two settings rather than one because the two directions are not the same decision: rolling into the
+     * break the moment a pomodoro ends is what you want — the break is earned and its clock should already
+     * be running while you get up. Rolling back into work is not, because a break often runs long on
+     * purpose. Asked as one switch, whoever wants the first has to give up the second.
+     *
+     * Keyed on the slot coming up, and used by both `CompleteSlotUseCase` and `SkipSlotUseCase`, so
+     * finishing a slot and skipping it cannot disagree.
+     */
+    fun autoStartsInto(nextType: SlotType): Boolean =
+        if (nextType.isBreak) autoStartBreak else autoStartFocus
 
     companion object {
         const val MINUTE_MS = 60_000L

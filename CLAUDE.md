@@ -39,9 +39,10 @@ El nombre juega con el tomate (*pomodoro* en italiano, de donde viene el nombre 
 - Un círculo grande relleno de rojo que **se va vaciando por abajo como un líquido**, con la superficie ondulando. Es el indicador de progreso del slot en curso.
 - La cifra del tiempo restante centrada, **en negativo** donde el líquido la cubre (blanca sobre el hueco, negra sobre el rojo).
 - Etiqueta de fase debajo: `ENFOQUE` / `DESCANSO` / `DESCANSO LARGO` / `¡TIEMPO!`.
-- Control primario en texto, sin caja: `▸ INICIAR` / `❚❚ PAUSAR` / `▸ REANUDAR`.
-- Control secundario `reiniciar`, visible solo si hay progreso.
-- Puntos de ciclo abajo (`● ● ○ ○   2/4`) indicando en qué pomodoro del ciclo vamos.
+- Control primario en texto, sin caja: `▸ INICIAR` / `❚❚ PAUSAR` / `▸ REANUDAR`. **Tocar el círculo hace lo mismo que el control primario**: es el objetivo táctil más grande de la pantalla.
+- Controles secundarios `REINICIAR` y `SALTAR` en una fila debajo, con su hueco reservado para que el tomate no salte al aparecer. Son las tres acciones que tiene un pomodoro en marcha, y **saltar tiene que estar en la pantalla, no solo en la notificación**.
+- Línea `A CONTINUACIÓN: DESCANSO · 5 MIN`, de `SlotPlanner.upcomingSlot` — la misma función pura que alimenta la notificación ongoing.
+- Puntos de ciclo **pegados al borde inferior** (`● ● ○ ○   2/4`) indicando en qué pomodoro del ciclo vamos. No forman parte del grupo de controles.
 
 ### 2.2 Pantalla Estadísticas ✅ Implementada
 
@@ -61,7 +62,8 @@ Todo dibujado con Compose `Canvas`. **Sin librería de gráficos** — ver `docs
 | Descanso corto | **5 min** | 1–60 |
 | Descanso largo | **15 min** | 1–120 |
 | Pomodoros por ciclo | **4** | 2–12 |
-| Auto-iniciar el siguiente slot | desactivado | — |
+| **Auto-iniciar el descanso** (al terminar un pomodoro) | desactivado | — |
+| **Auto-iniciar el pomodoro** (al terminar un descanso) | desactivado | — |
 | Sonido al terminar | Campana | `silent`, `bell`, `bowl`, `digital`, `soft` |
 | **Duración de la vibración** | **5 s** | 0 (= desactivada) – 30 |
 | Mantener pantalla encendida | desactivado | — |
@@ -73,7 +75,9 @@ Más: estado de los permisos (notificaciones y alarmas exactas) con botón a los
 
 ### 2.4 Pantalla Onboarding ✅ Implementada
 
-Tres páginas: qué es la técnica pomodoro · elige tus duraciones · el widget y el permiso de notificaciones.
+Tres páginas: qué es la técnica pomodoro · elige tus duraciones · el widget y los dos permisos.
+
+En la tercera página los permisos son **filas con su estado escrito** (`Pendiente` en ámbar con `Necesario` debajo, o `Activado`), no botones planos, y **`EMPEZAR` está deshabilitado hasta que los dos estén concedidos**, con un `CONTINUAR SIN ELLOS` discreto como válvula de escape obligatoria. Ver `docs/decisions/008-el-onboarding-exige-los-dos-permisos.md`.
 
 ### 2.5 Widget de escritorio 1×1 ✅ Implementado
 
@@ -81,6 +85,7 @@ Tres páginas: qué es la técnica pomodoro · elige tus duraciones · el widget
 
 - Ocupa **una sola casilla** (`targetCellWidth/Height=1`, `resizeMode="none"`).
 - Muestra los minutos restantes y el nivel de líquido como progreso. Distingue enfoque (rojo) de descanso (ámbar) por color.
+- **Lleva dibujado el glifo de la acción que hará el toque**: `▶` parado o pausado, `❚❚` corriendo. Parado no muestra cifra, solo el `▶` a todo el tomate. Los glifos se pintan en el bitmap con `Canvas`, no se escriben como texto: Space Grotesk no tiene ni `▸` ni `❚`.
 - **Un toque** = iniciar / pausar / reanudar, según el estado.
 - **Doble toque rápido** (ventana de ~400 ms) = reiniciar.
 - **No usa pulsación larga**: en cualquier launcher (Nova incluido) el long-press sobre un widget lo intercepta el propio launcher para arrastrarlo y el evento nunca llega a la app. Es una limitación de plataforma, no una preferencia.
@@ -120,7 +125,7 @@ El test unitario `ChangelogCatalogTest` falla si el `versionCode` compilado no t
 | `targetSdk` | 36 (Android 16) |
 | `compileSdk` | 36 |
 | Build | Gradle Kotlin DSL + Version Catalog (`libs.versions.toml`) |
-| AGP | **9.2.1** |
+| AGP | **9.3.1** |
 | KSP | **2.3.7** (para Hilt y Room; **no usar kapt**) |
 | Arquitectura | MVVM + UDF, capas `ui` / `domain` / `data` |
 | DI | Hilt **2.59.2** |
@@ -153,7 +158,7 @@ El test unitario `ChangelogCatalogTest` falla si el `versionCode` compilado no t
 | MockK | 1.13.9 |
 | Turbine | 1.2.0 |
 
-Gradle wrapper **9.4.1**, toolchain JDK **21**, `compileOptions` Java **11**.
+Gradle wrapper **9.5.0**, toolchain JDK **21**, `compileOptions` Java **11**.
 
 ### Permisos requeridos
 
@@ -167,7 +172,7 @@ Gradle wrapper **9.4.1**, toolchain JDK **21**, `compileOptions` Java **11**.
 <uses-permission android:name="android.permission.WAKE_LOCK" />
 ```
 
-> **No declarar `USE_EXACT_ALARM` jamás.** Google Play lo reserva a despertadores y calendarios, y nuestra arquitectura no lo necesita: la alarma exacta es la tercera capa de respaldo, no el mecanismo principal. `SCHEDULE_EXACT_ALARM` se pide en onboarding con `Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM` y **la app funciona sin él**.
+> **No declarar `USE_EXACT_ALARM` jamás.** Google Play lo reserva a despertadores y calendarios, y nuestra arquitectura no lo necesita: la alarma exacta es la tercera capa de respaldo, no el mecanismo principal. `SCHEDULE_EXACT_ALARM` se pide en onboarding con `Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM` y **la app funciona sin él** — pero el onboarding lo pide como necesario en vez de como opcional, porque describir la arquitectura no es lo mismo que describir la experiencia; ver `docs/decisions/008-*`.
 
 > **No declarar `USE_FULL_SCREEN_INTENT`.** Android 14 lo restringe a llamadas y alarmas de despertador, y Play lo revisa. Basta con `IMPORTANCE_HIGH` y heads-up.
 
@@ -358,7 +363,7 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 - **`START_NOT_STICKY`.** Un `START_STICKY` reviviría el servicio con `intent == null` y sin contexto; preferimos reconciliar.
 - **Todo `startForegroundService` va en `try/catch (ForegroundServiceStartNotAllowedException)`** con degradación a «solo estado + alarma». Las exenciones legítimas que sí tenemos: desde la Activity, desde una acción de notificación, desde el toque en el widget y desde una alarma exacta.
 - **Al pausar se detiene el servicio.** No tiene sentido quemar wakelock y notificación foreground con el reloj parado; se publica una notificación normal con «Reanudar».
-- **`reconcile()` nunca simula más de un slot vencido**, aunque `autoStartNext` esté activo. Si el móvil estuvo apagado 8 horas, se registra el slot que venció, se pasa a `IDLE` y ya. Sin esta regla, abrir la app por la mañana insertaría 16 pomodoros falsos.
+- **`reconcile()` nunca simula más de un slot vencido**, aunque el auto-inicio esté activo. Si el móvil estuvo apagado 8 horas, se registra el slot que venció, se pasa a `IDLE` y ya. Sin esta regla, abrir la app por la mañana insertaría 16 pomodoros falsos.
 - **La notificación ongoing no se repinta cada segundo.** Se publica una vez por transición (~4 `notify()` por pomodoro) y el descuento lo dibuja SystemUI con `setUsesChronometer(true)` + `setChronometerCountDown(true)`. Nada de `setProgress()`.
 - **El widget se refresca desde un solo sitio**: un colector con scope de aplicación observa `TimerStateRepository.state` con `distinctUntilChangedBy { Triple(status, slotType, endAtEpochMs) }` + `debounce(250)`. **Nunca por segundo** — de eso se encarga el `Chronometer` del widget.
 

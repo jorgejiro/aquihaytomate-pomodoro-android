@@ -230,7 +230,7 @@ class TimerEngineTest {
 
     @Test
     fun `auto start chains straight into the next slot without ringing idle`() = runTest {
-        settings.set(TimerSettings(autoStartNext = true))
+        settings.set(TimerSettings(autoStartBreak = true))
         start()
         advance(focusMs)
 
@@ -241,6 +241,62 @@ class TimerEngineTest {
         assertEquals(SlotType.SHORT_BREAK, state.slotType)
         assertEquals(shortBreakMs, remaining())
         assertEquals(1, alerts.playCount)
+    }
+
+    // The reason the single switch was split: rolling into the break is welcome, rolling back into work
+    // is not, because a break often runs long on purpose.
+    @Test
+    fun `auto starting the break leaves the next pomodoro waiting`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = true, autoStartFocus = false))
+        start()
+        advance(focusMs)
+        complete()
+
+        // The break is already running, and it still rang and buzzed on the way in.
+        assertEquals(TimerStatus.RUNNING, state().status)
+        assertEquals(SlotType.SHORT_BREAK, state().slotType)
+        assertEquals(1, alerts.playCount)
+
+        advance(shortBreakMs)
+        complete()
+
+        // The pomodoro is not: it waits for the user, however long the break really took.
+        assertEquals(TimerStatus.RINGING, state().status)
+        assertEquals(SlotType.FOCUS, state().slotType)
+        assertEquals(2, alerts.playCount)
+    }
+
+    @Test
+    fun `auto starting the pomodoro leaves the break waiting`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false, autoStartFocus = true))
+        start()
+        advance(focusMs)
+        complete()
+
+        assertEquals(TimerStatus.RINGING, state().status)
+        assertEquals(SlotType.SHORT_BREAK, state().slotType)
+
+        // Take the break by hand, and the pomodoro after it chains on its own.
+        start()
+        advance(shortBreakMs)
+        complete()
+
+        assertEquals(TimerStatus.RUNNING, state().status)
+        assertEquals(SlotType.FOCUS, state().slotType)
+    }
+
+    // Skipping goes through the same switch as finishing, so the two cannot diverge.
+    @Test
+    fun `skipping a break honours the pomodoro switch and not the break one`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = true, autoStartFocus = false))
+        start()
+        advance(focusMs)
+        complete()
+
+        skip()
+
+        assertEquals(SlotType.FOCUS, state().slotType)
+        assertEquals(TimerStatus.IDLE, state().status)
     }
 
     @Test
@@ -368,7 +424,7 @@ class TimerEngineTest {
 
     @Test
     fun `skipping honours auto start`() = runTest {
-        settings.set(TimerSettings(autoStartNext = true))
+        settings.set(TimerSettings(autoStartBreak = true))
         start()
         advance(60_000L)
 
@@ -503,7 +559,7 @@ class TimerEngineTest {
     // Eight hours with the phone off must yield one pomodoro, not sixteen.
     @Test
     fun `reconciling after hours records one slot silently and stops`() = runTest {
-        settings.set(TimerSettings(autoStartNext = true))
+        settings.set(TimerSettings(autoStartBreak = true))
         start()
         advance(8 * 60 * 60_000L)
 
@@ -517,7 +573,7 @@ class TimerEngineTest {
 
     @Test
     fun `reconciling never chains even with auto start on`() = runTest {
-        settings.set(TimerSettings(autoStartNext = true))
+        settings.set(TimerSettings(autoStartBreak = true))
         start()
         advance(focusMs + 1_000L)
 
@@ -671,7 +727,7 @@ class TimerEngineTest {
 
     @Test
     fun `auto start rearms the alarm for the next slot`() = runTest {
-        settings.set(TimerSettings(autoStartNext = true))
+        settings.set(TimerSettings(autoStartBreak = true))
         start()
         advance(focusMs)
         complete()

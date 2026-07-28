@@ -28,6 +28,7 @@ import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.WidgetBackground
 import com.jjrapps.aquihaytomate.ui.common.PickerOption
+import com.jjrapps.aquihaytomate.ui.common.RefreshPermissionsOnResume
 import com.jjrapps.aquihaytomate.ui.common.SectionLabel
 import com.jjrapps.aquihaytomate.ui.common.SettingsGroup
 import com.jjrapps.aquihaytomate.ui.common.SettingsRow
@@ -59,7 +60,7 @@ fun SettingsScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    PermissionRefreshOnResume(viewModel)
+    RefreshPermissionsOnResume(viewModel::onResume)
 
     SettingsContent(
         state = state,
@@ -74,7 +75,8 @@ fun SettingsScreen(
         onVibrationSecondsSelected = viewModel::onVibrationSecondsSelected,
         onWidgetBackgroundSelected = viewModel::onWidgetBackgroundSelected,
         onLanguageSelected = viewModel::onLanguageSelected,
-        onAutoStartNextChanged = viewModel::onAutoStartNextChanged,
+        onAutoStartBreakChanged = viewModel::onAutoStartBreakChanged,
+        onAutoStartFocusChanged = viewModel::onAutoStartFocusChanged,
         onKeepScreenOnChanged = viewModel::onKeepScreenOnChanged,
         onLiquidAnimationChanged = viewModel::onLiquidAnimationChanged,
         onOpenNotificationSettings = {
@@ -110,7 +112,8 @@ private fun SettingsContent(
     onVibrationSecondsSelected: (Int) -> Unit,
     onWidgetBackgroundSelected: (WidgetBackground) -> Unit,
     onLanguageSelected: (AppLanguage) -> Unit,
-    onAutoStartNextChanged: (Boolean) -> Unit,
+    onAutoStartBreakChanged: (Boolean) -> Unit,
+    onAutoStartFocusChanged: (Boolean) -> Unit,
     onKeepScreenOnChanged: (Boolean) -> Unit,
     onLiquidAnimationChanged: (Boolean) -> Unit,
     onOpenNotificationSettings: () -> Unit,
@@ -130,7 +133,8 @@ private fun SettingsContent(
                 BehaviourSection(
                     state.settings,
                     onSheetRequested,
-                    onAutoStartNextChanged,
+                    onAutoStartBreakChanged,
+                    onAutoStartFocusChanged,
                     onKeepScreenOnChanged,
                 )
                 AlertsSection(state.settings, onSheetRequested)
@@ -197,14 +201,25 @@ private fun DurationsSection(
 private fun BehaviourSection(
     settings: TimerSettings,
     onSheetRequested: (SettingsSheet) -> Unit,
-    onAutoStartNextChanged: (Boolean) -> Unit,
+    onAutoStartBreakChanged: (Boolean) -> Unit,
+    onAutoStartFocusChanged: (Boolean) -> Unit,
     onKeepScreenOnChanged: (Boolean) -> Unit,
 ) {
     Section(stringResource(R.string.settings_section_behaviour)) {
+        // Two switches, one per direction of the chain. See TimerSettings.autoStartsInto for why they are
+        // not one: a break that starts by itself is welcome, a pomodoro that does is not.
         SettingsToggleRow(
-            label = stringResource(R.string.settings_auto_start),
-            checked = settings.autoStartNext,
-            onCheckedChange = onAutoStartNextChanged,
+            label = stringResource(R.string.settings_auto_start_break),
+            sublabel = stringResource(R.string.settings_auto_start_break_sublabel),
+            checked = settings.autoStartBreak,
+            onCheckedChange = onAutoStartBreakChanged,
+        )
+        Divider()
+        SettingsToggleRow(
+            label = stringResource(R.string.settings_auto_start_focus),
+            sublabel = stringResource(R.string.settings_auto_start_focus_sublabel),
+            checked = settings.autoStartFocus,
+            onCheckedChange = onAutoStartFocusChanged,
         )
         Divider()
         SettingsToggleRow(
@@ -471,7 +486,8 @@ private fun SettingsScreenPreview() {
             onVibrationSecondsSelected = {},
             onWidgetBackgroundSelected = {},
             onLanguageSelected = {},
-            onAutoStartNextChanged = {},
+            onAutoStartBreakChanged = {},
+            onAutoStartFocusChanged = {},
             onKeepScreenOnChanged = {},
             onLiquidAnimationChanged = {},
             onOpenNotificationSettings = {},

@@ -58,7 +58,9 @@ class SettingsDataSource @Inject constructor(
         pomodoros.coerceIn(TimerSettings.DAILY_GOAL_RANGE)
     }
 
-    suspend fun setAutoStartNext(enabled: Boolean) = edit(Keys.AUTO_START_NEXT) { enabled }
+    suspend fun setAutoStartBreak(enabled: Boolean) = edit(Keys.AUTO_START_BREAK) { enabled }
+
+    suspend fun setAutoStartFocus(enabled: Boolean) = edit(Keys.AUTO_START_FOCUS) { enabled }
 
     suspend fun setKeepScreenOn(enabled: Boolean) = edit(Keys.KEEP_SCREEN_ON) { enabled }
 
@@ -94,7 +96,15 @@ class SettingsDataSource @Inject constructor(
             ),
             pomodorosPerCycle = (this[Keys.POMODOROS_PER_CYCLE] ?: defaults.pomodorosPerCycle)
                 .coerceIn(TimerSettings.POMODOROS_PER_CYCLE_RANGE),
-            autoStartNext = this[Keys.AUTO_START_NEXT] ?: defaults.autoStartNext,
+            // Falls back to the single auto_start_next flag these two replaced, so anyone who had it on
+            // keeps chaining both ways until they touch the new switches. Reading a retired key is
+            // cheaper than a migration and it costs one line.
+            autoStartBreak = this[Keys.AUTO_START_BREAK]
+                ?: this[Keys.RETIRED_AUTO_START_NEXT]
+                ?: defaults.autoStartBreak,
+            autoStartFocus = this[Keys.AUTO_START_FOCUS]
+                ?: this[Keys.RETIRED_AUTO_START_NEXT]
+                ?: defaults.autoStartFocus,
             alertSound = AlertSound.fromId(this[Keys.ALERT_SOUND]),
             vibrationSeconds = (this[Keys.VIBRATION_SECONDS] ?: defaults.vibrationSeconds)
                 .coerceIn(TimerSettings.VIBRATION_SECONDS_RANGE),
@@ -120,7 +130,14 @@ class SettingsDataSource @Inject constructor(
         val SHORT_BREAK_MINUTES = intPreferencesKey("short_break_minutes")
         val LONG_BREAK_MINUTES = intPreferencesKey("long_break_minutes")
         val POMODOROS_PER_CYCLE = intPreferencesKey("pomodoros_per_cycle")
-        val AUTO_START_NEXT = booleanPreferencesKey("auto_start_next")
+        val AUTO_START_BREAK = booleanPreferencesKey("auto_start_break")
+        val AUTO_START_FOCUS = booleanPreferencesKey("auto_start_focus")
+
+        /**
+         * The single switch that became the two above. Never written any more, only read as their
+         * fallback; deleting it would silently turn the setting off for whoever had it on.
+         */
+        val RETIRED_AUTO_START_NEXT = booleanPreferencesKey("auto_start_next")
         val ALERT_SOUND = stringPreferencesKey("alert_sound")
         val VIBRATION_SECONDS = intPreferencesKey("vibration_seconds")
         val KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")

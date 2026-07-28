@@ -75,12 +75,25 @@ val PhaseLabelStyle = TextStyle(
     letterSpacing = 3.2.sp,
 )
 
-/** PAUSE / START / RESUME. */
+/** Secondary controls: RESET, the onboarding pager button. */
 val ControlLabel = TextStyle(
     fontFamily = InterFontFamily,
     fontWeight = FontWeight.Medium,
     fontSize = 15.sp,
     letterSpacing = 1.4.sp,
+)
+
+/**
+ * PAUSE / START / RESUME, the primary control of the timer.
+ *
+ * One step above [ControlLabel] because it is the only thing on that screen the user ever taps, and at
+ * 15 sp it read as a caption next to a 268 dp tomato.
+ */
+val ControlLabelLarge = TextStyle(
+    fontFamily = InterFontFamily,
+    fontWeight = FontWeight.Medium,
+    fontSize = 19.sp,
+    letterSpacing = 1.8.sp,
 )
 
 val TabLabel = TextStyle(

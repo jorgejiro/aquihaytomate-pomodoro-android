@@ -144,7 +144,8 @@ Se añade `res/raw/licenses_ofl.txt` con la licencia y una fila **Licencias** en
 | `displayStat` | Space Grotesk Bold | 34 sp | −0,8 | Cifras de «Hoy» y racha |
 | `titleScreen` | Inter SemiBold | 28 sp | −0,4 | Títulos de onboarding |
 | `phaseLabel` | Inter SemiBold | 13 sp | **+3,2** | `ENFOQUE`, `DESCANSO` |
-| `controlLabel` | Inter Medium | 15 sp | +1,4 | `PAUSAR`, `INICIAR` |
+| `controlLabelLarge` | Inter Medium | 19 sp | +1,8 | `PAUSAR`, `INICIAR`: el control primario del temporizador |
+| `controlLabel` | Inter Medium | 15 sp | +1,4 | Controles secundarios: `REINICIAR`, `SIGUIENTE` del onboarding |
 | `tabLabel` | Inter Medium | 12 sp | +1,2 | Pestañas superiores |
 | `sectionLabel` | Inter Medium | 10 sp | +1,6 | Cabeceras de sección, en mayúsculas |
 | `rowLabel` | Inter Regular | 15 sp | 0 | Etiqueta de fila de ajustes |
@@ -188,6 +189,7 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 - Tres etiquetas `tabLabel` repartidas con `Arrangement.SpaceEvenly`: `TEMPORIZADOR · ESTADÍSTICAS · AJUSTES`.
 - Activa: `TextPrimary` más subrayado de **2 × 16 dp** en el `bright` de la fase actual, centrado, con `animateDpAsState(spring(dampingRatio = 0.85f))` en la posición X.
 - Inactiva: `TextMuted`.
+- **La barra lleva su propio `statusBarsPadding()`**, con el `background` aplicado *antes* del padding: el negro llega por detrás del reloj del sistema y las etiquetas quedan por debajo. `Scaffold` no lo inserta solo — solo las app bars de Material consumen ese inset, y esta deliberadamente no es una de ellas. Sin este padding las tres pestañas se solapan con la hora y los iconos de estado.
 
 ### 5.1 Temporizador (`TimerScreen`)
 
@@ -202,16 +204,18 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 │       │ ░░░░░░ 18:42 ░░░░░   │       │  76 sp
 │        │∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿│        │  ← superficie ondulando
 │         ╲████████████████████╱        │  relleno TomateFill
-│           ╰──────────────╯           │
-│                                      │  20 dp
-│              E N F O Q U E           │  phaseLabel · TomateBright
-│                                      │  8 dp
-│             ❚❚  P A U S A R          │  controlLabel · alto táctil 48 dp
-│                                      │  4 dp
-│               reiniciar              │  caption · TextMuted · solo si hay progreso
+│           ╰──────────────╯           │  ← el círculo entero es área táctil
 │                                      │  28 dp
+│              E N F O Q U E           │  phaseLabel · TomateBright
+│                                      │  20 dp
+│             ❚❚  P A U S A R          │  controlLabelLarge · alto táctil 56 dp
+│                                      │
+│      R E I N I C I A R   S A L T A R │  controlLabel · TextMuted · fila de 48 dp
+│                                      │  ← todo el aire sobrante, peso 1,35
+│   A CONTINUACIÓN: DESCANSO · 5 MIN   │  sectionLabel · TextMuted · hueco de 20 dp
+│                                      │  16 dp
 │          ● ● ○ ○      2/4            │  puntos 7 dp, gap 10 dp
-└──────────────────────────────────────┘  24 dp de aire inferior
+└──────────────────────────────────────┘  32 dp de aire inferior
 ```
 
 | Elemento | Valor |
@@ -221,15 +225,33 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 | Hueco sin líquido | relleno `phase.ghost` |
 | Contador | `displayTimer`, centrado con `offsetY = -2.dp` (compensa el descender vacío) |
 | Línea de superficie | 1,5 dp en `SurfaceHighlight`, alpha 0,9 |
-| Tomate → etiqueta de fase | 20 dp |
-| Etiqueta → control primario | 8 dp |
-| Control primario | `Box` de 48 dp de alto, ancho `wrap`, ripple sin límites de radio 88 dp, **sin fondo** |
-| Control secundario | 32 dp de alto, entra con `fadeIn(150 ms)` |
-| Control → puntos de ciclo | 28 dp |
+| Tomate → etiqueta de fase | 28 dp |
+| Etiqueta → control primario | 20 dp |
+| Control primario | `controlLabelLarge`, alto táctil **56 dp**, ancho `wrap`, ripple sin límites, **sin fondo** |
+| Controles secundarios | `REINICIAR` y `SALTAR` en una fila, `controlLabel` en `TextMuted`, **en mayúsculas igual que el primario**, gap 24 dp, en un hueco de 48 dp reservado siempre; entran con `fadeIn(150 ms)` |
+| «A continuación» | `sectionLabel` `TextMuted` vía `SectionLabel`, hueco de 20 dp reservado, 16 dp por encima de los puntos |
 | Puntos de ciclo | 7 dp Ø, gap 10 dp. Completado: relleno `phase.bright`. Actual: anillo de 1,5 dp `phase.bright` + relleno al 25 %. Pendiente: anillo de 1 dp `TextGhost` |
 | `2/4` | `numberSmall` `TextMuted`, 12 dp a la derecha del último punto |
 
-Bloque vertical total ≈ **494 dp**, centrado con `Arrangement.Center` en el espacio restante. Funciona de 560 a 800 dp de alto sin recortes.
+**El reparto vertical no es un `Arrangement.Center` con espaciados fijos.** El aire libre se divide en dos `Spacer` con peso, **1 arriba y 1,35 abajo**, con los puntos de ciclo pegados al borde inferior a 32 dp. Dos razones:
+
+1. Con todo centrado en bloque, el tomate, la etiqueta, los dos controles y los puntos formaban una sola masa apelotonada en el centro con dos franjas negras enormes arriba y abajo. Los puntos de ciclo son un indicador de estado, no parte del grupo de controles, y su sitio es abajo.
+2. El peso mayor abajo deja el tomate ligeramente por encima del centro óptico, que es donde el ojo lo espera.
+
+**El hueco de los controles secundarios se reserva esté o no visible.** Si no, `REINICIAR` empujaba el tomate 48 dp arriba y abajo cada vez que se pausaba o se reiniciaba. Lo mismo con la línea de «a continuación», que no existe en `RINGING`.
+
+**Las tres acciones son el control primario, `REINICIAR` y `SALTAR`.** Son las tres cosas que se pueden hacer con un pomodoro en marcha, y hasta ahora la pantalla ofrecía dos: saltar solo se alcanzaba desde la notificación. Cuándo se ve cada secundario:
+
+| Control | Visible cuando | Por qué |
+|---|---|---|
+| `REINICIAR` | `status != IDLE` | En `IDLE` no hay progreso que tirar, y `ResetTimerUseCase` no haría nada |
+| `SALTAR` | `status != IDLE` **o** el slot pendiente es un descanso | Saltarse un descanso que aún no ha empezado es algo que se quiere de verdad; saltarse el primer enfoque antes de empezarlo lleva a un descanso que nadie ha ganado |
+
+**La línea «A CONTINUACIÓN: DESCANSO · 5 MIN»** sale de `SlotPlanner.upcomingSlot(state, settings)`, la misma función pura que usa la notificación ongoing y la misma que ejecuta el motor cuando el slot termina de verdad. No se muestra en `RINGING`: allí el estado ya apunta al slot siguiente, así que la predicción hablaría del que viene *después*, y el control primario ya nombra el inmediato.
+
+**Toda la superficie del tomate es el control primario**: `LiquidCountdown` acepta `onClick`, con recorte a `CircleShape` para que el ripple sea circular y con el `onClick` declarado también dentro de `clearAndSetSemantics` — ese bloque sustituye la semántica del subárbol, así que la acción del `clickable` no sobreviviría a él. Un objetivo de 268 dp de diámetro es lo más cómodo que hay en la pantalla; la etiqueta de texto se queda porque es lo que *nombra* la acción.
+
+Funciona de 560 a 900 dp de alto sin recortes: a 560 dp los pesos se comprimen a cero y quedan los espaciados fijos con el tomate de 224 dp.
 
 **Estados del control primario:**
 
@@ -307,7 +329,8 @@ Fila estándar: **52 dp** de alto, padding horizontal 16 dp. Etiqueta `rowLabel`
 │ └──────────────────────────────────┘ │
 │  COMPORTAMIENTO                      │
 │ ┌──────────────────────────────────┐ │
-│ │ Auto-iniciar el siguiente [● ]   │ │  toggle 40×22, thumb 16
+│ │ Auto-iniciar el descanso  [● ]   │ │  toggle 40×22, thumb 16
+│ │ Auto-iniciar el pomodoro  [ ○]   │ │  dos ajustes, no uno
 │ │ Mantener pantalla encendida[● ]  │ │
 │ │ Objetivo diario              8 › │ │
 │ └──────────────────────────────────┘ │
@@ -356,23 +379,34 @@ Página 1 — Qué es          Página 2 — Tus duraciones   Página 3 — Widg
 │                    │     │   └──┴──┴──┴──┘    │48 dp │                    │
 │  ¡Aquí hay tomate! │28sp │   DESCANSO         │      │  Ponlo en tu       │
 │                    │     │   ┌──┬──┬──┬──┐    │      │  escritorio        │
-│  25 minutos de     │body │   │ 3│ 5│10│15│    │      │                    │
-│  trabajo, 5 de     │máx  │   └──┴──┴──┴──┘    │      │  Un toque:         │
-│  descanso, y un    │260dp│                    │      │  iniciar / pausar  │
-│  widget de una     │     │   Lo puedes cambiar│cap.  │  Dos toques:       │
-│  sola casilla.     │     │   luego en Ajustes │      │  reiniciar         │
-│                    │     │                    │      │ [ Permitir avisos ]│
+│  25 minutos de     │body │   │ 3│ 5│10│15│    │      │  AJUSTA TU MÓVIL   │
+│  trabajo, 5 de     │máx  │   └──┴──┴──┴──┘    │      │ ┌────────────────┐ │
+│  descanso, y un    │260dp│                    │      │ │Avisos PENDIENTE│ │
+│  widget de una     │     │   Lo puedes cambiar│cap.  │ │Necesario     › │ │
+│  sola casilla.     │     │   luego en Ajustes │      │ │Alarmas ACTIVADO│ │
+│                    │     │                    │      │ └────────────────┘ │
 │   ● ○ ○            │     │   ○ ● ○            │      │   ○ ○ ●            │
 │         SIGUIENTE →│     │         SIGUIENTE →│      │        EMPEZAR →   │
 └────────────────────┘     └────────────────────┘      └────────────────────┘
 ```
 
+- **Toda la pantalla lleva `safeDrawingPadding()`**: el onboarding no está dentro del `Scaffold` de las pestañas, así que nadie más le aplica los insets y sin él el contenido se metía bajo la status bar y bajo la barra de gestos.
 - Padding lateral 32 dp. Título `titleScreen`. Cuerpo `bodyDefault` en `TextSecondary`, ancho máximo 260 dp, centrado.
 - Indicador de página: 3 puntos de 6 dp, gap 8 dp; activo `TomateFill`, inactivo `TextGhost`. Abajo a la izquierda, 24 dp del borde.
 - Botón solo texto, `controlLabel` en `TextPrimary`, abajo a la derecha, alto táctil 48 dp.
 - **En la página 1 el tomate se drena de lleno a vacío en bucle de 6 s.** Es la demostración del concepto.
-- «Permitir avisos» solicita `POST_NOTIFICATIONS`. La página 3 también ofrece conceder alarmas exactas, indicando que es **opcional** y que el temporizador funciona sin ellas.
 - Al terminar se marca `onboarding_done`; `MainViewModel` decide el destino inicial.
+
+**Página 3: los permisos son filas de estado, no botones.** Cada uno es un `SettingsRow` dentro de un `SettingsGroup`, igual que en Ajustes:
+
+| Estado | Valor | Color | Sublabel | Chevron |
+|---|---|---|---|---|
+| Pendiente | `Pendiente` | `AlertAmber` | `Necesario` | sí, y la fila abre el diálogo o los ajustes del sistema |
+| Concedido | `Activado` | `TomateBright` | — | no, y la fila deja de ser pulsable |
+
+- **`EMPEZAR` queda en `TextGhost` y deshabilitado hasta que los dos estén concedidos**, con `CONTINUAR SIN ELLOS` en `caption` `TextMuted` debajo, a la derecha. El hueco de esa salida (40 dp) se reserva en las tres páginas para que el pager no salte al llegar a la última. Ver `docs/decisions/008-el-onboarding-exige-los-dos-permisos.md`.
+- El diálogo de `POST_NOTIFICATIONS` se puede mostrar **una sola vez por instalación**: después de una negativa Android lo descarta en silencio, así que el segundo toque abre `ACTION_APP_NOTIFICATION_SETTINGS`. En API 31–32 no hay permiso que pedir y la fila va directa a los ajustes.
+- El estado se relee en cada `ON_RESUME` con `RefreshPermissionsOnResume`, compartido con Ajustes, y también en la respuesta del diálogo: el diálogo del sistema no siempre pasa la Activity por `ON_PAUSE`, y sin eso la fila seguiría diciendo «Pendiente» sobre un permiso recién concedido.
 
 ---
 
@@ -499,11 +533,20 @@ Fondo con `@android:dimen/system_app_widget_background_radius` (el sistema decid
 
 ### 7.2 Contenido a 40 × 40 dp
 
-Tomate en miniatura de 34 dp con el nivel de líquido como progreso, y la cifra encima en `widgetTime` (Space Grotesk Bold 15 sp).
+Tomate en miniatura de 34 dp con el nivel de líquido como progreso, la cifra encima en `widgetTime` (Space Grotesk Bold 15 sp) y **el glifo de la acción que hará el toque**.
 
 > **Pregunta abierta (§13 de CLAUDE.md):** a 40 dp, `24:58` en 15 sp no cabe con holgura. Propuesta a validar en dispositivo: mostrar solo los minutos (`24`) mientras quedan ≥ 1 min, y los segundos en `phase.bright` durante el último minuto.
 
 El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCountDown(true)`, que tickea en el proceso del launcher **sin despertar la app**.
+
+**El glifo de acción se dibuja en el bitmap, no se escribe.** Era el carácter `▸` en un `TextView` con `fontFamily` Space Grotesk — una fuente que no lo tiene, así que el sistema hacía fallback y pintaba una mota oscura de 13 sp que se leía como suciedad sobre el tomate, no como un botón. Ahora son dos `Path` en el `Canvas` del `TomatoBitmapRenderer`, con la misma lógica que `ControlGlyph` en la app: no dependen de ninguna fuente y se pueden dimensionar.
+
+| | Tamaño | Posición | Color |
+|---|---|---|---|
+| Glifo grande (`IDLE`) | 34 % del tomate | centrado, y **sin cifra**: un temporizador parado no tiene tiempo que informar | `TextPrimary` |
+| Glifo pequeño (resto) | 15 % del tomate | centrado en x, a 0,83 de la altura, debajo de la cifra | `TextPrimary` |
+
+`TextPrimary` y no el acento de fase ni negro: el glifo tiene que leerse tanto sobre el líquido como sobre el hueco. En acento sobre `TomateFill` el contraste es 1,1:1 y en negro desaparece en el hueco de un tomate casi vacío; el hueso da 3,6:1 sobre el relleno y 18:1 sobre el hueco, y a estos tamaños es un gráfico, no texto corrido. Hay test instrumentado a nivel de píxel (`TomatoBitmapRendererTest`).
 
 ### 7.3 Estados
 
@@ -512,17 +555,19 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
                  CORRIENDO        PAUSADO          CORRIENDO       PAUSADO
 ┌────────┐      ┌────────┐       ┌────────┐       ┌────────┐      ┌────────┐    ┌────────┐
 │ ╭────╮ │      │ ╭────╮ │       │ ╭────╮ │       │ ╭────╮ │      │ ╭────╮ │    │ ╭────╮ │
-│ │    │ │      │ │░░░░│ │       │ │░░░░│ │       │ │░░░░│ │      │ │░░░░│ │    │ │▓▓▓▓│ │
-│ │ ▸  │ │      │ │ 24 │ │       │ │ 24 │ │       │ │  5 │ │      │ │  5 │ │    │ │ ¡! │ │
-│ │████│ │      │ │████│ │       │ │▒▒▒▒│ │       │ │████│ │      │ │▒▒▒▒│ │    │ │▓▓▓▓│ │
-│ ╰────╯ │      │ ╰────╯ │       │ ╰──❚❚╯ │       │ ╰────╯ │      │ ╰──❚❚╯ │    │ ╰────╯ │
+│ │████│ │      │ │░░░░│ │       │ │░░░░│ │       │ │░░░░│ │      │ │░░░░│ │    │ │▓▓▓▓│ │
+│ │ ▶  │ │      │ │24:58│ │      │ │24:31│ │      │ │ 4:07│ │     │ │ 4:07│ │   │ │ ¡! │ │
+│ │████│ │      │ │ ❚❚ │ │       │ │ ▶  │ │       │ │ ❚❚ │ │      │ │ ▶  │ │    │ │▓▓▓▓│ │
+│ ╰────╯ │      │ ╰────╯ │       │ ╰────╯ │       │ ╰────╯ │      │ ╰────╯ │    │ ╰────╯ │
 └────────┘      └────────┘       └────────┘       └────────┘      └────────┘    └────────┘
- contorno        TomateFill       TomateFill       AmbarFill       AmbarFill     borde
- TomateDeep      lleno            @45 % + ❚❚       + cáliz         @45 % + ❚❚    DoradoBright
- + glifo ▸                                                                        parpadeando
+ TomateFill      TomateFill       TomateFill       AmbarFill       AmbarFill     borde
+ lleno           + ❚❚ pequeño     @45 % + ▶        + cáliz + ❚❚    @45 % + ▶     DoradoBright
+ + ▶ grande                                                                       parpadeando
 ```
 
-- El glifo `❚❚` de pausado va en la esquina inferior derecha, 8 dp, en `TextPrimary` al 80 %.
+**El glifo dice lo que hará el toque, no en qué estado está el temporizador.** Parado y pausado muestran `▶`, corriendo muestra `❚❚`. Es la misma regla que el control primario de la app, y es lo que convierte un cuadrado de 40 dp en un botón: la acción por defecto se ve sin pensar. El estado ya lo cuentan el nivel del líquido, el color de la fase y —en pausa— el líquido al 45 %, así que el glifo no tiene que repetirlo.
+
+- **En `IDLE` no hay cifra.** Un temporizador parado no tiene tiempo que informar y el `▶` se queda con todo el tomate. Es también el estado en el que queda el widget tras un doble toque o tras reiniciar el móvil, que es cuando más falta hace que se entienda que hay que tocarlo.
 - El cáliz de descanso es la redundancia no cromática, igual que en la app.
 - En `RINGING` el borde de la placa parpadea en `DoradoBright` cada 900 ms. Como el widget no puede animar solo, se hacen dos `updateAppWidget()` alternos mientras dure el `RINGING`, con tope de 60 s — es el único caso donde se refresca por tiempo, y está acotado.
 
@@ -558,18 +603,19 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
 ### 8.1 Ongoing (canal `timer_running`, IMPORTANCE_LOW)
 
 - Icono pequeño `ic_notif_tomate`, `setColor(TomateFill)`.
-- Título: `Enfoque · 2/4` / `Descanso corto` / `Descanso largo`.
+- Título: `Enfoque · 2/4` / `Descanso` / `Descanso largo`.
 - Descuento: `setWhen(endAtEpochMs)` + `setShowWhen(true)` + `setUsesChronometer(true)` + `setChronometerCountDown(true)`. **Cero `notify()` por segundo.**
-- Pausado: `setUsesChronometer(false)` y texto estático `Pausado · 12:34`.
+- Texto en RUNNING: **`A continuación: Descanso · 5 min`**, con el mismo string y el mismo `SlotPlanner.upcomingSlot` que la línea de la pantalla. Es información que no cambia dentro del slot, así que no cuesta ni un repintado extra.
+- Pausado: `setUsesChronometer(false)` y texto estático `Pausado · 12:34`; ahí el tiempo que queda importa más que lo que viene después.
 - Flags: `setOngoing`, `setSilent`, `setOnlyAlertOnce`, `CATEGORY_STOPWATCH`, `VISIBILITY_PUBLIC`, y **`setForegroundServiceBehavior(FOREGROUND_SERVICE_IMMEDIATE)`** — sin esto Android 12+ retrasa la aparición hasta 10 s y el usuario cree que no ha arrancado.
-- Acciones: RUNNING → **Pausar** y **Saltar**. PAUSED → **Reanudar** y **Reiniciar**.
+- Acciones: **las mismas tres que la pantalla y en el mismo orden** — `Pausar`/`Reanudar` · `Reiniciar` · `Saltar`. Tres es el máximo que muestra una notificación, y que el juego sea idéntico en RUNNING y en PAUSED significa que **el botón bajo el dedo no se mueve** al pausar desde la persiana.
 - **Nada de `setProgress()`**: obligaría a repintar constantemente. El progreso visual vive en la app y en el widget.
 
 ### 8.2 Fin de slot (canal `timer_alerts`, IMPORTANCE_HIGH)
 
 `CATEGORY_ALARM`, `setAutoCancel(true)`. Título `¡Tiempo!`, texto `25 min de enfoque completados · 3 de 4`. Acciones **Empezar descanso** / **Volver al tajo** y **Descartar**.
 
-Si `autoStartNext` está activo no se publica alerta separada: se actualiza la ongoing con el nuevo slot y solo se dispara sonido y vibración.
+Si el slot siguiente arranca solo —`autoStartBreak` al acabar un pomodoro, `autoStartFocus` al acabar un descanso— no se publica alerta separada: se actualiza la ongoing con el nuevo slot y **el sonido y la vibración se disparan igual**. Auto-iniciar significa no tener que tocar, no enterarse de nada.
 
 > **Los dos canales son mudos** (`setSound(null, null)`, `enableVibration(false)`). El sonido y la vibración los toca `AlertPlayer`, porque un canal no permite cambiarlos después de creado y ambos son ajustes de primera línea. Ver ADR 004.
 
@@ -616,9 +662,10 @@ Sin `windowSplashScreenIconBackgroundColor`: el tomate flota directamente sobre 
 | Componente | Descripción |
 |---|---|
 | `LiquidTomato` | El círculo que se drena: hueco, dos ondas, línea de superficie, contorno y cáliz opcional. El corazón visual de la app |
-| `LiquidCountdown` | `LiquidTomato` más los dos `Text` superpuestos que producen los dígitos en negativo |
+| `LiquidCountdown` | `LiquidTomato` más los dos `Text` superpuestos que producen los dígitos en negativo. Con `onClick`, el círculo entero es el control primario |
 | `PhaseLabel` | `ENFOQUE` / `DESCANSO` / `DESCANSO LARGO` / `¡TIEMPO!` con tracking amplio y color de fase |
-| `TextControl` | Control sin caja: glifo + etiqueta, alto táctil 48 dp, ripple sin límites. Base de `INICIAR`/`PAUSAR`/`REINICIAR` |
+| `TextControl` | Control sin caja: glifo + etiqueta **siempre en mayúsculas**, alto táctil configurable (48 dp por defecto), ripple sin límites. Base de `INICIAR`/`PAUSAR`/`REINICIAR`. El glifo se dibuja al 72 % del `fontSize` del estilo, así que crece con él |
+| `RefreshPermissionsOnResume` | Relee el estado de los dos permisos en cada `ON_RESUME`. Lo comparten Ajustes y la página 3 del onboarding |
 | `CycleDots` | Fila de N puntos (completado / actual / pendiente) más el contador `2/4` |
 | `TopTabBar` | Tres pestañas de texto con subrayado animado |
 | `SectionLabel` | Cabecera de sección en `sectionLabel` `TextMuted` |

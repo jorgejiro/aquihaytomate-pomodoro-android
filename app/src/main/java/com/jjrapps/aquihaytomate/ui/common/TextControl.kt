@@ -20,6 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,12 +28,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jjrapps.aquihaytomate.ui.theme.AquiHayTomateTheme
 import com.jjrapps.aquihaytomate.ui.theme.ControlLabel
+import com.jjrapps.aquihaytomate.ui.theme.ControlLabelLarge
 import com.jjrapps.aquihaytomate.ui.theme.TextMuted
 import com.jjrapps.aquihaytomate.ui.theme.TextPrimary
 
 private val TOUCH_HEIGHT = 48.dp
-private val GLYPH_SIZE = 11.dp
 private val GLYPH_GAP = 10.dp
+
+/** The glyph is drawn at this fraction of the label size, so it grows with the style rather than apart. */
+private const val GLYPH_TO_FONT_RATIO = 0.72f
+private val GLYPH_FALLBACK_SIZE = 11.dp
 
 /**
  * The glyph beside a control label.
@@ -56,8 +61,6 @@ fun TextControl(
     glyph: ControlGlyph = ControlGlyph.NONE,
     color: Color = TextPrimary,
     style: TextStyle = ControlLabel,
-    /** False for the secondary control, which the spec sets in lower case. */
-    uppercase: Boolean = true,
     height: Dp = TOUCH_HEIGHT,
     enabled: Boolean = true,
 ) {
@@ -76,22 +79,30 @@ fun TextControl(
         horizontalArrangement = Arrangement.Center,
     ) {
         if (glyph != ControlGlyph.NONE) {
-            Glyph(glyph, color)
+            Glyph(glyph, color, glyphSizeFor(style))
             Spacer(Modifier.width(GLYPH_GAP))
         }
         Text(
-            text = if (uppercase) label.uppercase() else label.lowercase(),
+            text = label.uppercase(),
             style = style,
             color = color,
         )
     }
 }
 
+/** Keeps the glyph in proportion with whatever style the caller passed. */
 @Composable
-private fun Glyph(glyph: ControlGlyph, color: Color) {
+private fun glyphSizeFor(style: TextStyle): Dp {
+    val fontSize = style.fontSize
+    if (!fontSize.isSp) return GLYPH_FALLBACK_SIZE
+    return with(LocalDensity.current) { fontSize.toDp() * GLYPH_TO_FONT_RATIO }
+}
+
+@Composable
+private fun Glyph(glyph: ControlGlyph, color: Color, glyphSize: Dp) {
     val path = remember { Path() }
     Spacer(
-        Modifier.size(GLYPH_SIZE).drawBehind {
+        Modifier.size(glyphSize).drawBehind {
             when (glyph) {
                 ControlGlyph.PLAY -> {
                     path.rewind()
@@ -122,7 +133,12 @@ private fun Glyph(glyph: ControlGlyph, color: Color) {
 @Composable
 private fun TextControlStartPreview() {
     AquiHayTomateTheme {
-        TextControl(label = "Iniciar", onClick = {}, glyph = ControlGlyph.PLAY)
+        TextControl(
+            label = "Iniciar",
+            onClick = {},
+            glyph = ControlGlyph.PLAY,
+            style = ControlLabelLarge,
+        )
     }
 }
 
@@ -130,7 +146,12 @@ private fun TextControlStartPreview() {
 @Composable
 private fun TextControlPausePreview() {
     AquiHayTomateTheme {
-        TextControl(label = "Pausar", onClick = {}, glyph = ControlGlyph.PAUSE)
+        TextControl(
+            label = "Pausar",
+            onClick = {},
+            glyph = ControlGlyph.PAUSE,
+            style = ControlLabelLarge,
+        )
     }
 }
 
@@ -138,6 +159,6 @@ private fun TextControlPausePreview() {
 @Composable
 private fun TextControlSecondaryPreview() {
     AquiHayTomateTheme {
-        TextControl(label = "Reiniciar", onClick = {}, color = TextMuted, uppercase = false)
+        TextControl(label = "Reiniciar", onClick = {}, color = TextMuted)
     }
 }

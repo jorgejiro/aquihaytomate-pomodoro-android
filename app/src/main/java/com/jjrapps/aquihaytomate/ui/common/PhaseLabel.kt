@@ -57,15 +57,21 @@ fun PhaseLabel(
  */
 @StringRes
 fun phaseLabelRes(slotType: SlotType, status: TimerStatus): Int =
-    if (status == TimerStatus.RINGING) {
-        R.string.phase_ringing
-    } else {
-        when (slotType) {
-            SlotType.FOCUS -> R.string.phase_focus
-            SlotType.SHORT_BREAK -> R.string.phase_short_break
-            SlotType.LONG_BREAK -> R.string.phase_long_break
-        }
-    }
+    if (status == TimerStatus.RINGING) R.string.phase_ringing else phaseNameRes(slotType)
+
+/**
+ * The name of a phase on its own, with no status involved.
+ *
+ * The only place this mapping lives. The "up next" readout of the timer screen and the one in the ongoing
+ * notification both come through here, which is what stops the phone from calling the same slot two
+ * different things in two places.
+ */
+@StringRes
+fun phaseNameRes(slotType: SlotType): Int = when (slotType) {
+    SlotType.FOCUS -> R.string.phase_focus
+    SlotType.SHORT_BREAK -> R.string.phase_short_break
+    SlotType.LONG_BREAK -> R.string.phase_long_break
+}
 
 /** Fixed alpha with reduced motion: the blink is decoration, the text carries the information. */
 @Composable

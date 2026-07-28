@@ -2,6 +2,8 @@ package com.jjrapps.aquihaytomate.domain.usecase
 
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
+import com.jjrapps.aquihaytomate.domain.model.TimerState
+import com.jjrapps.aquihaytomate.domain.model.TimerStatus
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -118,6 +120,49 @@ class SlotPlannerTest {
         val fourth = plan(third.type, third.completedFocusInCycle, completedFully = true, with = short)
         assertEquals(SlotType.FOCUS, fourth.type)
         assertEquals(0, fourth.completedFocusInCycle)
+    }
+
+    // The "up next" readout of the screen and of the notification comes from here, so it has to answer
+    // the optimistic case: what happens if this slot is left alone until it runs out.
+    @Test
+    fun `the upcoming slot after a focus is the break it earns`() {
+        val next = SlotPlanner.upcomingSlot(
+            TimerState(
+                status = TimerStatus.RUNNING,
+                slotType = SlotType.FOCUS,
+                completedFocusInCycle = 1,
+            ),
+            settings,
+        )
+
+        assertEquals(SlotType.SHORT_BREAK, next.type)
+        assertEquals(5 * 60_000L, next.durationMs)
+    }
+
+    @Test
+    fun `the upcoming slot after the last focus of the cycle is the long break`() {
+        val next = SlotPlanner.upcomingSlot(
+            TimerState(
+                status = TimerStatus.RUNNING,
+                slotType = SlotType.FOCUS,
+                completedFocusInCycle = 3,
+            ),
+            settings,
+        )
+
+        assertEquals(SlotType.LONG_BREAK, next.type)
+        assertEquals(15 * 60_000L, next.durationMs)
+    }
+
+    @Test
+    fun `the upcoming slot after a break is focus`() {
+        val next = SlotPlanner.upcomingSlot(
+            TimerState(status = TimerStatus.RUNNING, slotType = SlotType.SHORT_BREAK),
+            settings,
+        )
+
+        assertEquals(SlotType.FOCUS, next.type)
+        assertEquals(25 * 60_000L, next.durationMs)
     }
 
     // Shrinking the cycle mid-run must not leave the counter above the new limit, or the dots would

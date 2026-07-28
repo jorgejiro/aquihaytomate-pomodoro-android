@@ -72,8 +72,11 @@ class CompleteSlotUseCase @Inject constructor(
             completedFully = true,
             settings = settings,
         )
+        // Auto-start is decided by what comes *next*, not by what just ended: see
+        // TimerSettings.autoStartsInto. Note that the alert still fires below when it chains — the point
+        // of auto-starting the break is not to be silent about it, it is to not have to tap.
         val nextStatus = when {
-            allowAutoStart && settings.autoStartNext -> TimerStatus.RUNNING
+            allowAutoStart && settings.autoStartsInto(planned.type) -> TimerStatus.RUNNING
             alertUser -> TimerStatus.RINGING
             else -> TimerStatus.IDLE
         }

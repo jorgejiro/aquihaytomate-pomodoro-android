@@ -21,6 +21,9 @@
     <string name="control_start_break">Start break</string>
     <string name="control_back_to_work">Back to work</string>
     <string name="control_reset">Reset</string>
+    <string name="control_skip">Skip</string>
+    <!-- Shared by the timer screen and the ongoing notification: phase, then its length. -->
+    <string name="next_up">Up next: %1$s · %2$s</string>
 
     <!-- Cycle readout, e.g. 2/4 -->
     <string name="cycle_progress">%1$d/%2$d</string>
@@ -84,7 +87,10 @@
     <string name="settings_short_break">Short break</string>
     <string name="settings_long_break">Long break</string>
     <string name="settings_pomodoros_per_cycle">Pomodoros per cycle</string>
-    <string name="settings_auto_start">Auto-start the next interval</string>
+    <string name="settings_auto_start_break">Auto-start the break</string>
+    <string name="settings_auto_start_break_sublabel">When a pomodoro ends</string>
+    <string name="settings_auto_start_focus">Auto-start the pomodoro</string>
+    <string name="settings_auto_start_focus_sublabel">When a break ends</string>
     <string name="settings_keep_screen_on">Keep the screen on</string>
     <string name="settings_daily_goal">Daily goal</string>
     <string name="settings_alert_sound">Sound when it ends</string>
@@ -123,9 +129,12 @@
     <string name="onboarding_page2_hint">You can change all of this later in Settings.</string>
     <string name="onboarding_page3_title">On your home screen</string>
     <string name="onboarding_page3_body">One tap starts and pauses. Two taps reset.</string>
-    <string name="onboarding_page3_notifications">Allow notifications</string>
-    <string name="onboarding_page3_exact_alarms">Allow exact alarms</string>
-    <string name="onboarding_page3_optional">Optional. The timer works without them.</string>
+    <string name="onboarding_page3_permissions">Set up your phone</string>
+    <string name="onboarding_page3_required">Required</string>
+    <string name="onboarding_page3_pending">Pending</string>
+    <string name="onboarding_page3_ready">On</string>
+    <string name="onboarding_page3_permissions_hint">Without them the timer can be late with the screen off and cannot tell you when a slot is over.</string>
+    <string name="onboarding_continue_without">Continue without them</string>
 
     <!-- Alert sounds -->
     <string name="sound_silent">Silent</string>
@@ -165,8 +174,6 @@
     <string name="widget_description">One-cell timer. Tap to start or pause, double-tap to reset.</string>
 
     <!-- Widget glyphs. Not translatable: they are symbols, not words. -->
-    <string name="widget_idle_glyph" translatable="false">▸</string>
-    <string name="widget_paused_glyph" translatable="false">❚❚</string>
     <string name="widget_ringing_glyph" translatable="false">!</string>
     <string name="widget_preview_time" translatable="false">25:00</string>
 

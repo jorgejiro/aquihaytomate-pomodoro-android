@@ -25,7 +25,11 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setPomodorosPerCycle(count: Int) = dataSource.setPomodorosPerCycle(count)
 
-    override suspend fun setAutoStartNext(enabled: Boolean) = dataSource.setAutoStartNext(enabled)
+    override suspend fun setAutoStartBreak(enabled: Boolean) =
+        dataSource.setAutoStartBreak(enabled)
+
+    override suspend fun setAutoStartFocus(enabled: Boolean) =
+        dataSource.setAutoStartFocus(enabled)
 
     override suspend fun setAlertSound(sound: AlertSound) = dataSource.setAlertSound(sound)
 

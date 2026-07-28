@@ -6,6 +6,14 @@ import com.jjrapps.aquihaytomate.domain.model.TimerStatus
 /** What the primary control does right now. The label follows from it. */
 enum class PrimaryControl { START, PAUSE, RESUME, START_BREAK, BACK_TO_WORK }
 
+/**
+ * The slot that follows the current one, for the "up next" readout.
+ *
+ * @param minutes the length of that slot, already in whole minutes: it is a duration to read, not a
+ *   countdown, and `5 min` is easier to take in at a glance than `05:00`.
+ */
+data class NextSlot(val type: SlotType, val minutes: Int)
+
 sealed interface TimerUiState {
 
     /** First frame, before the persisted state has been read off disk. */
@@ -23,10 +31,21 @@ sealed interface TimerUiState {
         val cyclePosition: Int,
         val pomodorosPerCycle: Int,
         val keepScreenOn: Boolean,
+        /** Null while ringing: there the primary control already names what comes next. */
+        val nextSlot: NextSlot? = null,
     ) : TimerUiState {
 
-        /** The secondary control appears only when there is progress to throw away. */
+        /** Reset appears only when there is progress to throw away. */
         val showReset: Boolean get() = status != TimerStatus.IDLE
+
+        /**
+         * Skip appears except on the untouched first screen.
+         *
+         * Skipping a break that has not started yet is a real thing to want — "I do not need this one" —
+         * so it is offered while idle too. Skipping the very first focus slot before starting it is not:
+         * it would jump to a break earned by nothing.
+         */
+        val showSkip: Boolean get() = status != TimerStatus.IDLE || slotType.isBreak
 
         /** Breaks carry the calyx, the redundancy that keeps the phase off colour alone. */
         val showCalyx: Boolean get() = slotType.isBreak

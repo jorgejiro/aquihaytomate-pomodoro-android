@@ -92,7 +92,7 @@ El nombre se mantiene en español en ambos idiomas: es la marca.
 > • Todas las duraciones configurables, y también cuántos pomodoros por ciclo
 > • Estadísticas: pomodoros completados, tiempo enfocado, racha de días, mapa mensual y tendencia
 > • Aviso al terminar con sonido a elegir y vibración de la duración que tú decidas
-> • Opción de auto-iniciar el siguiente bloque
+> • Auto-iniciar el descanso, el pomodoro siguiente, o ninguno de los dos
 > • Notificación con el descuento y botones de pausar, saltar y reiniciar
 > • Respeta el modo silencio y No molestar
 > • Español e inglés

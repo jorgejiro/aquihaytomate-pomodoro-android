@@ -18,7 +18,9 @@ interface SettingsRepository {
 
     suspend fun setPomodorosPerCycle(count: Int)
 
-    suspend fun setAutoStartNext(enabled: Boolean)
+    suspend fun setAutoStartBreak(enabled: Boolean)
+
+    suspend fun setAutoStartFocus(enabled: Boolean)
 
     suspend fun setAlertSound(sound: AlertSound)
 

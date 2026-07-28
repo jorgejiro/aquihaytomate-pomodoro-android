@@ -2,6 +2,7 @@ package com.jjrapps.aquihaytomate.domain.usecase
 
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
+import com.jjrapps.aquihaytomate.domain.model.TimerState
 
 /** The shape of the slot that comes next, before any clock is involved. */
 data class PlannedSlot(
@@ -68,4 +69,24 @@ object SlotPlanner {
             )
         }
     }
+
+    /**
+     * What comes after the slot [state] describes, assuming it is left to run out.
+     *
+     * The "up next" readout of the timer screen and of the ongoing notification both go through here, so
+     * the two cannot promise the user different things. It is the same call the engine will make when the
+     * slot really ends, with `completedFully = true` — the optimistic case, which is the one being
+     * predicted.
+     *
+     * **Meaningless in [com.jjrapps.aquihaytomate.domain.model.TimerStatus.RINGING]**: there the state has
+     * already moved on to the next slot, so this would answer with the one after it. Callers do not show
+     * the readout in that state.
+     */
+    fun upcomingSlot(state: TimerState, settings: TimerSettings): PlannedSlot = planNextSlot(
+        currentType = state.slotType,
+        completedFocusInCycle = state.completedFocusInCycle,
+        currentSlotIndex = state.slotIndex,
+        completedFully = true,
+        settings = settings,
+    )
 }

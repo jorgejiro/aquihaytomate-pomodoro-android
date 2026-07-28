@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +46,10 @@ private val INDICATOR_HEIGHT = 2.dp
  * Three text tabs with an animated underline. Deliberately not a Material `TabRow`: that brings
  * its own paddings, ripple and indicator, all of which fight docs/design-spec.md §5.0.
  *
+ * Holds the status bar inset itself, so the black plate reaches behind the clock while the labels sit
+ * below it. `Scaffold` does not insert it: only Material's own app bars consume that inset, and this bar
+ * is deliberately not one of them.
+ *
  * @param accent colour of the underline; follows the current phase.
  */
 @Composable
@@ -71,8 +76,9 @@ fun TopTabBar(
     Box(
         modifier
             .fillMaxWidth()
-            .height(BAR_HEIGHT)
             .background(BackgroundVoid)
+            .statusBarsPadding()
+            .height(BAR_HEIGHT)
             .onSizeChanged { barWidthPx = it.width },
     ) {
         Row(Modifier.fillMaxWidth().height(BAR_HEIGHT)) {

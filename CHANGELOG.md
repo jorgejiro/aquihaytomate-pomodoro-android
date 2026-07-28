@@ -19,7 +19,8 @@ Primera versión. En desarrollo; ver el roadmap por fases en `CLAUDE.md` §9.
 
 - Temporizador Pomodoro con ciclos completos: enfoque, descanso corto y descanso largo cada N
   pomodoros. Todas las duraciones y el tamaño del ciclo son configurables.
-- **Widget de escritorio de 1×1**: un toque inicia o pausa, un doble toque rápido reinicia. Muestra
+- **Widget de escritorio de 1×1**: un toque inicia o pausa, un doble toque rápido reinicia, y lleva
+  dibujado el glifo de lo que hará el siguiente toque (`▶` / `❚❚`). Muestra
   el tiempo restante y distingue enfoque de descanso por color. Es la funcionalidad diferencial del
   proyecto. Ver `docs/decisions/001-widget-con-remoteviews-y-chronometer.md`.
 - Estadísticas e historial: pomodoros completados y tiempo enfocado por día, semana y mes, racha de
@@ -28,8 +29,12 @@ Primera versión. En desarrollo; ver el roadmap por fases en `CLAUDE.md` §9.
 - Aviso al terminar cada slot con sonido seleccionable y **vibración de duración configurable en
   segundos** (5 s por defecto), respetando el modo silencio y No molestar. Ver
   `docs/decisions/004-alerta-propia-en-vez-de-sonido-de-canal.md`.
-- Notificación persistente con el descuento y acciones de pausar, reanudar, saltar y reiniciar.
-- Opción de auto-iniciar el siguiente slot.
+- Notificación persistente con el descuento, el aviso de lo que viene a continuación y las mismas tres
+  acciones que la pantalla: pausar o reanudar, reiniciar y saltar.
+- Auto-inicio en dos ajustes independientes: **auto-iniciar el descanso** al terminar un pomodoro y
+  **auto-iniciar el pomodoro** al terminar un descanso. Las dos direcciones no son la misma decisión:
+  el descanso conviene que arranque solo, y el pomodoro siguiente casi nunca, porque un descanso se
+  alarga a propósito. En ambos casos el aviso suena y vibra igual.
 - Onboarding en el primer arranque.
 - Pantalla «Novedades» accesible desde Ajustes → Acerca de.
 - Interfaz en español e inglés, con selector de idioma en Ajustes.

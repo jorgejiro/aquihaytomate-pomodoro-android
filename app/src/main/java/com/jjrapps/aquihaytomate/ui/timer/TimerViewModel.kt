@@ -13,6 +13,7 @@ import com.jjrapps.aquihaytomate.domain.usecase.ObserveTimerStateUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.ReconcileTimerUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.ResetTimerUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.SkipSlotUseCase
+import com.jjrapps.aquihaytomate.domain.usecase.SlotPlanner
 import com.jjrapps.aquihaytomate.domain.usecase.TimerMath
 import com.jjrapps.aquihaytomate.domain.usecase.ToggleTimerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -141,6 +142,23 @@ class TimerViewModel @Inject constructor(
             cyclePosition = state.cyclePosition,
             pomodorosPerCycle = state.pomodorosPerCycleWith(settings),
             keepScreenOn = settings.keepScreenOn && state.status == TimerStatus.RUNNING,
+            nextSlot = nextSlotFor(state, settings),
+        )
+    }
+
+    /**
+     * The "up next" readout, through the same pure planner the engine uses when the slot really ends.
+     *
+     * Nothing to show while ringing: the state has already advanced to the next slot, so the planner would
+     * answer with the one after that, and the primary control is naming the immediate one anyway.
+     */
+    private fun nextSlotFor(state: TimerState, settings: TimerSettings): NextSlot? {
+        if (state.status == TimerStatus.RINGING) return null
+        val planned = SlotPlanner.upcomingSlot(state, settings)
+
+        return NextSlot(
+            type = planned.type,
+            minutes = (planned.durationMs / TimerSettings.MINUTE_MS).toInt(),
         )
     }
 

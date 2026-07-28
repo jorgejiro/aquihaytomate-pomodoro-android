@@ -94,8 +94,12 @@ class SettingsViewModel @Inject constructor(
         settingsRepository.setLanguage(language)
     }
 
-    fun onAutoStartNextChanged(enabled: Boolean) = update {
-        settingsRepository.setAutoStartNext(enabled)
+    fun onAutoStartBreakChanged(enabled: Boolean) = update {
+        settingsRepository.setAutoStartBreak(enabled)
+    }
+
+    fun onAutoStartFocusChanged(enabled: Boolean) = update {
+        settingsRepository.setAutoStartFocus(enabled)
     }
 
     fun onKeepScreenOnChanged(enabled: Boolean) = update {

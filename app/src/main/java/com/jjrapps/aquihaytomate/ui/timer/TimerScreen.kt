@@ -5,13 +5,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -35,8 +38,10 @@ import com.jjrapps.aquihaytomate.ui.common.LiquidCountdown
 import com.jjrapps.aquihaytomate.ui.common.PhaseLabel
 import com.jjrapps.aquihaytomate.ui.common.TextControl
 import com.jjrapps.aquihaytomate.ui.common.phaseLabelRes
+import com.jjrapps.aquihaytomate.ui.common.phaseNameRes
 import com.jjrapps.aquihaytomate.ui.theme.AquiHayTomateTheme
-import com.jjrapps.aquihaytomate.ui.theme.Caption
+import com.jjrapps.aquihaytomate.ui.theme.ControlLabelLarge
+import com.jjrapps.aquihaytomate.ui.theme.SectionLabelStyle
 import com.jjrapps.aquihaytomate.ui.theme.TextMuted
 import com.jjrapps.aquihaytomate.ui.theme.phaseColorsOf
 
@@ -44,14 +49,31 @@ private val TOMATO_DIAMETER = 268.dp
 private val TOMATO_DIAMETER_COMPACT = 224.dp
 private val COMPACT_HEIGHT_THRESHOLD = 600.dp
 
-private val TOMATO_TO_PHASE = 20.dp
-private val PHASE_TO_CONTROL = 8.dp
-private val CONTROL_TO_RESET = 4.dp
-private val RESET_TO_DOTS = 28.dp
+private val TOMATO_TO_PHASE = 28.dp
+private val PHASE_TO_CONTROL = 20.dp
+private val PRIMARY_HEIGHT = 56.dp
 private val SCREEN_PADDING = 20.dp
-private val RESET_HEIGHT = 32.dp
+private val DOTS_BOTTOM_MARGIN = 32.dp
+private val NEXT_UP_TO_DOTS = 16.dp
 
-private const val RESET_FADE_MS = 150
+/** Reserved whether or not the secondary controls are showing, so the tomato does not jump. */
+private val SECONDARY_ROW_HEIGHT = 48.dp
+
+/** Reserved the same way for the "up next" line, which is absent while ringing. */
+private val NEXT_UP_HEIGHT = 20.dp
+
+/** Wide enough that RESET and SKIP read as two controls rather than as one long label. */
+private val SECONDARY_GAP = 24.dp
+
+/**
+ * The free vertical space is split above and below the tomato block. Below weighs more so the block sits
+ * a little above the optical centre and the cycle dots settle near the bottom edge, where they belong:
+ * they are a status readout, not part of the control cluster.
+ */
+private const val SPACE_ABOVE_WEIGHT = 1f
+private const val SPACE_BELOW_WEIGHT = 1.35f
+
+private const val CONTROL_FADE_MS = 150
 
 @Composable
 fun TimerScreen(
@@ -64,6 +86,7 @@ fun TimerScreen(
         state = state,
         onPrimaryClick = viewModel::onPrimaryControlClick,
         onResetClick = viewModel::onResetClick,
+        onSkipClick = viewModel::onSkipClick,
         modifier = modifier,
     )
 }
@@ -73,11 +96,11 @@ private fun TimerContent(
     state: TimerUiState,
     onPrimaryClick: () -> Unit,
     onResetClick: () -> Unit,
+    onSkipClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
         modifier = modifier.fillMaxSize().padding(horizontal = SCREEN_PADDING),
-        contentAlignment = Alignment.Center,
     ) {
         // 224 dp on a short screen, so the whole block still fits without clipping. See §5.1.
         val diameter = if (maxHeight < COMPACT_HEIGHT_THRESHOLD) {
@@ -93,6 +116,7 @@ private fun TimerContent(
                 diameter = diameter,
                 onPrimaryClick = onPrimaryClick,
                 onResetClick = onResetClick,
+                onSkipClick = onSkipClick,
             )
         }
     }
@@ -104,21 +128,28 @@ private fun TimerBlock(
     diameter: Dp,
     onPrimaryClick: () -> Unit,
     onResetClick: () -> Unit,
+    onSkipClick: () -> Unit,
 ) {
     KeepScreenOn(state.keepScreenOn)
 
     val colors = phaseColorsOf(state.slotType)
+    val primaryLabel = stringResource(state.primaryControl.labelRes)
 
     Column(
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
     ) {
+        Spacer(Modifier.weight(SPACE_ABOVE_WEIGHT))
+
         LiquidCountdown(
             timeText = state.timeText,
             fillFraction = state.fillFraction,
             colors = colors,
             showCalyx = state.showCalyx,
             contentDescription = tomatoContentDescription(state),
+            // Tapping the tomato is the primary control: it is by far the biggest target on the screen.
+            onClick = onPrimaryClick,
+            onClickLabel = primaryLabel,
             modifier = Modifier.size(diameter),
         )
 
@@ -127,34 +158,105 @@ private fun TimerBlock(
 
         Spacer(Modifier.height(PHASE_TO_CONTROL))
         TextControl(
-            label = stringResource(state.primaryControl.labelRes),
+            label = primaryLabel,
             onClick = onPrimaryClick,
             glyph = state.primaryControl.glyph,
+            style = ControlLabelLarge,
+            height = PRIMARY_HEIGHT,
         )
 
-        Spacer(Modifier.height(CONTROL_TO_RESET))
-        AnimatedVisibility(
-            visible = state.showReset,
-            enter = fadeIn(tween(RESET_FADE_MS)),
-            exit = fadeOut(tween(RESET_FADE_MS)),
-        ) {
-            TextControl(
-                label = stringResource(R.string.control_reset),
-                onClick = onResetClick,
-                color = TextMuted,
-                style = Caption,
-                uppercase = false,
-                height = RESET_HEIGHT,
-            )
-        }
+        SecondaryControls(
+            showReset = state.showReset,
+            showSkip = state.showSkip,
+            onResetClick = onResetClick,
+            onSkipClick = onSkipClick,
+        )
 
-        Spacer(Modifier.height(RESET_TO_DOTS))
+        Spacer(Modifier.weight(SPACE_BELOW_WEIGHT))
+        NextUpLine(state.nextSlot)
+
+        Spacer(Modifier.height(NEXT_UP_TO_DOTS))
         CycleDots(
             completed = state.completedInCycle,
             current = state.cyclePosition,
             total = state.pomodorosPerCycle,
             accent = colors.bright,
         )
+        Spacer(Modifier.height(DOTS_BOTTOM_MARGIN))
+    }
+}
+
+/**
+ * `REINICIAR` and `SALTAR`, side by side under the primary control.
+ *
+ * The two of them plus the primary are the three things there are to do with a running pomodoro, and the
+ * screen used to offer only two — reset was there, skip was reachable from the notification alone. They
+ * share the row rather than stacking so the whole cluster stays one glance wide; both are `controlLabel`
+ * in `TextMuted`, a clear step below the primary, because neither is the ordinary thing to do.
+ *
+ * The row keeps its height even when both are hidden, so the tomato above it never moves.
+ */
+@Composable
+private fun SecondaryControls(
+    showReset: Boolean,
+    showSkip: Boolean,
+    onResetClick: () -> Unit,
+    onSkipClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.height(SECONDARY_ROW_HEIGHT),
+        horizontalArrangement = Arrangement.spacedBy(SECONDARY_GAP),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AnimatedVisibility(
+            visible = showReset,
+            enter = fadeIn(tween(CONTROL_FADE_MS)),
+            exit = fadeOut(tween(CONTROL_FADE_MS)),
+        ) {
+            TextControl(
+                label = stringResource(R.string.control_reset),
+                onClick = onResetClick,
+                color = TextMuted,
+            )
+        }
+
+        AnimatedVisibility(
+            visible = showSkip,
+            enter = fadeIn(tween(CONTROL_FADE_MS)),
+            exit = fadeOut(tween(CONTROL_FADE_MS)),
+        ) {
+            TextControl(
+                label = stringResource(R.string.control_skip),
+                onClick = onSkipClick,
+                color = TextMuted,
+            )
+        }
+    }
+}
+
+/**
+ * `A CONTINUACIÓN: DESCANSO · 5 MIN`, in the same `sectionLabel` as the headers of Settings.
+ *
+ * It answers the question the old screen left hanging — what happens when this runs out — which matters
+ * most right at the end of a slot. Same string and same pure planner as the ongoing notification, so the
+ * two cannot disagree. The height is reserved so the dots below do not shift when it goes away.
+ */
+@Composable
+private fun NextUpLine(nextSlot: NextSlot?) {
+    Box(
+        modifier = Modifier.height(NEXT_UP_HEIGHT),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (nextSlot != null) {
+            val text = stringResource(
+                R.string.next_up,
+                stringResource(phaseNameRes(nextSlot.type)),
+                pluralStringResource(R.plurals.settings_minutes, nextSlot.minutes, nextSlot.minutes),
+            )
+            // A plain Text rather than the SectionLabel component: that one fills the width for the
+            // trailing arrows of the charts, and this line has to sit centred under the tomato.
+            Text(text = text.uppercase(), style = SectionLabelStyle, color = TextMuted)
+        }
     }
 }
 
@@ -220,6 +322,7 @@ private fun previewState(
     timeText: String = "18:42",
     fillFraction: Float = 0.74f,
     primaryControl: PrimaryControl = PrimaryControl.PAUSE,
+    nextSlot: NextSlot? = NextSlot(SlotType.SHORT_BREAK, 5),
 ) = TimerUiState.Success(
     status = status,
     slotType = slotType,
@@ -231,13 +334,14 @@ private fun previewState(
     cyclePosition = 2,
     pomodorosPerCycle = 4,
     keepScreenOn = false,
+    nextSlot = nextSlot,
 )
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000, heightDp = 720)
 @Composable
 private fun TimerScreenRunningPreview() {
     AquiHayTomateTheme {
-        TimerContent(previewState(), onPrimaryClick = {}, onResetClick = {})
+        TimerContent(previewState(), onPrimaryClick = {}, onResetClick = {}, onSkipClick = {})
     }
 }
 
@@ -254,6 +358,7 @@ private fun TimerScreenIdlePreview() {
             ),
             onPrimaryClick = {},
             onResetClick = {},
+            onSkipClick = {},
         )
     }
 }
@@ -270,6 +375,7 @@ private fun TimerScreenBreakPreview() {
             ),
             onPrimaryClick = {},
             onResetClick = {},
+            onSkipClick = {},
         )
     }
 }
@@ -288,6 +394,7 @@ private fun TimerScreenRingingPreview() {
             ),
             onPrimaryClick = {},
             onResetClick = {},
+            onSkipClick = {},
         )
     }
 }
@@ -296,6 +403,6 @@ private fun TimerScreenRingingPreview() {
 @Composable
 private fun TimerScreenCompactPreview() {
     AquiHayTomateTheme {
-        TimerContent(previewState(), onPrimaryClick = {}, onResetClick = {})
+        TimerContent(previewState(), onPrimaryClick = {}, onResetClick = {}, onSkipClick = {})
     }
 }
