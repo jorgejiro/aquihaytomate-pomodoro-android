@@ -1,6 +1,10 @@
 # CLAUDE.md — ¡Aquí hay tomate!
 
 > Documento guía para Claude Code. Léelo antes de cualquier tarea no trivial. Si algo aquí entra en conflicto con la petición del usuario, pregunta antes de ejecutar.
+>
+> **Si vuelves al proyecto después de un tiempo, empieza por `docs/estado-del-proyecto.md`**: resume en qué punto está la app, los acuerdos de producto que no se deducen del código y las trampas de plataforma ya pagadas.
+
+---
 
 ---
 
@@ -32,7 +36,7 @@ El nombre juega con el tomate (*pomodoro* en italiano, de donde viene el nombre 
 
 ---
 
-## 2. Funcionalidad (v1.0, en desarrollo · se publica como 0.9.x)
+## 2. Funcionalidad (v1.0, publicada)
 
 ### 2.1 Pantalla Temporizador (principal) ✅ Implementada en F3
 
@@ -62,7 +66,7 @@ Todo dibujado con Compose `Canvas`. **Sin librería de gráficos** — ver `docs
 | Descanso corto | **5 min** | 1–60 |
 | Descanso largo | **15 min** | 1–120 |
 | Pomodoros por ciclo | **4** | 2–12 |
-| **Auto-iniciar el descanso** (al terminar un pomodoro) | desactivado | — |
+| **Auto-iniciar el descanso** (al terminar un pomodoro) | **activado** | — |
 | **Auto-iniciar el pomodoro** (al terminar un descanso) | desactivado | — |
 | Sonido al terminar | Campana | `silent`, `bell`, `bowl`, `digital`, `soft` |
 | **Duración de la vibración** | **5 s** | 0 (= desactivada) – 30 |
@@ -75,7 +79,9 @@ Más: estado de los permisos (notificaciones y alarmas exactas) con botón a los
 
 ### 2.4 Pantalla Onboarding ✅ Implementada
 
-Tres páginas: qué es la técnica pomodoro · elige tus duraciones · el widget y los dos permisos.
+Cuatro páginas: qué es la técnica pomodoro · elige tus duraciones · **tu ciclo** · el widget y los dos permisos.
+
+La tercera reúne los cuatro ajustes que deciden cómo se siente la app a lo largo de una mañana —pomodoros por ciclo, descanso largo y los dos auto-inicios— porque son los que conviene preguntar antes del primer pomodoro y no dejar enterrados en Ajustes. **Auto-iniciar el descanso viene activado**; el pomodoro siguiente, no.
 
 En la tercera página los permisos son **filas con su estado escrito** (`Pendiente` en ámbar con `Necesario` debajo, o `Activado`), no botones planos, y **`EMPEZAR` está deshabilitado hasta que los dos estén concedidos**, con un `CONTINUAR SIN ELLOS` discreto como válvula de escape obligatoria. Ver `docs/decisions/008-el-onboarding-exige-los-dos-permisos.md`.
 
@@ -86,6 +92,7 @@ En la tercera página los permisos son **filas con su estado escrito** (`Pendien
 - Ocupa **una sola casilla** (`targetCellWidth/Height=1`, `resizeMode="none"`).
 - Muestra los minutos restantes y el nivel de líquido como progreso. Distingue enfoque (rojo) de descanso (ámbar) por color.
 - **Lleva dibujado el glifo de la acción que hará el toque**: `▶` parado o pausado, `❚❚` corriendo. Parado no muestra cifra, solo el `▶` a todo el tomate. Los glifos se pintan en el bitmap con `Canvas`, no se escriben como texto: Space Grotesk no tiene ni `▸` ni `❚`.
+- **Al terminar un slot muestra el siguiente listo**: color de esa fase, su duración y el `▶`. Nunca un signo de alarma — en un escritorio se lee como un error. Qué muestra cada estado vive en la función pura `widget/WidgetReadout.kt`, con test.
 - **Un toque** = iniciar / pausar / reanudar, según el estado.
 - **Doble toque rápido** (ventana de ~400 ms) = reiniciar.
 - **No usa pulsación larga**: en cualquier launcher (Nova incluido) el long-press sobre un widget lo intercepta el propio launcher para arrastrarlo y el evento nunca llega a la app. Es una limitación de plataforma, no una preferencia.
@@ -98,6 +105,7 @@ En la tercera página los permisos son **filas con su estado escrito** (`Pendien
 - **Vibración de duración configurable en segundos**, por defecto 5 s, en pulsos de 400 ms con huecos de 250 ms.
 - Respeta modo silencio y No molestar.
 - **La alerta la toca la app, no el canal de notificación.** Ver `docs/decisions/004-alerta-propia-en-vez-de-sonido-de-canal.md`.
+- **La notificación de fin de slot está hecha para llegar al reloj emparejado** con sus dos acciones —empezar el siguiente y descartar—, y es la única que no va marcada como silenciosa. Ver `docs/decisions/011-*`.
 
 ### 2.7 Pantalla Novedades (changelog) ✅ Implementada
 
@@ -364,7 +372,8 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 - **Todo `startForegroundService` va en `try/catch (ForegroundServiceStartNotAllowedException)`** con degradación a «solo estado + alarma». Las exenciones legítimas que sí tenemos: desde la Activity, desde una acción de notificación, desde el toque en el widget y desde una alarma exacta.
 - **Al pausar se detiene el servicio.** No tiene sentido quemar wakelock y notificación foreground con el reloj parado; se publica una notificación normal con «Reanudar».
 - **`reconcile()` nunca simula más de un slot vencido**, aunque el auto-inicio esté activo. Si el móvil estuvo apagado 8 horas, se registra el slot que venció, se pasa a `IDLE` y ya. Sin esta regla, abrir la app por la mañana insertaría 16 pomodoros falsos.
-- **La notificación ongoing no se repinta cada segundo.** Se publica una vez por transición (~4 `notify()` por pomodoro) y el descuento lo dibuja SystemUI con `setUsesChronometer(true)` + `setChronometerCountDown(true)`. Nada de `setProgress()`.
+- **La notificación ongoing vuelve si el usuario la descarta**, mientras el temporizador esté corriendo o pausado: desde Android 13 `setOngoing` no impide el swipe, y quedarse sin notificación es quedarse sin cifra y sin controles. En `RINGING` e `IDLE` no vuelve. Ver `docs/decisions/010-*`.
+- **La notificación ongoing no se repinta cada segundo.** Se publica una vez por transición (~4 `notify()` por pomodoro) y el descuento lo tickea un `Chronometer` dentro de **nuestro propio cuerpo de notificación** (`DecoratedCustomViewStyle`), en el proceso de SystemUI. Nada de `setProgress()` ni de minutos en el título, que obligaría a republicar cada minuto. Ver `docs/decisions/009-*`.
 - **El widget se refresca desde un solo sitio**: un colector con scope de aplicación observa `TimerStateRepository.state` con `distinctUntilChangedBy { Triple(status, slotType, endAtEpochMs) }` + `debounce(250)`. **Nunca por segundo** — de eso se encarga el `Chronometer` del widget.
 
 ### Máquina de estados
@@ -441,13 +450,12 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 
 ## 9. Roadmap
 
-**v1.0 — MVP 🔨 En desarrollo** (`versionCode 1`, `versionName 0.9.0`)
+**v1.0 — MVP ✅ Publicada** (`versionCode 2`, `versionName 1.0.0`)
 
-> **Esquema de versionado.** La funcionalidad de la 1.0 está completa, pero **se publica como `0.9.0`**
-> hasta que la checklist de resiliencia §10 esté pasada en dispositivo real. Lo que salga de esas pruebas
-> va en `0.9.1`, `0.9.2`…, y el nombre **`1.0.0` se reserva para la versión que cierre F9**. El
-> `versionCode` sube de uno en uno en **cada** subida a Play, aunque solo cambie el patch: Play rechaza un
-> bundle cuyo `versionCode` no supere el de la última subida.
+> **Esquema de versionado.** Las `0.9.0` y `0.9.1` fueron versiones internas que nunca se subieron; la
+> `1.0.0` sale tras la revisión del autor en un Galaxy S25 real. El `versionCode` sube de uno en uno en
+> **cada** subida a Play, aunque solo cambie el patch: Play rechaza un bundle cuyo `versionCode` no supere
+> el de la última subida.
 
 - [x] **F0** Esqueleto: Gradle, Hilt, tema, navegación, i18n, changelog, CI. *Hito alcanzado: `lint test` verde con 9 tests unitarios y la app vacía.*
 - [x] **F1** Núcleo puro: `TimerMath`, `SlotPlanner`, `StreakCalculator`, `StatsAggregation`, `VibrationPatterns`, `AlertPolicy`, `TomatoGeometry` + tests. *Sin nada de Android.*
@@ -458,7 +466,7 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 - [x] **F6** Estadísticas: agregaciones y las cuatro gráficas Canvas.
 - [x] **F7** Ajustes, onboarding e i18n completos, con Inter y Space Grotesk empaquetadas como fuentes variables.
 - [x] **F8** Widget 1×1. *Código completo; probarlo en Nova, Pixel Launcher y One UI sigue pendiente.*
-- [ ] **F9** Endurecimiento y publicación: R8, batería, prueba en OEM agresivo, ficha de Play. *R8 verificado y corregido (renombraba las constantes de los enums persistidos); 28 tests instrumentados en verde; **firma configurada con la upload key de Bebe Agua y `.aab` de release firmado y verificado** (4,5 MiB, certificado hasta 2051); ficha, data safety, política y declaración de `specialUse` redactadas. **Falta lo que solo se puede hacer en dispositivo real**: la checklist §10 en Android 12/14/16, la del widget en Nova / Pixel Launcher / One UI, batería restringida y OEM agresivo. Después, subir a pruebas internas. Ver `docs/f9-verificacion-en-emulador.md` y `docs/play-store-publication-texts.md` §1.*
+- [x] **F9** Endurecimiento y publicación: R8, batería, prueba en OEM agresivo, ficha de Play. *R8 verificado y corregido (renombraba las constantes de los enums persistidos); 28 tests instrumentados en verde; **firma configurada con la upload key de Bebe Agua y `.aab` de release firmado y verificado** (4,5 MiB, certificado hasta 2051); ficha, data safety, política y declaración de `specialUse` redactadas. **Falta lo que solo se puede hacer en dispositivo real**: la checklist §10 en Android 12/14/16, la del widget en Nova / Pixel Launcher / One UI, batería restringida y OEM agresivo. Después, subir a pruebas internas. Ver `docs/f9-verificacion-en-emulador.md` y `docs/play-store-publication-texts.md` §1.*
 
 **v1.1 (eventual)**
 
@@ -470,6 +478,25 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 ---
 
 ## 10. Checklists de verificación manual
+
+### Notificación con cuerpo propio (obligatoria tras el ADR 009)
+
+El cuerpo de la notificación lo decora cada fabricante, así que hay que mirarlo en:
+
+- Android 12, 14 y 16.
+- **One UI** (el móvil de Jorge) además de Pixel Launcher.
+- **Tema claro y tema oscuro** del sistema: la cifra sale de `values-night`, y es la única superficie de la app con esquema claro.
+- Colapsada y expandida, y en la **pantalla de bloqueo**, donde algunos sistemas degradan a la plantilla estándar.
+
+### Aviso en el reloj emparejado (Garmin, tras el ADR 011)
+
+1. La app aparece habilitada en Garmin Connect → Notificaciones inteligentes.
+2. **Con el temporizador corriendo, en el reloj no hay ninguna notificación**: la persistente va `localOnly`.
+3. Al terminar un slot con el auto-inicio desactivado, el aviso llega al reloj.
+4. En el reloj se ven **las dos acciones**: «Empezar descanso» / «Volver al tajo» y «Descartar».
+5. Pulsar la primera arranca el slot siguiente **con el móvil bloqueado**.
+6. Descartar desde el reloj **corta la vibración** en el móvil, incluso con la vibración a 30 s.
+7. Con auto-inicio activado **también llega**, con el texto «… ya en marcha» y la acción de saltar.
 
 ### Resiliencia del temporizador (obligatoria en F4, en Android 12, 14 y 16)
 

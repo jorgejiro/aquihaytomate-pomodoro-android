@@ -10,12 +10,9 @@ import android.os.PowerManager
 import androidx.core.app.ServiceCompat
 import com.jjrapps.aquihaytomate.domain.model.TimerState
 import com.jjrapps.aquihaytomate.domain.model.TimerStatus
-import com.jjrapps.aquihaytomate.domain.repository.SettingsRepository
 import com.jjrapps.aquihaytomate.domain.repository.TimerStateRepository
 import com.jjrapps.aquihaytomate.domain.time.ElapsedRealtimeSource
 import com.jjrapps.aquihaytomate.domain.usecase.CompleteSlotUseCase
-import com.jjrapps.aquihaytomate.domain.usecase.PlannedSlot
-import com.jjrapps.aquihaytomate.domain.usecase.SlotPlanner
 import com.jjrapps.aquihaytomate.domain.usecase.TimerMath
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.Clock
@@ -49,9 +46,6 @@ import timber.log.Timber
 class PomodoroTimerService : Service() {
 
     @Inject lateinit var timerStateRepository: TimerStateRepository
-
-    /** Read only to work out what follows the running slot, for the second line of the notification. */
-    @Inject lateinit var settingsRepository: SettingsRepository
 
     @Inject lateinit var completeSlot: CompleteSlotUseCase
 
@@ -121,7 +115,7 @@ class PomodoroTimerService : Service() {
                 return
             }
 
-            publishOngoing(state, SlotPlanner.upcomingSlot(state, settingsRepository.current()))
+            publishOngoing(state)
 
             val remainingMs =
                 TimerMath.remainingMs(state, clock.millis(), elapsedRealtime.millis())
@@ -137,12 +131,12 @@ class PomodoroTimerService : Service() {
         }
     }
 
-    private fun publishOngoing(state: TimerState, nextSlot: PlannedSlot) {
+    private fun publishOngoing(state: TimerState) {
         try {
             ServiceCompat.startForeground(
                 this,
                 TimerNotificationFactory.NOTIFICATION_ID_ONGOING,
-                notificationFactory.ongoingRunning(state, nextSlot),
+                notificationFactory.ongoingRunning(state),
                 specialUseTypeFlag,
             )
         } catch (e: IllegalStateException) {

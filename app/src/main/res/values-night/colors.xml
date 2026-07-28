@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark counterpart of values/colors.xml. See the comment there for why this cannot be a theme attribute. -->
+<resources>
+    <color name="notification_time">#FFFFFFFF</color>
+    <color name="notification_phase">#B3FFFFFF</color>
+    <color name="notification_action">#FFFF6B5A</color>
+    <color name="notification_time_focus">#FFFF6B5A</color>
+    <color name="notification_time_break">#FFF2A03D</color>
+</resources>

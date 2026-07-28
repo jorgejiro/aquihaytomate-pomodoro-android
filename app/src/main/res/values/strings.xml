@@ -127,13 +127,17 @@
     <string name="onboarding_page2_focus">Focus</string>
     <string name="onboarding_page2_break">Break</string>
     <string name="onboarding_page2_hint">You can change all of this later in Settings.</string>
-    <string name="onboarding_page3_title">On your home screen</string>
-    <string name="onboarding_page3_body">One tap starts and pauses. Two taps reset.</string>
-    <string name="onboarding_page3_permissions">Set up your phone</string>
-    <string name="onboarding_page3_required">Required</string>
-    <string name="onboarding_page3_pending">Pending</string>
-    <string name="onboarding_page3_ready">On</string>
-    <string name="onboarding_page3_permissions_hint">Without them the timer can be late with the screen off and cannot tell you when a slot is over.</string>
+    <string name="onboarding_cycle_title">Your cycle</string>
+    <string name="onboarding_cycle_pomodoros">Pomodoros per cycle</string>
+    <string name="onboarding_cycle_long_break">Long break</string>
+    <string name="onboarding_cycle_chaining">Chaining</string>
+    <string name="onboarding_permissions_title">On your home screen</string>
+    <string name="onboarding_permissions_body">One tap starts and pauses. Two taps reset.</string>
+    <string name="onboarding_permissions_label">Grant the required permissions</string>
+    <string name="onboarding_permissions_required">Required</string>
+    <string name="onboarding_permissions_pending">Pending</string>
+    <string name="onboarding_permissions_ready">On</string>
+    <string name="onboarding_permissions_hint">Without them the timer can be late with the screen off and cannot tell you when a slot is over.</string>
     <string name="onboarding_continue_without">Continue without them</string>
 
     <!-- Alert sounds -->
@@ -160,9 +164,14 @@
 
     <!-- Notifications -->
     <string name="notification_title_focus">Focus · %1$d/%2$d</string>
-    <string name="notification_paused">Paused · %1$s</string>
-    <string name="notification_focus_finished">Focus interval done · %1$d of %2$d</string>
-    <string name="notification_break_finished">Break over.</string>
+    <string name="notification_paused_label">Paused</string>
+    <!-- Phase line of the ongoing notification: phase, then a state such as Paused. -->
+    <string name="notification_phase_suffix">%1$s · %2$s</string>
+    <string name="notification_focus_done_title">Pomodoro %1$d of %2$d done</string>
+    <string name="notification_break_done_title">Break over</string>
+    <string name="notification_next_waiting">%1$s · tap to start</string>
+    <string name="notification_next_running">%1$s already running</string>
+    <string name="notification_slot_of">%1$s of %2$s</string>
     <string name="notification_action_pause">Pause</string>
     <string name="notification_action_resume">Resume</string>
     <string name="notification_action_skip">Skip</string>
@@ -174,20 +183,20 @@
     <string name="widget_description">One-cell timer. Tap to start or pause, double-tap to reset.</string>
 
     <!-- Widget glyphs. Not translatable: they are symbols, not words. -->
-    <string name="widget_ringing_glyph" translatable="false">!</string>
     <string name="widget_preview_time" translatable="false">25:00</string>
 
     <!-- Changelog -->
     <string name="changelog_title">What\'s new</string>
     <string name="changelog_current_badge">Current</string>
 
-    <string-array name="changelog_0_9_0">
+    <string-array name="changelog_1_0_0">
         <item>First release.</item>
         <item>Pomodoro timer with focus, short break and long break every N Pomodoros. Every duration is configurable.</item>
-        <item>One-cell home screen widget: tap to start or pause, double-tap to reset.</item>
+        <item>One-cell home screen widget: tap to start or pause, double-tap to reset. It shows what the tap will do.</item>
+        <item>Timer notification with the time left in large type and pause, reset and skip in reach without expanding it.</item>
+        <item>End-of-interval alert with a sound of your choice and vibration for as long as you want. It reaches a paired watch with two actions: start the next one, or dismiss.</item>
         <item>Statistics: completed Pomodoros, time focused, day streak, monthly map and 30-day trend.</item>
-        <item>End-of-interval alert with a sound of your choice and vibration for as long as you want.</item>
         <item>Auto-start each way separately: let the break roll on without the next Pomodoro doing the same.</item>
-        <item>Spanish and English.</item>
+        <item>Spanish and English. Dark theme only. No ads, no tracking, no accounts.</item>
     </string-array>
 </resources>

@@ -3,6 +3,7 @@ package com.jjrapps.aquihaytomate.domain.usecase
 import com.jjrapps.aquihaytomate.domain.model.TimerStatus
 import com.jjrapps.aquihaytomate.domain.repository.AlertPlayer
 import com.jjrapps.aquihaytomate.domain.repository.SettingsRepository
+import com.jjrapps.aquihaytomate.domain.repository.TimerNotifier
 import com.jjrapps.aquihaytomate.domain.repository.TimerStateRepository
 import com.jjrapps.aquihaytomate.domain.time.ElapsedRealtimeSource
 import java.time.Clock
@@ -31,6 +32,7 @@ class CompleteSlotUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val recordFocusSlot: RecordFocusSlotUseCase,
     private val alertPlayer: AlertPlayer,
+    private val notifier: TimerNotifier,
     private val syncTimerRuntime: SyncTimerRuntimeUseCase,
     private val clock: Clock,
     private val elapsedRealtime: ElapsedRealtimeSource,
@@ -103,7 +105,17 @@ class CompleteSlotUseCase @Inject constructor(
             // Rearm or tear down before alerting: the alert can take seconds of vibration, and the
             // next slot's alarm should already be armed by then.
             syncTimerRuntime()
-            if (alertUser) alertPlayer.play(settings.alertSound, settings.vibrationSeconds)
+
+            if (alertUser) {
+                // When the next slot chained on its own, `syncTimerRuntime` cleared the alert on its way
+                // through RUNNING and nothing else would publish one — so the phone would buzz and leave no
+                // trace, and a paired watch would never hear about the pomodoro ending. Published after the
+                // sync, precisely so it survives that clear.
+                if (nextStatus == TimerStatus.RUNNING) {
+                    notifier.showSlotFinished(timerStateRepository.current(), chained = true)
+                }
+                alertPlayer.play(settings.alertSound, settings.vibrationSeconds)
+            }
         }
         return closedByUs
     }

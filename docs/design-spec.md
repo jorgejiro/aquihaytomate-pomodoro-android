@@ -368,7 +368,9 @@ Fila estándar: **52 dp** de alto, padding horizontal 16 dp. Etiqueta `rowLabel`
 
 ### 5.4 Onboarding (`OnboardingScreen`)
 
-Tres páginas en `HorizontalPager`, sin barra de pestañas, sin botón «saltar».
+Cuatro páginas en `HorizontalPager`, sin barra de pestañas, sin botón «saltar».
+
+La tercera —**Tu ciclo**— lleva `pomodorosPerCycle` y el descanso largo como filas de chips (`2 · 3 · 4 · 6` y `10 · 15 · 20 · 30 min`) y los dos auto-inicios como `SettingsToggleRow` dentro de un `SettingsGroup`, con los mismos textos que Ajustes. Son los cuatro ajustes que deciden cómo se comporta la app a lo largo de una mañana, y por eso se preguntan antes del primer pomodoro. Los valores por defecto se ven ya marcados: ciclo de 4, descanso largo de 15 min, **auto-iniciar el descanso activado** y auto-iniciar el pomodoro desactivado.
 
 ```
 Página 1 — Qué es          Página 2 — Tus duraciones   Página 3 — Widget y permisos
@@ -397,7 +399,7 @@ Página 1 — Qué es          Página 2 — Tus duraciones   Página 3 — Widg
 - **En la página 1 el tomate se drena de lleno a vacío en bucle de 6 s.** Es la demostración del concepto.
 - Al terminar se marca `onboarding_done`; `MainViewModel` decide el destino inicial.
 
-**Página 3: los permisos son filas de estado, no botones.** Cada uno es un `SettingsRow` dentro de un `SettingsGroup`, igual que en Ajustes:
+**Página 3: los permisos son filas de estado, no botones.** Cada uno es un `SettingsRow` dentro de un `SettingsGroup`, igual que en Ajustes, pero **con 64 dp de alto en vez de 52** y 14 dp entre la cabecera y el grupo: aquí las dos filas son todo el contenido de la página, y con las medidas de Ajustes —donde una fila es una de treinta— se leían apelotonadas. La cabecera dice `CONCEDE LOS PERMISOS NECESARIOS`, que es una instrucción y no una etiqueta de sección.
 
 | Estado | Valor | Color | Sublabel | Chevron |
 |---|---|---|---|---|
@@ -555,21 +557,25 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
                  CORRIENDO        PAUSADO          CORRIENDO       PAUSADO
 ┌────────┐      ┌────────┐       ┌────────┐       ┌────────┐      ┌────────┐    ┌────────┐
 │ ╭────╮ │      │ ╭────╮ │       │ ╭────╮ │       │ ╭────╮ │      │ ╭────╮ │    │ ╭────╮ │
-│ │████│ │      │ │░░░░│ │       │ │░░░░│ │       │ │░░░░│ │      │ │░░░░│ │    │ │▓▓▓▓│ │
-│ │ ▶  │ │      │ │24:58│ │      │ │24:31│ │      │ │ 4:07│ │     │ │ 4:07│ │   │ │ ¡! │ │
-│ │████│ │      │ │ ❚❚ │ │       │ │ ▶  │ │       │ │ ❚❚ │ │      │ │ ▶  │ │    │ │▓▓▓▓│ │
+│ │████│ │      │ │░░░░│ │       │ │░░░░│ │       │ │░░░░│ │      │ │░░░░│ │    │ │████│ │
+│ │ ▶  │ │      │ │24:58│ │      │ │24:31│ │      │ │ 4:07│ │     │ │ 4:07│ │   │ │05:00│ │
+│ │████│ │      │ │ ❚❚ │ │       │ │ ▶  │ │       │ │ ❚❚ │ │      │ │ ▶  │ │    │ │ ▶  │ │
 │ ╰────╯ │      │ ╰────╯ │       │ ╰────╯ │       │ ╰────╯ │      │ ╰────╯ │    │ ╰────╯ │
 └────────┘      └────────┘       └────────┘       └────────┘      └────────┘    └────────┘
- TomateFill      TomateFill       TomateFill       AmbarFill       AmbarFill     borde
- lleno           + ❚❚ pequeño     @45 % + ▶        + cáliz + ❚❚    @45 % + ▶     DoradoBright
- + ▶ grande                                                                       parpadeando
+ TomateFill      TomateFill       TomateFill       AmbarFill       AmbarFill     el color y
+ lleno           + ❚❚ pequeño     @45 % + ▶        + cáliz + ❚❚    @45 % + ▶     la duración
+ + ▶ grande                                                                       del slot que
+                                                                                  viene
 ```
 
 **El glifo dice lo que hará el toque, no en qué estado está el temporizador.** Parado y pausado muestran `▶`, corriendo muestra `❚❚`. Es la misma regla que el control primario de la app, y es lo que convierte un cuadrado de 40 dp en un botón: la acción por defecto se ve sin pensar. El estado ya lo cuentan el nivel del líquido, el color de la fase y —en pausa— el líquido al 45 %, así que el glifo no tiene que repetirlo.
 
 - **En `IDLE` no hay cifra.** Un temporizador parado no tiene tiempo que informar y el `▶` se queda con todo el tomate. Es también el estado en el que queda el widget tras un doble toque o tras reiniciar el móvil, que es cuando más falta hace que se entienda que hay que tocarlo.
 - El cáliz de descanso es la redundancia no cromática, igual que en la app.
-- En `RINGING` el borde de la placa parpadea en `DoradoBright` cada 900 ms. Como el widget no puede animar solo, se hacen dos `updateAppWidget()` alternos mientras dure el `RINGING`, con tope de 60 s — es el único caso donde se refresca por tiempo, y está acotado.
+- **En `RINGING` el widget muestra el slot que está a punto de empezar**: tomate lleno con el color de esa fase —rojo si viene enfoque, ámbar si viene descanso—, su duración como cifra y el `▶`. El estado ya apunta al slot siguiente, así que es literalmente lo que hará el toque.
+
+  Antes dibujaba un tomate vacío con un `!`, y en un escritorio lleno de iconos eso se lee como «algo va mal», no como «tu descanso está listo». Se retiró con él el parpadeo del borde, que era **el único sitio donde el widget se refrescaba por tiempo** (dos `updateAppWidget()` alternos hasta 60 s): sin signo de alarma no hay nada que hacer parpadear, y el aviso de que el slot terminó lo dan el sonido, la vibración y la notificación.
+- **Qué muestra cada estado es una función pura**, `widget/WidgetReadout.kt`, con test unitario. Estas reglas cambiaron tres veces en una tarde de feedback y cada error era invisible hasta ver el widget en un escritorio.
 
 ### 7.4 Configuración del proveedor
 
@@ -603,10 +609,34 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
 ### 8.1 Ongoing (canal `timer_running`, IMPORTANCE_LOW)
 
 - Icono pequeño `ic_notif_tomate`, `setColor(TomateFill)`.
-- Título: `Enfoque · 2/4` / `Descanso` / `Descanso largo`.
-- Descuento: `setWhen(endAtEpochMs)` + `setShowWhen(true)` + `setUsesChronometer(true)` + `setChronometerCountDown(true)`. **Cero `notify()` por segundo.**
-- Texto en RUNNING: **`A continuación: Descanso · 5 min`**, con el mismo string y el mismo `SlotPlanner.upcomingSlot` que la línea de la pantalla. Es información que no cambia dentro del slot, así que no cuesta ni un repintado extra.
-- Pausado: `setUsesChronometer(false)` y texto estático `Pausado · 12:34`; ahí el tiempo que queda importa más que lo que viene después.
+- **Dos cuerpos propios** con `DecoratedCustomViewStyle`, para que la cifra sea lo más grande de la notificación y los controles estén desde que se abre la cortinilla:
+
+  ```
+  COLAPSADA · notification_timer_collapsed.xml · 48 dp de tope
+  ┌──────────────────────────────────────┐
+  │ 🍅  24:58  ENFOQUE    ❚❚   ↺   ▶│    │  24 sp · 12 sp · iconos 44 dp
+  └──────────────────────────────────────┘
+
+  EXPANDIDA · notification_timer.xml
+  ┌──────────────────────────────────────┐
+  │ 🍅 ¡Aquí hay tomate!                 │  encabezado del sistema
+  │   24:58     ENFOQUE · 2/4            │  26 sp · 13 sp
+  │  PAUSAR   │   REINICIAR   │  SALTAR  │  fila de acciones del sistema
+  └──────────────────────────────────────┘
+  ```
+
+- **En la forma colapsada no hay texto de fase.** No cabe: con la cifra y los tres controles, en One UI se cortaba a `En…`, y ese estado ni siquiera dibuja el encabezado. La fase va en el `subText` —que se lee al expandir— y **en la forma colapsada la lleva el color de la cifra**: rojo en enfoque, ámbar en descanso, con los tres iconos del mismo color. No queda como único indicador: el `subText` y el `contentTitle` la llevan escrita, que es lo que lee un lector de pantalla.
+- **Todas las vistas de los dos cuerpos tienen que estar en la lista blanca de `RemoteViews`.** Un `Space` usado de espaciador llegó a ejecución: `RemoteViews` lo rechaza con «Class not allowed to be inflated», la notificación del servicio en primer plano no se puede inflar y **el sistema mata la app** con `BadForegroundServiceNotificationException`. El espaciador es un `TextView` vacío con `weight`, y `TimerNotificationFactoryTest.bothBodiesInflate` infla los dos cuerpos para que no vuelva a pasar.
+- **La fila de acciones del sistema solo se dibuja expandida**, así que la colapsada lleva tres iconos propios con los mismos `PendingIntent`. Son iconos y no etiquetas porque **el contenido propio de una notificación colapsada está limitado a 48 dp** con `targetSdk` ≥ 31 (antes 106 dp): no hay dos filas, y en una no caben la cifra y tres palabras. Por lo mismo, la colapsada muestra el nombre de la fase sin el `2/4`.
+- Las acciones de `addAction` se mantienen aunque en colapsada no se usen: son las que ven Wear, el asistente y la pantalla de bloqueo.
+
+- Descuento: `Chronometer` con `setChronometerCountDown(true)` **dentro del cuerpo propio**, con base en el reloj monotónico. Sigue ticando en el proceso de SystemUI: **cero `notify()` por segundo**. Ver `docs/decisions/009-*`.
+- La plantilla estándar daba la cifra al hueco del timestamp — 11 sp, arriba a la derecha, inmodificable — y todo el peso al título, donde estaba el `2/4`. Con el cuerpo propio se invierte: la cifra manda y la fase con el ciclo bajan a 13 sp.
+- **Colores del cuerpo por cualificador** (`values/colors.xml` y `values-night/colors.xml`), no de la paleta del tomate ni de `?android:attr/textColorPrimary`, que resuelve oscuro en ambos temas. Es la única superficie de la app con esquema claro, porque su fondo lo pinta SystemUI.
+- Pausado: `TextView` al mismo tamaño con la cifra congelada —un `Chronometer` no se puede detener en un valor arbitrario— y `· Pausado` al final de la línea de fase.
+- **No hay línea de «A continuación».** Ocupaba el renglón que ahora es la cifra y decía algo que el usuario ya sabe. En la pantalla del temporizador se mantiene, donde no compite con nada.
+- `setContentTitle` se sigue rellenando aunque no se vea: es el fallback de las superficies que rechazan vistas propias y lo que lee un lector de pantalla.
+- **Si el usuario la descarta por swipe con un slot en marcha, vuelve.** `setOngoing(true)` dejó de impedirlo en Android 13, y sin notificación no hay cifra ni controles. Un `deleteIntent` la republica mientras el estado sea `RUNNING` o `PAUSED`; en `RINGING` e `IDLE` no, porque ahí descartar es lo que el usuario quiere decir. Ver `docs/decisions/010-*`.
 - Flags: `setOngoing`, `setSilent`, `setOnlyAlertOnce`, `CATEGORY_STOPWATCH`, `VISIBILITY_PUBLIC`, y **`setForegroundServiceBehavior(FOREGROUND_SERVICE_IMMEDIATE)`** — sin esto Android 12+ retrasa la aparición hasta 10 s y el usuario cree que no ha arrancado.
 - Acciones: **las mismas tres que la pantalla y en el mismo orden** — `Pausar`/`Reanudar` · `Reiniciar` · `Saltar`. Tres es el máximo que muestra una notificación, y que el juego sea idéntico en RUNNING y en PAUSED significa que **el botón bajo el dedo no se mueve** al pausar desde la persiana.
 - **Nada de `setProgress()`**: obligaría a repintar constantemente. El progreso visual vive en la app y en el widget.
@@ -615,7 +645,19 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
 
 `CATEGORY_ALARM`, `setAutoCancel(true)`. Título `¡Tiempo!`, texto `25 min de enfoque completados · 3 de 4`. Acciones **Empezar descanso** / **Volver al tajo** y **Descartar**.
 
-Si el slot siguiente arranca solo —`autoStartBreak` al acabar un pomodoro, `autoStartFocus` al acabar un descanso— no se publica alerta separada: se actualiza la ongoing con el nuevo slot y **el sonido y la vibración se disparan igual**. Auto-iniciar significa no tener que tocar, no enterarse de nada.
+- **Es la única que llega a un reloj emparejado**: las dos ongoing van `setLocalOnly(true)`, porque un cronómetro permanente en la lista de un reloj es ruido. Se renuncia así a pausar desde la muñeca, a cambio de que la muñeca solo avise cuando hay algo que decidir; para el control rápido está el widget.
+- **Esta es la única notificación que NO lleva `setSilent(true)`.** El canal ya es mudo, así que el flag no aportaba silencio: lo que hacía era marcarla como no alertante, quitarle el heads-up y dejarla fuera de lo que un reloj emparejado reenvía. Las dos acciones se muestran en un Garmin como lista, que es como se controla el temporizador desde la muñeca. Ver `docs/decisions/011-*`.
+- **Descartarla desde cualquier sitio para el sonido y la vibración**, vía `deleteIntent` a `ACTION_DISMISS`: al descartar desde el reloj, el sistema cancela la notificación sin pasar por la acción, y la vibración seguía hasta 30 s.
+
+**Con auto-inicio también se publica**, con el cuerpo diciendo que el slot ya está en marcha, la acción de saltarlo en vez de empezarlo y `setTimeoutAfter` de 2 min para que no se acumule. Sin eso, el fin de un pomodoro no llegaba al reloj emparejado, que es justo cuando el móvil está lejos. Auto-iniciar significa no tener que tocar, no enterarse de nada.
+
+El copy se escribe **para una pantalla de reloj**, que muestra título y cuerpo y nada más:
+
+| Situación | Título | Cuerpo |
+|---|---|---|
+| Fin de pomodoro, esperando | `Pomodoro 3 de 4 completado` | `Descanso de 5 min · toca para empezar` |
+| Fin de pomodoro, encadenado | `Pomodoro 3 de 4 completado` | `Descanso de 5 min ya en marcha` |
+| Fin de descanso | `Descanso terminado` | `Pomodoro de 25 min · toca para empezar` |
 
 > **Los dos canales son mudos** (`setSound(null, null)`, `enableVibration(false)`). El sonido y la vibración los toca `AlertPlayer`, porque un canal no permite cambiarlos después de creado y ambos son ajustes de primera línea. Ver ADR 004.
 

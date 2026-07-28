@@ -131,13 +131,17 @@
     <string name="onboarding_page2_focus">Enfoque</string>
     <string name="onboarding_page2_break">Descanso</string>
     <string name="onboarding_page2_hint">Lo puedes cambiar luego en Ajustes.</string>
-    <string name="onboarding_page3_title">En tu escritorio</string>
-    <string name="onboarding_page3_body">Un toque inicia y pausa. Dos toques reinician.</string>
-    <string name="onboarding_page3_permissions">Ajusta tu móvil</string>
-    <string name="onboarding_page3_required">Necesario</string>
-    <string name="onboarding_page3_pending">Pendiente</string>
-    <string name="onboarding_page3_ready">Activado</string>
-    <string name="onboarding_page3_permissions_hint">Sin ellos el temporizador puede retrasarse con la pantalla apagada y no puede avisarte al terminar un slot.</string>
+    <string name="onboarding_cycle_title">Tu ciclo</string>
+    <string name="onboarding_cycle_pomodoros">Pomodoros por ciclo</string>
+    <string name="onboarding_cycle_long_break">Descanso largo</string>
+    <string name="onboarding_cycle_chaining">Encadenado</string>
+    <string name="onboarding_permissions_title">En tu escritorio</string>
+    <string name="onboarding_permissions_body">Un toque inicia y pausa. Dos toques reinician.</string>
+    <string name="onboarding_permissions_label">Concede los permisos necesarios</string>
+    <string name="onboarding_permissions_required">Necesario</string>
+    <string name="onboarding_permissions_pending">Pendiente</string>
+    <string name="onboarding_permissions_ready">Activado</string>
+    <string name="onboarding_permissions_hint">Sin ellos el temporizador puede retrasarse con la pantalla apagada y no puede avisarte al terminar un slot.</string>
     <string name="onboarding_continue_without">Continuar sin ellos</string>
 
     <!-- Alert sounds -->
@@ -162,9 +166,14 @@
 
     <!-- Notifications -->
     <string name="notification_title_focus">Enfoque · %1$d/%2$d</string>
-    <string name="notification_paused">Pausado · %1$s</string>
-    <string name="notification_focus_finished">Enfoque completado · %1$d de %2$d</string>
-    <string name="notification_break_finished">Se acabó el descanso.</string>
+    <string name="notification_paused_label">Pausado</string>
+    <!-- Phase line of the ongoing notification: phase, then a state such as Paused. -->
+    <string name="notification_phase_suffix">%1$s · %2$s</string>
+    <string name="notification_focus_done_title">Pomodoro %1$d de %2$d completado</string>
+    <string name="notification_break_done_title">Descanso terminado</string>
+    <string name="notification_next_waiting">%1$s · toca para empezar</string>
+    <string name="notification_next_running">%1$s ya en marcha</string>
+    <string name="notification_slot_of">%1$s de %2$s</string>
     <string name="notification_action_pause">Pausar</string>
     <string name="notification_action_resume">Reanudar</string>
     <string name="notification_action_skip">Saltar</string>
@@ -179,13 +188,14 @@
     <string name="changelog_title">Novedades</string>
     <string name="changelog_current_badge">Actual</string>
 
-    <string-array name="changelog_0_9_0">
+    <string-array name="changelog_1_0_0">
         <item>Primera versión.</item>
         <item>Temporizador Pomodoro con enfoque, descanso corto y descanso largo cada N pomodoros. Todas las duraciones son configurables.</item>
-        <item>Widget de escritorio de una sola casilla: un toque para iniciar o pausar, dos toques para reiniciar.</item>
+        <item>Widget de escritorio de una sola casilla: un toque para iniciar o pausar, dos toques para reiniciar. Enseña lo que hará el toque.</item>
+        <item>Notificación del temporizador con el tiempo restante en grande y pausar, reiniciar y saltar a mano sin desplegarla.</item>
+        <item>Aviso al terminar cada intervalo con sonido a elegir y vibración configurable. Llega al reloj emparejado con dos acciones: empezar el siguiente o descartar.</item>
         <item>Estadísticas: pomodoros completados, tiempo enfocado, racha de días, mapa mensual y tendencia de 30 días.</item>
-        <item>Aviso al terminar cada intervalo con sonido a elegir y vibración de la duración que tú decidas.</item>
         <item>Auto-inicio por separado: que el descanso arranque solo sin que lo haga el pomodoro siguiente.</item>
-        <item>Español e inglés.</item>
+        <item>Español e inglés. Solo tema oscuro. Sin anuncios, sin seguimiento y sin cuentas.</item>
     </string-array>
 </resources>

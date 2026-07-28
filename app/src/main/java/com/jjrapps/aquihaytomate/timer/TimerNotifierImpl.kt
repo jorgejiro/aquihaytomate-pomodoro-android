@@ -31,14 +31,20 @@ class TimerNotifierImpl @Inject constructor(
     private val canPost: Boolean
         get() = manager.areNotificationsEnabled()
 
+    override fun showRunning(state: TimerState) {
+        notify(TimerNotificationFactory.NOTIFICATION_ID_ONGOING) { factory.ongoingRunning(state) }
+    }
+
     override fun showPaused(state: TimerState, remainingMs: Long) {
         notify(
             TimerNotificationFactory.NOTIFICATION_ID_ONGOING,
         ) { factory.ongoingPaused(state, remainingMs) }
     }
 
-    override fun showSlotFinished(state: TimerState) {
-        notify(TimerNotificationFactory.NOTIFICATION_ID_ALERT) { factory.slotFinished(state) }
+    override fun showSlotFinished(state: TimerState, chained: Boolean) {
+        notify(TimerNotificationFactory.NOTIFICATION_ID_ALERT) {
+            factory.slotFinished(state, chained)
+        }
     }
 
     override fun clearOngoing() {

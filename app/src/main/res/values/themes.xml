@@ -20,4 +20,17 @@
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_tomate</item>
         <item name="postSplashScreenTheme">@style/Theme.AquiHayTomate</item>
     </style>
+
+    <!--
+      A control in the collapsed body of the ongoing notification. An icon rather than a label because the
+      whole body is capped at 48 dp and three words plus the figure do not fit across. 44 dp of touch
+      target, which is as much as those 48 dp allow.
+    -->
+    <style name="NotificationIconAction">
+        <item name="android:layout_width">44dp</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+    </style>
 </resources>

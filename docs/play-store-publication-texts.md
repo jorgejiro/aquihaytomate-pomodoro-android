@@ -2,19 +2,20 @@
 
 > Textos y checklist para la ficha de Google Play. Cuenta de desarrollador: la misma que Bebe Agua.
 >
-> Estado: preparado para v0.9.0 (versionCode 1) · Última revisión: 2026-07-28
+> Estado: **v1.0.0 (versionCode 2), lista para subir** · Última revisión: 2026-07-28
 >
-> Se publica como **0.9.0** mientras queda pendiente la checklist §10 en dispositivo real; `1.0.0`
-> se reserva para la versión que la cierre. Ver `CLAUDE.md` §9.
+> El autor ha revisado la app en su Galaxy S25 —temporizador, widget, notificación y aviso al Garmin— y da
+> el visto bueno para publicar. Las 0.9.0 y 0.9.1 fueron versiones internas que nunca se subieron.
 
 ---
 
 ## 1. Checklist para publicar
 
-> Estado a 2026-07-28: la firma, el bundle y todos los textos están listos. **Lo que falta es
-> verificación en dispositivo real**, que no se puede delegar: los puntos 4 y 5 son la checklist §10 de
-> `CLAUDE.md` y la del widget, y hasta pasarlas esto no debe salir de pruebas internas. Ver
-> `docs/f9-verificacion-en-emulador.md` para lo que ya está cubierto y lo que no.
+> Estado a 2026-07-28: firma, bundle y textos listos, y la app revisada en un Galaxy S25 real. Lo que
+> **sigue sin probarse en dispositivo** son los escenarios de resiliencia de §10 que exigen tiempo o
+> condiciones raras —pantalla apagada un slot entero, reinicio a mitad, batería restringida, otros
+> launchers— y por eso la recomendación es **subir primero a pruebas internas** y comprobarlos sobre la
+> build de Play, que lleva R8. Ver `docs/f9-verificacion-en-emulador.md`.
 
 ### Antes de la primera subida
 
@@ -186,11 +187,11 @@ El nombre se mantiene en español en ambos idiomas: es la marca.
 
 ## 7. Novedades de esta versión
 
-**ES (0.9.0)**
+**ES (1.0.0)**
 > Primera versión. Temporizador Pomodoro con widget de una sola casilla, estadísticas, avisos
 > configurables y tema oscuro. Sin anuncios ni seguimiento.
 
-**EN (0.9.0)**
+**EN (1.0.0)**
 > First release. Pomodoro timer with a one-cell home screen widget, statistics, configurable alerts
 > and a dark theme. No ads, no tracking.
 
@@ -214,6 +215,20 @@ la primera captura, tiene que ver eso.
 
 Formato: PNG 1080 × 2400. Sin marcos de móvil, sin fondos degradados de marketing. El texto
 sobreimpreso en Inter SemiBold blanco, abajo, sobre el propio fondo negro de la app.
+
+**Hay cuatro capturas listas en `docs/store-assets/`**, tomadas del emulador con la build de release en
+español, sin texto sobreimpreso:
+
+| Fichero | Qué muestra |
+|---|---|
+| `01-widget-en-el-escritorio.png` | El widget de 1×1 en el escritorio, junto a un icono de app para que se vea el tamaño |
+| `02-temporizador-enfoque.png` | Temporizador en enfoque, con los tres controles y «a continuación» |
+| `03-ajustes.png` | Ajustes, con las duraciones y los dos auto-inicios |
+| `04-onboarding-ciclo.png` | La página «Tu ciclo» del onboarding |
+
+**Falta la de Estadísticas**, y a propósito: con una instalación nueva sale vacía. Hazla tú desde tu móvil
+tras unos días de uso, que además es lo honesto para la ficha. Play exige un mínimo de dos capturas de
+teléfono, así que se puede subir sin ella.
 
 ---
 

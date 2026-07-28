@@ -189,9 +189,15 @@ class FakeTimerRuntime : TimerAlarmScheduler, TimerServiceController, TimerNotif
         private set
     var startCount: Int = 0
         private set
+    var runningNotificationCount: Int = 0
+        private set
     var pausedNotificationCount: Int = 0
         private set
     var finishedNotificationCount: Int = 0
+        private set
+
+    /** Of the finished alerts, how many were published for a slot that started by itself. */
+    var chainedNotificationCount: Int = 0
         private set
 
     /** Set to false to simulate `ForegroundServiceStartNotAllowedException`. */
@@ -223,12 +229,17 @@ class FakeTimerRuntime : TimerAlarmScheduler, TimerServiceController, TimerNotif
         serviceRunning = false
     }
 
+    override fun showRunning(state: TimerState) {
+        runningNotificationCount++
+    }
+
     override fun showPaused(state: TimerState, remainingMs: Long) {
         pausedNotificationCount++
     }
 
-    override fun showSlotFinished(state: TimerState) {
+    override fun showSlotFinished(state: TimerState, chained: Boolean) {
         finishedNotificationCount++
+        if (chained) chainedNotificationCount++
     }
 
     override fun clearOngoing() = Unit

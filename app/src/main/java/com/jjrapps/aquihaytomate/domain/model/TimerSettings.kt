@@ -12,9 +12,15 @@ data class TimerSettings(
     val shortBreakMinutes: Int = DEFAULT_SHORT_BREAK_MINUTES,
     val longBreakMinutes: Int = DEFAULT_LONG_BREAK_MINUTES,
     val pomodorosPerCycle: Int = DEFAULT_POMODOROS_PER_CYCLE,
-    /** Chain straight into the break when a pomodoro ends. */
-    val autoStartBreak: Boolean = false,
-    /** Chain straight into the next pomodoro when a break ends. */
+    /**
+     * Chain straight into the break when a pomodoro ends. **On by default**: the break is earned and its
+     * clock should already be running while you get up, which is how the author uses it.
+     */
+    val autoStartBreak: Boolean = true,
+    /**
+     * Chain straight into the next pomodoro when a break ends. Off by default, and deliberately not
+     * symmetric with [autoStartBreak]: a break often runs long on purpose.
+     */
     val autoStartFocus: Boolean = false,
     val alertSound: AlertSound = AlertSound.DEFAULT,
     val vibrationSeconds: Int = DEFAULT_VIBRATION_SECONDS,

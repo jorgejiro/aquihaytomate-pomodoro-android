@@ -51,8 +51,10 @@ class TimerEngineTest {
         ResetTimerUseCase(timerState, settings, recordFocusSlot, sync, clock, elapsed)
     private val skip = SkipSlotUseCase(timerState, settings, recordFocusSlot, sync, clock, elapsed)
     private val complete =
-        CompleteSlotUseCase(timerState, settings, recordFocusSlot, alerts, sync, clock, elapsed)
+        CompleteSlotUseCase(timerState, settings, recordFocusSlot, alerts, runtime, sync, clock, elapsed)
     private val reconcile = ReconcileTimerUseCase(timerState, complete, sync, clock, elapsed)
+    private val restoreNotification =
+        RestoreOngoingNotificationUseCase(timerState, runtime, clock, elapsed)
 
     private fun advance(millis: Long) {
         clock.advanceBy(millis)
@@ -158,6 +160,8 @@ class TimerEngineTest {
 
     @Test
     fun `a finished focus slot is recorded, rings and plans the short break`() = runTest {
+        // Auto-starting the break is the default now, and this test is about the slot *waiting* instead.
+        settings.set(TimerSettings(autoStartBreak = false))
         start()
         advance(focusMs)
 
@@ -356,6 +360,7 @@ class TimerEngineTest {
 
     @Test
     fun `skipping a focus slot does not advance the cycle and leads to a short break`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
         start()
         advance(10 * 60_000L)
 
@@ -432,6 +437,50 @@ class TimerEngineTest {
 
         assertEquals(TimerStatus.RUNNING, state().status)
         assertEquals(SlotType.SHORT_BREAK, state().slotType)
+    }
+
+    // ─── The ongoing notification coming back ───────────────────────────────
+
+    // From Android 13 the user can swipe away the notification of a foreground service and the service
+    // survives it: the countdown would keep running with nothing on screen and no controls to reach.
+    @Test
+    fun `a dismissed notification comes back while the slot runs`() = runTest {
+        start()
+        advance(60_000L)
+
+        restoreNotification()
+
+        assertEquals(1, runtime.runningNotificationCount)
+    }
+
+    @Test
+    fun `a dismissed notification comes back while the slot is paused`() = runTest {
+        start()
+        advance(60_000L)
+        pause()
+        val afterPausing = runtime.pausedNotificationCount
+
+        restoreNotification()
+
+        assertEquals(afterPausing + 1, runtime.pausedNotificationCount)
+    }
+
+    // Dismissing the end-of-slot alert is the user acknowledging it, and an idle timer has nothing to
+    // report. Bringing either back would be the notification that will not die.
+    @Test
+    fun `nothing comes back when ringing or idle`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
+        start()
+        advance(focusMs)
+        complete()
+        val ringingCounts = runtime.runningNotificationCount to runtime.pausedNotificationCount
+
+        restoreNotification()
+        assertEquals(ringingCounts, runtime.runningNotificationCount to runtime.pausedNotificationCount)
+
+        reset()
+        restoreNotification()
+        assertEquals(ringingCounts, runtime.runningNotificationCount to runtime.pausedNotificationCount)
     }
 
     // ─── Resetting ──────────────────────────────────────────────────────────
@@ -716,6 +765,7 @@ class TimerEngineTest {
 
     @Test
     fun `ringing tears the service down and posts the alert notification`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
         start()
         advance(focusMs)
         complete()
@@ -734,7 +784,40 @@ class TimerEngineTest {
 
         assertTrue(runtime.serviceRunning)
         assertEquals(state().endAtElapsedRealtimeMs, runtime.armedDeadlineMs)
-        assertEquals(0, runtime.finishedNotificationCount)
+    }
+
+    /**
+     * Chaining still tells you the pomodoro ended.
+     *
+     * It used not to: with auto-start on there was no `RINGING` state, so no alert was published and the
+     * phone just buzzed. On a paired watch — the reason this changed — a pomodoro would end with nothing on
+     * the wrist to say so, which is precisely when the phone is in another room.
+     */
+    @Test
+    fun `chaining into the break still publishes the alert`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = true))
+        start()
+        advance(focusMs)
+
+        complete()
+
+        assertEquals(TimerStatus.RUNNING, state().status)
+        assertEquals(SlotType.SHORT_BREAK, state().slotType)
+        assertEquals(1, runtime.finishedNotificationCount)
+        assertEquals("It has to know the slot is already under way", 1, runtime.chainedNotificationCount)
+        assertEquals(1, alerts.playCount)
+    }
+
+    @Test
+    fun `a slot that waits for the user is not announced as chained`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
+        start()
+        advance(focusMs)
+
+        complete()
+
+        assertEquals(1, runtime.finishedNotificationCount)
+        assertEquals(0, runtime.chainedNotificationCount)
     }
 
     @Test

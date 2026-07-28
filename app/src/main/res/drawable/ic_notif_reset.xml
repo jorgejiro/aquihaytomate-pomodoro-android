@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Back to the start of this slot: a counter-clockwise arrow. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:tint="@color/notification_action"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,5 V2 L7,6.5 L12,11 V8 c2.76,0 5,2.24 5,5 s-2.24,5 -5,5 s-5,-2.24 -5,-5 H5 c0,3.87 3.13,7 7,7 s7,-3.13 7,-7 S15.87,5 12,5 Z" />
+</vector>

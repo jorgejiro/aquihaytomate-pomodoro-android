@@ -98,8 +98,10 @@ porque las restricciones son distintas.
   Binder ronda 1 MB; un bitmap de 40 dp a xxxhdpi son ~160 × 160 px ARGB, unos 100 KB: sobra
   margen, pero no se puede rasterizar «por si acaso» a un tamaño mayor).
 
-- El estado `RINGING` es el **único** caso en que el widget se refresca por tiempo, para hacer
-  parpadear el borde. Está acotado a 60 segundos y luego para.
+- **El widget no se refresca por tiempo en ningún caso.** El estado `RINGING` lo hacía, para parpadear el
+  borde, acotado a 60 segundos; se retiró al rediseñar ese estado —ahora muestra el slot siguiente listo,
+  con su color y su duración, en vez de un signo de alarma— así que ya no queda ninguna excepción a la
+  regla. Ver `docs/design-spec.md` §7.3.
 
 - Hay que probar en **Nova Launcher** (el que usa el autor), Pixel Launcher y One UI: algunos
   launchers ignoran `targetCellWidth` y colocan el widget con el tamaño de `minWidth`.

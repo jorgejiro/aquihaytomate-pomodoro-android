@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jjrapps.aquihaytomate.ui.theme.AquiHayTomateTheme
 import com.jjrapps.aquihaytomate.ui.theme.Caption
@@ -76,6 +77,9 @@ class SettingsGroupScope internal constructor() {
  *
  * @param value shown in the phase accent; null for a row that only navigates.
  * @param trailing replaces the value and chevron entirely — used for the toggle rows.
+ * @param minHeight taller than the 52 dp of Settings where the rows are the whole screen rather than one
+ *   of eight groups — the onboarding, where two permission rows had nothing else to share the page with and
+ *   read as cramped.
  */
 @Composable
 fun SettingsRow(
@@ -85,6 +89,7 @@ fun SettingsRow(
     value: String? = null,
     valueColor: Color = TomateBright,
     showChevron: Boolean = true,
+    minHeight: Dp = ROW_HEIGHT,
     onClick: (() -> Unit)? = null,
     trailing: @Composable (() -> Unit)? = null,
 ) {
@@ -94,7 +99,7 @@ fun SettingsRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = ROW_HEIGHT)
+            .heightIn(min = minHeight)
             .background(if (pressed && onClick != null) SurfacePressed else Color.Transparent)
             .then(
                 if (onClick != null) {
