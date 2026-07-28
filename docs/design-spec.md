@@ -555,21 +555,25 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
                  CORRIENDO        PAUSADO          CORRIENDO       PAUSADO
 ┌────────┐      ┌────────┐       ┌────────┐       ┌────────┐      ┌────────┐    ┌────────┐
 │ ╭────╮ │      │ ╭────╮ │       │ ╭────╮ │       │ ╭────╮ │      │ ╭────╮ │    │ ╭────╮ │
-│ │████│ │      │ │░░░░│ │       │ │░░░░│ │       │ │░░░░│ │      │ │░░░░│ │    │ │▓▓▓▓│ │
-│ │ ▶  │ │      │ │24:58│ │      │ │24:31│ │      │ │ 4:07│ │     │ │ 4:07│ │   │ │ ¡! │ │
-│ │████│ │      │ │ ❚❚ │ │       │ │ ▶  │ │       │ │ ❚❚ │ │      │ │ ▶  │ │    │ │▓▓▓▓│ │
+│ │████│ │      │ │░░░░│ │       │ │░░░░│ │       │ │░░░░│ │      │ │░░░░│ │    │ │████│ │
+│ │ ▶  │ │      │ │24:58│ │      │ │24:31│ │      │ │ 4:07│ │     │ │ 4:07│ │   │ │05:00│ │
+│ │████│ │      │ │ ❚❚ │ │       │ │ ▶  │ │       │ │ ❚❚ │ │      │ │ ▶  │ │    │ │ ▶  │ │
 │ ╰────╯ │      │ ╰────╯ │       │ ╰────╯ │       │ ╰────╯ │      │ ╰────╯ │    │ ╰────╯ │
 └────────┘      └────────┘       └────────┘       └────────┘      └────────┘    └────────┘
- TomateFill      TomateFill       TomateFill       AmbarFill       AmbarFill     borde
- lleno           + ❚❚ pequeño     @45 % + ▶        + cáliz + ❚❚    @45 % + ▶     DoradoBright
- + ▶ grande                                                                       parpadeando
+ TomateFill      TomateFill       TomateFill       AmbarFill       AmbarFill     el color y
+ lleno           + ❚❚ pequeño     @45 % + ▶        + cáliz + ❚❚    @45 % + ▶     la duración
+ + ▶ grande                                                                       del slot que
+                                                                                  viene
 ```
 
 **El glifo dice lo que hará el toque, no en qué estado está el temporizador.** Parado y pausado muestran `▶`, corriendo muestra `❚❚`. Es la misma regla que el control primario de la app, y es lo que convierte un cuadrado de 40 dp en un botón: la acción por defecto se ve sin pensar. El estado ya lo cuentan el nivel del líquido, el color de la fase y —en pausa— el líquido al 45 %, así que el glifo no tiene que repetirlo.
 
 - **En `IDLE` no hay cifra.** Un temporizador parado no tiene tiempo que informar y el `▶` se queda con todo el tomate. Es también el estado en el que queda el widget tras un doble toque o tras reiniciar el móvil, que es cuando más falta hace que se entienda que hay que tocarlo.
 - El cáliz de descanso es la redundancia no cromática, igual que en la app.
-- En `RINGING` el borde de la placa parpadea en `DoradoBright` cada 900 ms. Como el widget no puede animar solo, se hacen dos `updateAppWidget()` alternos mientras dure el `RINGING`, con tope de 60 s — es el único caso donde se refresca por tiempo, y está acotado.
+- **En `RINGING` el widget muestra el slot que está a punto de empezar**: tomate lleno con el color de esa fase —rojo si viene enfoque, ámbar si viene descanso—, su duración como cifra y el `▶`. El estado ya apunta al slot siguiente, así que es literalmente lo que hará el toque.
+
+  Antes dibujaba un tomate vacío con un `!`, y en un escritorio lleno de iconos eso se lee como «algo va mal», no como «tu descanso está listo». Se retiró con él el parpadeo del borde, que era **el único sitio donde el widget se refrescaba por tiempo** (dos `updateAppWidget()` alternos hasta 60 s): sin signo de alarma no hay nada que hacer parpadear, y el aviso de que el slot terminó lo dan el sonido, la vibración y la notificación.
+- **Qué muestra cada estado es una función pura**, `widget/WidgetReadout.kt`, con test unitario. Estas reglas cambiaron tres veces en una tarde de feedback y cada error era invisible hasta ver el widget en un escritorio.
 
 ### 7.4 Configuración del proveedor
 

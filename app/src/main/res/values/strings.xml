@@ -176,7 +176,6 @@
     <string name="widget_description">One-cell timer. Tap to start or pause, double-tap to reset.</string>
 
     <!-- Widget glyphs. Not translatable: they are symbols, not words. -->
-    <string name="widget_ringing_glyph" translatable="false">!</string>
     <string name="widget_preview_time" translatable="false">25:00</string>
 
     <!-- Changelog -->

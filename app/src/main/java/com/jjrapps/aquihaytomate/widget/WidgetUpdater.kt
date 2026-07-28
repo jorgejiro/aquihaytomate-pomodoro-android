@@ -17,7 +17,6 @@ import com.jjrapps.aquihaytomate.domain.repository.SettingsRepository
 import com.jjrapps.aquihaytomate.domain.repository.TimerStateRepository
 import com.jjrapps.aquihaytomate.domain.time.ElapsedRealtimeSource
 import com.jjrapps.aquihaytomate.domain.usecase.TimerMath
-import com.jjrapps.aquihaytomate.ui.theme.DoradoBright
 import com.jjrapps.aquihaytomate.ui.theme.TextPrimary
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Clock
@@ -52,47 +51,17 @@ class WidgetUpdater @Inject constructor(
 
         val state = timerStateRepository.current()
         val settings = settingsRepository.current()
-        val views = buildViews(state, settings.widgetBackground, ringingHighlight = false)
+        val views = buildViews(state, settings.widgetBackground)
 
         runCatching { manager.updateAppWidget(ids, views) }
             .onFailure { Timber.w(it, "Could not update the widget") }
     }
 
-    /**
-     * One frame of the ringing blink. The widget cannot animate itself, so the alternation is driven from
-     * outside — the only case where the widget is refreshed on a timer, and it is capped. See ADR 001.
-     */
-    suspend fun updateAllRingingFrame(highlighted: Boolean) {
-        val manager = AppWidgetManager.getInstance(context) ?: return
-        val ids = manager.getAppWidgetIds(ComponentName(context, PomodoroWidgetProvider::class.java))
-        if (ids.isEmpty()) return
-
-        val state = timerStateRepository.current()
-        if (state.status != TimerStatus.RINGING) return
-        val settings = settingsRepository.current()
-
-        runCatching {
-            manager.updateAppWidget(
-                ids,
-                buildViews(state, settings.widgetBackground, ringingHighlight = highlighted),
-            )
-        }.onFailure { Timber.w(it, "Could not blink the widget") }
-    }
-
-    private fun buildViews(
-        state: TimerState,
-        background: WidgetBackground,
-        ringingHighlight: Boolean,
-    ): RemoteViews {
+    private fun buildViews(state: TimerState, background: WidgetBackground): RemoteViews {
         val views = RemoteViews(context.packageName, R.layout.widget_tomate)
-        val settingsDuration = state.slotDurationMs
-        val remainingMs =
-            TimerMath.remainingMs(state, clock.millis(), elapsedRealtime.millis())
-        val fillFraction = when (state.status) {
-            TimerStatus.IDLE -> 1f
-            TimerStatus.RINGING -> 0f
-            else -> TimerMath.fillFraction(settingsDuration, remainingMs)
-        }
+        val remainingMs = TimerMath.remainingMs(state, clock.millis(), elapsedRealtime.millis())
+        // What each state shows is decided by a pure function, so it can be tested without a launcher.
+        val readout = readoutFor(state, remainingMs)
 
         views.setInt(
             R.id.widget_root,
@@ -103,79 +72,53 @@ class WidgetUpdater @Inject constructor(
             },
         )
 
-        // The glyph names the action a tap performs, exactly like the primary control of the app: play when
-        // the clock is stopped, pause while it runs. It is what makes a 40 dp square read as a button
-        // rather than as a readout.
-        val glyphLarge = state.status == TimerStatus.IDLE
         views.setImageViewBitmap(
             R.id.widget_tomato,
             renderer.render(
                 slotType = state.slotType,
-                fillFraction = fillFraction,
-                dimmed = state.status == TimerStatus.PAUSED,
+                fillFraction = readout.fillFraction,
+                dimmed = readout.dimmed,
                 showCalyx = state.slotType.isBreak,
-                glyph = glyphFor(state.status),
-                glyphLarge = glyphLarge,
+                glyph = readout.glyph,
+                glyphLarge = readout.glyphLarge,
             ),
         )
 
-        applyReadout(views, state, remainingMs, ringingHighlight)
+        applyFigure(views, readout)
         views.setOnClickPendingIntent(R.id.widget_root, tapIntent())
         return views
     }
 
     /**
-     * What a tap does from each state. Pausing and resuming are the *action*, not the state: a paused timer
-     * is already saying so with its liquid at 45%, so the glyph is free to say "resume" instead of
-     * repeating "paused". See docs/design-spec.md §7.3.
-     */
-    private fun glyphFor(status: TimerStatus): WidgetGlyph = when (status) {
-        TimerStatus.RUNNING -> WidgetGlyph.PAUSE
-        TimerStatus.IDLE, TimerStatus.PAUSED, TimerStatus.RINGING -> WidgetGlyph.PLAY
-    }
-
-    /**
-     * Picks between the self-ticking chronometer and a static figure.
+     * Puts the figure on screen: the self-ticking chronometer while the slot runs, a frozen `TextView`
+     * otherwise, and neither when there is nothing to report.
      *
-     * A `Chronometer` cannot be frozen at an arbitrary value, so every state other than `RUNNING` uses the
-     * plain `TextView`: the remaining time when paused, the alert mark when ringing, and nothing at all
-     * when idle — there the large play glyph on the tomato is the whole readout.
+     * A `Chronometer` cannot be stopped at an arbitrary value, which is the whole reason there are two views
+     * stacked in the layout.
      */
-    private fun applyReadout(
-        views: RemoteViews,
-        state: TimerState,
-        remainingMs: Long,
-        ringingHighlight: Boolean,
-    ) {
-        when (state.status) {
-            TimerStatus.RUNNING -> {
-                views.setViewVisibility(R.id.widget_chronometer, View.VISIBLE)
-                views.setViewVisibility(R.id.widget_static_text, View.GONE)
-                // The base is a point in the future on the monotonic clock; SystemUI counts down to it
-                // on its own, without ever waking this process.
-                views.setChronometer(
-                    R.id.widget_chronometer,
-                    SystemClock.elapsedRealtime() + remainingMs,
-                    null,
-                    true,
-                )
-                views.setChronometerCountDown(R.id.widget_chronometer, true)
-                views.setTextColor(R.id.widget_chronometer, TextPrimary.toArgb())
-            }
-
-            TimerStatus.PAUSED ->
-                staticReadout(views, TimerMath.formatRemaining(remainingMs), TextPrimary.toArgb())
-
-            // No figure at all: a stopped timer has no time to report, and the duration it *would* run for
-            // is already one tap away. The play glyph gets the whole tomato to itself.
-            TimerStatus.IDLE -> staticReadout(views, "", TextPrimary.toArgb())
-
-            TimerStatus.RINGING -> staticReadout(
-                views,
-                context.getString(R.string.widget_ringing_glyph),
-                if (ringingHighlight) DoradoBright.toArgb() else TextPrimary.toArgb(),
+    private fun applyFigure(views: RemoteViews, readout: WidgetReadout) {
+        val ticking = readout.tickingRemainingMs
+        if (ticking != null) {
+            views.setViewVisibility(R.id.widget_chronometer, View.VISIBLE)
+            views.setViewVisibility(R.id.widget_static_text, View.GONE)
+            // The base is a point in the future on the monotonic clock; SystemUI counts down to it on its
+            // own, without ever waking this process.
+            views.setChronometer(
+                R.id.widget_chronometer,
+                SystemClock.elapsedRealtime() + ticking,
+                null,
+                true,
             )
+            views.setChronometerCountDown(R.id.widget_chronometer, true)
+            views.setTextColor(R.id.widget_chronometer, TextPrimary.toArgb())
+            return
         }
+
+        staticReadout(
+            views,
+            readout.figureMs?.let { TimerMath.formatRemaining(it) } ?: "",
+            TextPrimary.toArgb(),
+        )
     }
 
     private fun staticReadout(views: RemoteViews, text: String, color: Int) {

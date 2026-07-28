@@ -86,6 +86,7 @@ En la tercera página los permisos son **filas con su estado escrito** (`Pendien
 - Ocupa **una sola casilla** (`targetCellWidth/Height=1`, `resizeMode="none"`).
 - Muestra los minutos restantes y el nivel de líquido como progreso. Distingue enfoque (rojo) de descanso (ámbar) por color.
 - **Lleva dibujado el glifo de la acción que hará el toque**: `▶` parado o pausado, `❚❚` corriendo. Parado no muestra cifra, solo el `▶` a todo el tomate. Los glifos se pintan en el bitmap con `Canvas`, no se escriben como texto: Space Grotesk no tiene ni `▸` ni `❚`.
+- **Al terminar un slot muestra el siguiente listo**: color de esa fase, su duración y el `▶`. Nunca un signo de alarma — en un escritorio se lee como un error. Qué muestra cada estado vive en la función pura `widget/WidgetReadout.kt`, con test.
 - **Un toque** = iniciar / pausar / reanudar, según el estado.
 - **Doble toque rápido** (ventana de ~400 ms) = reiniciar.
 - **No usa pulsación larga**: en cualquier launcher (Nova incluido) el long-press sobre un widget lo intercepta el propio launcher para arrastrarlo y el evento nunca llega a la app. Es una limitación de plataforma, no una preferencia.
