@@ -99,6 +99,7 @@ En la tercera página los permisos son **filas con su estado escrito** (`Pendien
 - **Vibración de duración configurable en segundos**, por defecto 5 s, en pulsos de 400 ms con huecos de 250 ms.
 - Respeta modo silencio y No molestar.
 - **La alerta la toca la app, no el canal de notificación.** Ver `docs/decisions/004-alerta-propia-en-vez-de-sonido-de-canal.md`.
+- **La notificación de fin de slot está hecha para llegar al reloj emparejado** con sus dos acciones —empezar el siguiente y descartar—, y es la única que no va marcada como silenciosa. Ver `docs/decisions/011-*`.
 
 ### 2.7 Pantalla Novedades (changelog) ✅ Implementada
 
@@ -481,6 +482,15 @@ El cuerpo de la notificación lo decora cada fabricante, así que hay que mirarl
 - **One UI** (el móvil de Jorge) además de Pixel Launcher.
 - **Tema claro y tema oscuro** del sistema: la cifra sale de `values-night`, y es la única superficie de la app con esquema claro.
 - Colapsada y expandida, y en la **pantalla de bloqueo**, donde algunos sistemas degradan a la plantilla estándar.
+
+### Aviso en el reloj emparejado (Garmin, tras el ADR 011)
+
+1. La app aparece habilitada en Garmin Connect → Notificaciones inteligentes.
+2. Al terminar un slot con el auto-inicio desactivado, el aviso llega al reloj.
+3. En el reloj se ven **las dos acciones**: «Empezar descanso» / «Volver al tajo» y «Descartar».
+4. Pulsar la primera arranca el slot siguiente **con el móvil bloqueado**.
+5. Descartar desde el reloj **corta la vibración** en el móvil, incluso con la vibración a 30 s.
+6. Con auto-inicio activado no llega nada, porque no se publica alerta.
 
 ### Resiliencia del temporizador (obligatoria en F4, en Android 12, 14 y 16)
 

@@ -641,6 +641,9 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
 
 `CATEGORY_ALARM`, `setAutoCancel(true)`. Título `¡Tiempo!`, texto `25 min de enfoque completados · 3 de 4`. Acciones **Empezar descanso** / **Volver al tajo** y **Descartar**.
 
+- **Esta es la única notificación que NO lleva `setSilent(true)`.** El canal ya es mudo, así que el flag no aportaba silencio: lo que hacía era marcarla como no alertante, quitarle el heads-up y dejarla fuera de lo que un reloj emparejado reenvía. Las dos acciones se muestran en un Garmin como lista, que es como se controla el temporizador desde la muñeca. Ver `docs/decisions/011-*`.
+- **Descartarla desde cualquier sitio para el sonido y la vibración**, vía `deleteIntent` a `ACTION_DISMISS`: al descartar desde el reloj, el sistema cancela la notificación sin pasar por la acción, y la vibración seguía hasta 30 s.
+
 Si el slot siguiente arranca solo —`autoStartBreak` al acabar un pomodoro, `autoStartFocus` al acabar un descanso— no se publica alerta separada: se actualiza la ongoing con el nuevo slot y **el sonido y la vibración se disparan igual**. Auto-iniciar significa no tener que tocar, no enterarse de nada.
 
 > **Los dos canales son mudos** (`setSound(null, null)`, `enableVibration(false)`). El sonido y la vibración los toca `AlertPlayer`, porque un canal no permite cambiarlos después de creado y ambos son ajustes de primera línea. Ver ADR 004.

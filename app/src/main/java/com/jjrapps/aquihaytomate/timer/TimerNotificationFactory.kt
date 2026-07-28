@@ -44,6 +44,8 @@ class TimerNotificationFactory @Inject constructor(
         base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
             .setContentTitle(titleFor(state))
             .setOngoing(true)
+            // Republished on every transition, so it must never make a sound of its own.
+            .setSilent(true)
             .withRestoreOnDismissal()
             .withBody(state, TimerActionReceiver.ACTION_PAUSE) { chronometerOf(state) }
             // Without IMMEDIATE, Android 12+ holds the notification back for up to ten seconds and the
@@ -60,6 +62,7 @@ class TimerNotificationFactory @Inject constructor(
         base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
             .setContentTitle(titleFor(state))
             .setOngoing(true)
+            .setSilent(true)
             .withRestoreOnDismissal()
             .withBody(state, TimerActionReceiver.ACTION_RESUME, R.string.notification_paused_label) {
                 frozenFigureOf(remainingMs)
@@ -252,12 +255,20 @@ class TimerNotificationFactory @Inject constructor(
             R.string.control_back_to_work
         }
 
+        // Deliberately NOT silent, unlike the ongoing ones. The channel is already mute — the sound and the
+        // vibration are `AlertPlayer`'s job, see ADR 004 — but `setSilent(true)` does more than mute: it
+        // marks the notification as non-alerting, which costs the heads-up that CLAUDE.md §3 counts on and,
+        // measured on a paired Garmin, stops it being handed to the watch at all. See ADR 011.
         return base(AquiHayTomateApplication.CHANNEL_TIMER_ALERTS)
             .setContentTitle(context.getString(R.string.phase_ringing))
             .setContentText(body)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
+            // Dismissing it from anywhere — the shade, a watch, "clear all" — has to stop the alarm, which
+            // can be vibrating for up to 30 seconds. Without this, a dismissal from the wrist cancelled the
+            // notification and left the phone buzzing.
+            .setDeleteIntent(actionIntent(TimerActionReceiver.ACTION_DISMISS))
             .addAction(
                 0,
                 context.getString(actionLabel),
@@ -275,8 +286,6 @@ class TimerNotificationFactory @Inject constructor(
         .setSmallIcon(R.drawable.ic_notif_tomate)
         .setColor(TomateFill.toArgb())
         .setContentIntent(openAppIntent())
-        // Both channels are mute by design; the alert is played by AlertPlayer. See ADR 004.
-        .setSilent(true)
         .setOnlyAlertOnce(true)
         .setCategory(NotificationCompat.CATEGORY_STOPWATCH)
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

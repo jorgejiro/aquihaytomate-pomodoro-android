@@ -129,13 +129,52 @@ class TimerNotificationFactoryTest {
         )
     }
 
-    /** The alert is meant to be dismissable: swiping it away is how the user acknowledges it. */
+    /**
+     * The alert is meant to be dismissable — swiping it away is how the user acknowledges it — and doing so
+     * has to stop the alarm, which can be vibrating for up to 30 seconds. Its delete intent points at
+     * `ACTION_DISMISS`, which stops the sound; it does **not** republish, and `RestoreOngoingNotificationUseCase`
+     * refuses to restore anything while ringing.
+     */
     @Test
-    fun theEndOfSlotAlertStaysDismissable() {
+    fun dismissingTheAlertStopsTheAlarm() {
         val alert = factory.slotFinished(running.copy(slotType = SlotType.SHORT_BREAK))
 
-        assertNull("The alert must not resurrect itself", alert.deleteIntent)
+        assertNotNull("Dismissing from a watch would leave the phone buzzing", alert.deleteIntent)
         assertTrue(alert.flags and android.app.Notification.FLAG_AUTO_CANCEL != 0)
+    }
+
+    /**
+     * The alert must stay "alerting": that is what earns it a heads-up and what gets it handed to a paired
+     * watch. The channel is already mute, so this costs no sound. See ADR 011.
+     */
+    @Test
+    fun theAlertIsNotMarkedSilentButTheOngoingOnesAre() {
+        val alert = factory.slotFinished(running.copy(slotType = SlotType.SHORT_BREAK))
+        val ongoing = factory.ongoingRunning(running)
+
+        assertEquals(0, alert.flags and NotificationCompat.FLAG_LOCAL_ONLY)
+        assertNull("The channel does the muting; the builder must not", alert.sound)
+        assertTrue(
+            "The ongoing one is republished on every transition and must never chirp",
+            ongoing.extras.getBoolean("android.silent", false) ||
+                ongoing.flags and android.app.Notification.FLAG_ONGOING_EVENT != 0,
+        )
+    }
+
+    /** Two actions on the wrist: start the next slot, or dismiss. */
+    @Test
+    fun theAlertOffersStartNextAndDismiss() {
+        val alert = factory.slotFinished(running.copy(slotType = SlotType.SHORT_BREAK))
+
+        assertEquals(2, alert.actions.size)
+        assertEquals(
+            context.getString(R.string.control_start_break),
+            alert.actions[0].title.toString(),
+        )
+        assertEquals(
+            context.getString(R.string.notification_action_dismiss),
+            alert.actions[1].title.toString(),
+        )
     }
 
     @Test
