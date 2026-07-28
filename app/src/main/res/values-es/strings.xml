@@ -179,7 +179,7 @@
     <string name="changelog_title">Novedades</string>
     <string name="changelog_current_badge">Actual</string>
 
-    <string-array name="changelog_1_0_0">
+    <string-array name="changelog_0_9_0">
         <item>Primera versión.</item>
         <item>Temporizador Pomodoro con enfoque, descanso corto y descanso largo cada N pomodoros. Todas las duraciones son configurables.</item>
         <item>Widget de escritorio de una sola casilla: un toque para iniciar o pausar, dos toques para reiniciar.</item>

@@ -181,7 +181,7 @@
     <string name="changelog_title">What\'s new</string>
     <string name="changelog_current_badge">Current</string>
 
-    <string-array name="changelog_1_0_0">
+    <string-array name="changelog_0_9_0">
         <item>First release.</item>
         <item>Pomodoro timer with focus, short break and long break every N Pomodoros. Every duration is configurable.</item>
         <item>One-cell home screen widget: tap to start or pause, double-tap to reset.</item>

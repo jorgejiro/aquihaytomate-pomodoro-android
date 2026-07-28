@@ -472,7 +472,7 @@ private fun SettingsScreenPreview() {
                 settings = TimerSettings(),
                 notificationsGranted = true,
                 exactAlarmsGranted = false,
-                versionName = "1.0.0",
+                versionName = "0.9.0",
                 versionCode = 1,
             ),
             onOpenChangelog = {},

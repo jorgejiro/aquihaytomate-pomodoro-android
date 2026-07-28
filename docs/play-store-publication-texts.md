@@ -2,7 +2,10 @@
 
 > Textos y checklist para la ficha de Google Play. Cuenta de desarrollador: la misma que Bebe Agua.
 >
-> Estado: preparado para v1.0.0 (versionCode 1) · Última revisión: 2026-07-27
+> Estado: preparado para v0.9.0 (versionCode 1) · Última revisión: 2026-07-28
+>
+> Se publica como **0.9.0** mientras queda pendiente la checklist §10 en dispositivo real; `1.0.0`
+> se reserva para la versión que la cierre. Ver `CLAUDE.md` §9.
 
 ---
 
@@ -183,11 +186,11 @@ El nombre se mantiene en español en ambos idiomas: es la marca.
 
 ## 7. Novedades de esta versión
 
-**ES (1.0.0)**
+**ES (0.9.0)**
 > Primera versión. Temporizador Pomodoro con widget de una sola casilla, estadísticas, avisos
 > configurables y tema oscuro. Sin anuncios ni seguimiento.
 
-**EN (1.0.0)**
+**EN (0.9.0)**
 > First release. Pomodoro timer with a one-cell home screen widget, statistics, configurable alerts
 > and a dark theme. No ads, no tracking.
 

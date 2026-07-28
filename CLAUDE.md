@@ -32,7 +32,7 @@ El nombre juega con el tomate (*pomodoro* en italiano, de donde viene el nombre 
 
 ---
 
-## 2. Funcionalidad (v1.0, en desarrollo)
+## 2. Funcionalidad (v1.0, en desarrollo · se publica como 0.9.x)
 
 ### 2.1 Pantalla Temporizador (principal) ✅ Implementada en F3
 
@@ -441,7 +441,13 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 
 ## 9. Roadmap
 
-**v1.0 — MVP 🔨 En desarrollo** (`versionCode 1`, `versionName 1.0.0`)
+**v1.0 — MVP 🔨 En desarrollo** (`versionCode 1`, `versionName 0.9.0`)
+
+> **Esquema de versionado.** La funcionalidad de la 1.0 está completa, pero **se publica como `0.9.0`**
+> hasta que la checklist de resiliencia §10 esté pasada en dispositivo real. Lo que salga de esas pruebas
+> va en `0.9.1`, `0.9.2`…, y el nombre **`1.0.0` se reserva para la versión que cierre F9**. El
+> `versionCode` sube de uno en uno en **cada** subida a Play, aunque solo cambie el patch: Play rechaza un
+> bundle cuyo `versionCode` no supere el de la última subida.
 
 - [x] **F0** Esqueleto: Gradle, Hilt, tema, navegación, i18n, changelog, CI. *Hito alcanzado: `lint test` verde con 9 tests unitarios y la app vacía.*
 - [x] **F1** Núcleo puro: `TimerMath`, `SlotPlanner`, `StreakCalculator`, `StatsAggregation`, `VibrationPatterns`, `AlertPolicy`, `TomatoGeometry` + tests. *Sin nada de Android.*

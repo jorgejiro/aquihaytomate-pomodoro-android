@@ -8,12 +8,19 @@ repositorio; el que se muestra dentro de la app vive en los `string-array` `chan
 Al publicar una versión nueva hay que tocar los cuatro sitios: este archivo, los dos
 `string-array` (EN y ES), el catálogo y el `versionCode`/`versionName` de `app/build.gradle.kts`.
 
+**El `versionCode` sube de uno en uno en cada subida a Play, incluso si el `versionName` solo cambia de
+patch.** Play rechaza un bundle cuyo `versionCode` no sea mayor que el de la última subida, y no se puede
+reutilizar ni bajando la versión.
+
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
-## [1.0.0] — 2026-07-28 (versionCode 1)
+## [0.9.0] — 2026-07-28 (versionCode 1)
 
-Primera versión.
+Primera versión, publicada como **0.9.0** para pruebas: la funcionalidad de la 1.0 está completa,
+pero la checklist de resiliencia en dispositivo real (`CLAUDE.md` §10) todavía no está pasada. Las
+correcciones que salgan de esas pruebas van en 0.9.1, 0.9.2…; la **1.0.0** se reserva para cuando la
+checklist esté cerrada.
 
 ### Añadido
 
