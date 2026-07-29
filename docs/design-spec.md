@@ -70,7 +70,6 @@ val BorderStrong        = Color(0xFF332D2A)   // borde de toggles y chips inacti
 // ─── Semantic ───────────────────────────────────────────────────────────
 val AlertAmber          = Color(0xFFF2A03D)   // avisos de permisos y batería
 val SurfaceHighlight    = Color(0x99FFFFFF)   // línea de brillo de la superficie
-val WidgetPlateStroke   = Color(0x24FFFFFF)   // borde del widget sobre wallpaper
 ```
 
 ### 2.2 Colores por fase
@@ -531,7 +530,7 @@ Con `reduced = true`:
 
 ### 7.1 Placa
 
-Fondo con `@android:dimen/system_app_widget_background_radius` (el sistema decide el radio, así encaja con el resto del escritorio), relleno negro opaco y trazo de 1 dp en `WidgetPlateStroke` (`#24FFFFFF`) para que se recorte sobre wallpapers claros. Variante transparente disponible en Ajustes.
+Fondo con `@android:dimen/system_app_widget_background_radius` (el sistema decide el radio, así encaja con el resto del escritorio) y relleno negro opaco, **sin trazo**. Hubo un filete de 1 dp al 14 % de blanco para que la placa negra no se perdiera sobre un wallpaper oscuro; lo que hacía en realidad era rodear el widget de un contorno gris que se lee como suciedad en el escritorio y contradice el «cero tarjetas» del §1 de `CLAUDE.md`. Que la placa se funda con un fondo negro es lo deseable: lo que tiene que verse es el tomate, y el tomate está siempre. Variante transparente disponible en Ajustes.
 
 ### 7.2 Contenido a 40 × 40 dp
 
@@ -673,7 +672,7 @@ El copy se escribe **para una pantalla de reloj**, que muestra título y cuerpo 
 | `mipmap-anydpi/ic_launcher.xml` | | `<adaptive-icon>` con `<background>`, `<foreground>` y **`<monochrome>`** |
 | Icono de notificación | `drawable/ic_notif_tomate.xml` | 24 × 24 dp, **máscara alfa pura** (el sistema lo tiñe de blanco). Silueta simplificada, sin agujeros finos |
 | Splash | `drawable/ic_splash_tomate.xml` | Lienzo 288 × 288 dp con el arte en 192 × 192 dp centrado |
-| Placa del widget | `drawable/widget_plate.xml` | Shape con `system_app_widget_background_radius`, relleno negro, trazo `WidgetPlateStroke` |
+| Placa del widget | `drawable/widget_plate.xml` | Shape con `system_app_widget_background_radius` y relleno negro, **sin trazo** |
 | Placa transparente | `drawable/widget_plate_transparent.xml` | Igual, sin relleno |
 | Preview del widget | `layout/widget_tomate_preview.xml` + `drawable/widget_preview_tomate.xml` | Copia del layout con cifra fija `25`, y vector de respaldo |
 | Fuentes | `font/inter_*.ttf`, `font/space_grotesk_*.ttf` | ~230 KB tras subsetting. SIL OFL 1.1 |

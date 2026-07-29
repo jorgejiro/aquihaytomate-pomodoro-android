@@ -189,6 +189,7 @@
     <string name="changelog_current_badge">Actual</string>
 
     <string-array name="changelog_1_0_1">
+        <item>El widget ya no tiene un contorno gris a su alrededor.</item>
         <item>El mapa del mes ya no se solapa con la leyenda que tiene debajo en pantallas anchas y tablets.</item>
         <item>La barra de estado vuelve a leerse con el móvil en tema claro: la hora y la batería se pintaban oscuras sobre el fondo negro de la app.</item>
     </string-array>

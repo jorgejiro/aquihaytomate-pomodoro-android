@@ -22,6 +22,10 @@ motor del temporizador. El `versionCode` sube a 3 porque el 2 ya se subió a Pla
 
 ### Corregido
 
+- **El widget llevaba un contorno gris.** La placa negra tenía un filete de 1 dp al 14 % de blanco, puesto
+  para que no se perdiera sobre un wallpaper oscuro. En el escritorio se leía como un borde sucio alrededor
+  del tomate y no hacía falta: lo que tiene que verse es el tomate, que está siempre porque es el
+  contenido. Sobre un wallpaper claro la placa negra ya se recorta sola.
 - **El mapa del mes se comía la leyenda en pantallas anchas.** La rejilla se dibuja repartiendo el ancho
   entre las siete columnas, pero el hueco reservado para ella se calculaba con una celda fija de 40 dp: en
   un móvil de 411 dp se derramaba 39 dp sobre la leyenda y en una tablet de 800 dp, 317 dp, tapando también
