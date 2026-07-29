@@ -338,7 +338,7 @@ Fila estándar: **52 dp** de alto, padding horizontal 16 dp. Etiqueta `rowLabel`
 │ │ Sonido al terminar el pomodoro   │ │
 │ │ Toca descansar        Cuenco   › │ │
 │ │ Sonido al terminar el descanso   │ │
-│ │ Vuelta al tajo        Digital  › │ │
+│ │ Vuelta al tajo        Campana  › │ │
 │ │ Vibración                  5 s › │ │  0 s = desactivada
 │ └──────────────────────────────────┘ │
 │  WIDGET                              │

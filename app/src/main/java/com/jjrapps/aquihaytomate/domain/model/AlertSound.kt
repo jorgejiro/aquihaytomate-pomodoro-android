@@ -33,11 +33,17 @@ enum class AlertSound(val id: String, @param:StringRes val labelRes: Int) {
         /**
          * The sound the end of a break gets by default.
          *
-         * `digital`, at a 2170 Hz centroid and 0.72 s: four times brighter than the bowl and dry. This one
-         * has to cut through whatever you drifted into and get you back to work, so it is deliberately
-         * less pleasant. See docs/decisions/012-*.
+         * The bell: brighter than the bowl — a 1112 Hz centroid against 506, and 11 dB more energy above
+         * 2 kHz — and it rings for 2.6 s. This one has to cut through whatever you drifted into and get
+         * you back to work.
+         *
+         * `digital` measures louder on paper (−7.2 dB RMS against −15.3, and the most total energy of the
+         * four) and was the first choice for that reason, but it lasts 0.72 s: a blip that is over before
+         * it registers if you are not looking at the phone. Chosen by ear on the author's own device, on
+         * the grounds that standing out is a matter of insisting, not of peak level. See
+         * docs/decisions/012-*.
          */
-        val DEFAULT_BREAK = DIGITAL
+        val DEFAULT_BREAK = BELL
 
         fun fromId(id: String?, fallback: AlertSound = DEFAULT_FOCUS): AlertSound =
             entries.firstOrNull { it.id == id } ?: fallback

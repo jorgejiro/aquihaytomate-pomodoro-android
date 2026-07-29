@@ -33,8 +33,8 @@ class TimerSettingsTest {
             defaults.focusAlertSound == AlertSound.BOWL,
         )
         assertTrue(
-            "Acabar el descanso es una orden: digital, cuatro veces más agudo y seco",
-            defaults.breakAlertSound == AlertSound.DIGITAL,
+            "Acabar el descanso es una orden: campana, más brillante que el cuenco y sonando 2,6 s",
+            defaults.breakAlertSound == AlertSound.BELL,
         )
         assertTrue(
             "Si los dos coincidieran, la mitad de la idea se pierde",

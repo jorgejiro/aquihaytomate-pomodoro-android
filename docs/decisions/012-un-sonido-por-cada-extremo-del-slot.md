@@ -2,8 +2,9 @@
 
 ## Contexto
 
-Hasta la 1.0.1 había **un solo** ajuste de sonido, `alert_sound`, que sonaba igual en los dos extremos de
-un slot: al terminar un pomodoro y al terminar un descanso. Por defecto, la campana.
+Hasta la 1.0.1 había **un solo** ajuste de sonido, `alert_sound`, con la campana por defecto. Ese sonido
+—el que fuera— sonaba igual en los dos extremos de un slot: al terminar un pomodoro y al terminar un
+descanso.
 
 Los dos momentos no dicen lo mismo. Terminar un pomodoro es una buena noticia —te has ganado el descanso—
 y el aviso puede permitirse ser agradable. Terminar el descanso es lo contrario: hay que sacarte de lo que
@@ -23,19 +24,26 @@ prueba.
 **Dos ajustes independientes**, `focus_alert_sound` y `break_alert_sound`, con valores por defecto
 distintos, y un selector que suena al tocarlo.
 
-Los valores por defecto se eligieron midiendo los cuatro clips, no por su nombre:
+Los cuatro clips, medidos:
 
-| clip | centroide espectral | rolloff | duración |
-|---|---|---|---|
-| `bowl` | 506 Hz | 723 | 2,90 s |
-| `soft` | 508 Hz | 491 | 1,40 s |
-| `bell` | 1112 Hz | 1263 | 2,60 s |
-| `digital` | **2170 Hz** | 3491 | 0,72 s |
+| clip | centroide | duración | RMS | energía total | RMS > 2 kHz |
+|---|---|---|---|---|---|
+| `bowl` | 506 Hz | 2,90 s | −14,8 dB | 4229 | −37,6 dB |
+| `soft` | 508 Hz | 1,40 s | −15,9 dB | 1578 | −42,9 dB |
+| `bell` | 1112 Hz | 2,60 s | −15,3 dB | 3353 | −26,3 dB |
+| `digital` | 2170 Hz | **0,72 s** | **−7,2 dB** | **6053** | **−9,9 dB** |
 
 - **Fin de pomodoro → `bowl`** (cuenco tibetano). El más grave y el más largo: entra y decae solo, se lee
   como recompensa.
-- **Fin de descanso → `digital`**. Cuatro veces más brillante que el cuenco y seco. Es deliberadamente
-  menos agradable, porque su trabajo es interrumpir.
+- **Fin de descanso → `bell`** (campana). Más brillante que el cuenco —1112 Hz de centroide contra 506, y
+  11 dB más de energía por encima de 2 kHz— y suena 2,6 s.
+
+**El primer valor por defecto fue `digital`, y se cambió tras escucharlo en un dispositivo real.** Sobre el
+papel es el candidato obvio: el más agudo, 8 dB más de RMS que la campana y el que más energía total tiene
+de los cuatro. Pero dura 0,72 s, y en el altavoz de un móvil eso es un blip que se acaba antes de que lo
+registres si no estás mirando la pantalla. Destacar no es cuestión de nivel de pico, sino de insistir: la
+campana suena tres veces y media más tiempo, y es la que se oye. La medida describe la señal, no lo que
+llega al oído a través de un altavoz pequeño y a dos metros de distancia.
 
 El sonido lo decide **el slot que acaba**, no el que empieza, en la función pura
 `TimerSettings.alertSoundFor(finishedType)` — por el mismo motivo que existe `autoStartsInto`: que
@@ -61,6 +69,8 @@ móvil está en silencio no se oye nada, que es exactamente lo que pasará cuand
   siguiente, seleccionar *es* la forma natural de probar.
 - **Sonidos nuevos** más marcados para cada extremo. Los cuatro clips ya cubren el rango de grave a agudo
   —hay un factor cuatro entre el cuenco y el digital—, y añadir audio engorda el APK sin necesidad.
+- **`digital` para el fin del descanso**, que es lo que decían las medidas. Descartado por corto: ver
+  arriba. Sigue estando en el catálogo para quien lo prefiera.
 
 ## Consecuencias
 
