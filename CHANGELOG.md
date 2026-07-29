@@ -15,7 +15,10 @@ reutilizar ni bajando la versión.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
-## [Sin publicar]
+## [1.1.0] — 2026-07-29 (versionCode 4)
+
+Sube el minor y no el patch porque hay funcionalidad nueva: los dos sonidos. El `versionCode` va a 4 porque
+el 3 se quedó en la 1.0.1, que nunca llegó a subirse a Play.
 
 ### Añadido
 

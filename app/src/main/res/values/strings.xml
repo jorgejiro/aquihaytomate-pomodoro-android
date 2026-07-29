@@ -194,6 +194,10 @@
     <string name="changelog_title">What\'s new</string>
     <string name="changelog_current_badge">Current</string>
 
+    <string-array name="changelog_1_1_0">
+        <item>The end of a pomodoro and the end of a break now sound different, and each one can be changed on its own. By default, a singing bowl when you finish working and a bell when the break is over: one is a reward, the other is an order.</item>
+        <item>The sound picker plays each option as you tap it and stays open so you can compare them. Before, it changed the sound and closed without letting you hear anything.</item>
+    </string-array>
     <string-array name="changelog_1_0_1">
         <item>The widget no longer has a grey outline around it.</item>
         <item>The monthly map no longer overlaps the legend below it on wide screens and tablets.</item>
