@@ -413,6 +413,25 @@ compartición de ubicación, sin interacción entre usuarios. Resultado esperado
 Este es el que hay que enviar y mantener. El manifiesto declara además
 `<property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="pomodoro_countdown_timer" />`.
 
+**Vídeo demostrativo, enviado con la 1.1.0**: <https://youtube.com/shorts/cQ_qm63iubo>
+
+El formulario exige un vídeo que muestre la funcionalidad, y **es el campo que más frena la revisión**.
+Este ya está grabado y publicado: el pomodoro en marcha, la app en segundo plano, la notificación con la
+cuenta atrás y sus controles. Reutilízalo en las siguientes subidas en vez de grabar otro, y **no lo borres
+ni lo pases a privado**: Google puede volver a revisarlo, y un enlace muerto en una declaración enviada es
+un rechazo. En YouTube tiene que estar como *no listado* o público — *privado* no vale, porque entonces el
+revisor tampoco lo ve.
+
+Respuestas del formulario, por si vuelve a pedirlas:
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Usa la app permisos de servicio en primer plano? | **Sí** |
+| Tipo | **Uso especial** (`specialUse`), subtipo `pomodoro_countdown_timer`. Ningún otro: no hay `camera`, `location`, `mediaPlayback` ni `dataSync` |
+| Descripción de la funcionalidad | el texto **EN** de abajo |
+| Por qué no vale una alternativa | el segundo párrafo del texto **EN**: ni `shortService` (3 min contra intervalos de hasta 3 h) ni WorkManager, que no da precisión al segundo ni notificación con controles |
+| Vídeo | el enlace de arriba |
+
 **EN**
 
 > The app is a user-initiated Pomodoro countdown timer. When the user explicitly starts a focus or
