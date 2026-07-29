@@ -41,7 +41,6 @@ val BorderStrong        = Color(0xFF332D2A)   // inactive toggles and chips
 // ─── Semantic ───────────────────────────────────────────────────────────
 val AlertAmber          = Color(0xFFF2A03D)   // permission and battery warnings
 val SurfaceHighlight    = Color(0x99FFFFFF)   // highlight line on the liquid surface
-val WidgetPlateStroke   = Color(0x24FFFFFF)   // widget edge over light wallpapers
 
 /**
  * The four shades of the current phase, resolved once and passed down, rather than each component

@@ -162,6 +162,20 @@ def capturar_widget(destino):
     tanda.esperar("PAUSAR") if ui.buscar("PAUSAR") else tanda.esperar("PAUSE")
     adb("shell", "input", "keyevent", "KEYCODE_HOME")
     time.sleep(3)
+
+    # HOME deja la primera página, y el widget vive en la segunda. Recién arrancado el emulador esto no se
+    # puede dar por supuesto: sin ir a buscarlo, la captura sale del escritorio vacío.
+    ancho = ancho_pantalla()
+    alto = int(adb("shell", "wm", "size").strip().split(":")[-1].split("x")[1])
+    for _ in range(3):
+        if ui.buscar("Pomodoro"):
+            break
+        adb("shell", "input", "swipe", str(int(ancho * 0.8)), str(alto // 2),
+            str(int(ancho * 0.2)), str(alto // 2), "300")
+        time.sleep(1.5)
+    else:
+        raise SystemExit("el widget no está en ninguna página del escritorio")
+
     ui.captura(os.path.join(destino, "06-widget-en-el-escritorio.png"))
     print("  06-widget-en-el-escritorio.png")
 

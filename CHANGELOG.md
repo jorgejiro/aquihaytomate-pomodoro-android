@@ -15,6 +15,15 @@ reutilizar ni bajando la versión.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
+## [Sin publicar]
+
+### Corregido
+
+- **El widget ya no lleva un contorno gris.** La placa negra tenía un filete de 1 dp al 14 % de blanco,
+  puesto para que no se perdiera sobre un wallpaper oscuro. En el escritorio se leía como un borde sucio
+  alrededor del tomate, y no hacía falta: lo que tiene que verse es el tomate, que está siempre. Sobre un
+  wallpaper claro la placa negra ya se recorta sola.
+
 ## [1.0.1] — 2026-07-29 (versionCode 3)
 
 Dos fallos visuales que salieron al preparar las capturas para la ficha de Play, ninguno de ellos en el
