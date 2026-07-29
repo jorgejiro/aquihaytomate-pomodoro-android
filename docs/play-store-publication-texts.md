@@ -322,6 +322,15 @@ que la app no declara `INTERNET`, que es comprobable por cualquiera en la propia
 futuro se añadiera un permiso, hay que añadirlo aquí. Como en la de Bebe Agua, no aparece ningún correo: se
 remite al que Play muestra en la ficha.
 
+> **La sección «Conservación de datos» no es opcional: no la quites.** Google rechazó una actualización de
+> Bebe Agua con este motivo —«No se especifica una política de conservación de datos. Indica tus prácticas
+> de conservación de datos en la política o declara explícitamente en ella que no almacenas ni conservas
+> datos de usuario»— y esta política tenía el mismo hueco: contaba que los datos se quedan en el dispositivo
+> y cómo borrarlos, pero en ninguna parte decía **cuánto tiempo se conservan ni que el desarrollador no
+> conserva nada**. No basta con que se deduzca de «no se recoge nada»: el revisor busca la palabra. La
+> sección lo dice en dos frases, una por lado — conservación cero del lado del desarrollador, y en el
+> dispositivo hasta que el usuario decida.
+
 Texto base, por si hiciera falta reescribirla:
 
 ### EN

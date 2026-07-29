@@ -72,6 +72,7 @@ Cada una de estas costó una iteración de depuración. Están en los ADR, pero 
 | Garmin **sí** reenvía las acciones de notificación | (suposición errónea al principio) | Se comprobó con TickTick; el copy debe valer sin nombre de app |
 | Alto reservado con celda fija vs. dibujo proporcional al ancho | El mapa del mes se derramaba sobre la leyenda: +3 dp en un móvil de 360, +317 dp en una tablet de 800 | Derivar el alto del ancho real con la misma aritmética que el dibujo; `MonthHeatmapTest` |
 | `enableEdgeToEdge()` sin argumentos | Con el tema del **sistema** en claro, los iconos de la barra de estado se pintan oscuros y desaparecen sobre el negro de la app | `SystemBarStyle.dark(...)` explícito: la app solo tiene tema oscuro |
+| Play exige que la política **hable de conservación**, no que se deduzca | Rechazo de una actualización de Bebe Agua: «No se especifica una política de conservación de datos» | Sección propia que declara conservación cero del lado del desarrollador y control del usuario en el dispositivo |
 | El emulador no deja cambiar el idioma del sistema | `setprop persist.sys.locale` lo bloquea SELinux y Ajustes se cierra al buscar idiomas | Para las capturas, el widget va en la segunda página del escritorio, que no lleva «At a glance» |
 
 ---
