@@ -70,6 +70,9 @@ Cada una de estas costó una iteración de depuración. Están en los ADR, pero 
 | Las Live Updates de Android 16 (`setRequestPromotedOngoing`) | — | **Incompatibles con vistas propias**: o cifra grande, o promoción |
 | R8 renombra las constantes de los enums | El release guardaba `"e"` en la base de datos | Reglas en `proguard-rules.pro`; verificado en el `mapping.txt` |
 | Garmin **sí** reenvía las acciones de notificación | (suposición errónea al principio) | Se comprobó con TickTick; el copy debe valer sin nombre de app |
+| Alto reservado con celda fija vs. dibujo proporcional al ancho | El mapa del mes se derramaba sobre la leyenda: +3 dp en un móvil de 360, +317 dp en una tablet de 800 | Derivar el alto del ancho real con la misma aritmética que el dibujo; `MonthHeatmapTest` |
+| `enableEdgeToEdge()` sin argumentos | Con el tema del **sistema** en claro, los iconos de la barra de estado se pintan oscuros y desaparecen sobre el negro de la app | `SystemBarStyle.dark(...)` explícito: la app solo tiene tema oscuro |
+| El emulador no deja cambiar el idioma del sistema | `setprop persist.sys.locale` lo bloquea SELinux y Ajustes se cierra al buscar idiomas | Para las capturas, el widget va en la segunda página del escritorio, que no lleva «At a glance» |
 
 ---
 
@@ -86,7 +89,10 @@ Lo que ha funcionado, por orden de coste:
 3. **El emulador, con `dumpsys` en vez de la vista.** `adb shell dumpsys notification --noredact` dice
    flags, acciones, `contentView` y textos exactos; es más fiable que mirar una captura. Para el estado del
    motor, `adb shell run-as com.jjrapps.aquihaytomate cat files/datastore/settings.preferences_pb | strings`.
-4. **Capturas solo para juzgar diseño**, nunca para verificar lógica.
+4. **Capturas solo para juzgar diseño**, nunca para verificar lógica. El juego de la ficha de Play se
+   regenera con `docs/store-assets/generar-capturas/` —36 imágenes, seis escenas por dos idiomas y tres
+   formatos— y ahí están anotadas las trampas de automatizar el launcher. Los dos fallos visuales del
+   apartado anterior salieron precisamente de mirar esas capturas en una tablet.
 
 Aviso práctico: automatizar la UI con `adb shell input tap` a ciegas falla la mitad de las veces. Captura,
 localiza y **luego** toca; y recuerda que el onboarding tiene cuatro páginas.

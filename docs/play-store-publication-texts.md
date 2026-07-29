@@ -47,7 +47,7 @@
    |---|---|
    | Icono de la aplicación | `docs/store-assets/icono-play-512.png` (§9) |
    | Gráfico de funciones | `docs/store-assets/grafico-de-funciones-1024x500.png` (§9) |
-   | Capturas de teléfono | las cuatro de `docs/store-assets/` (§8); **falta la de Estadísticas**, que hay que hacer con datos reales |
+   | Capturas de teléfono y de tablet | los seis juegos de `docs/store-assets/capturas/` (§8): teléfono, tablet de 7" y de 10", en ES y EN |
    | Nombre, descripción corta y completa | §2, §3 y §4, en ES y EN |
    | Política de privacidad | la URL de `docs/web/aqui-hay-tomate.html` una vez subida (§11) |
    | Data safety | §10 |
@@ -212,35 +212,43 @@ El nombre se mantiene en español en ambos idiomas: es la marca.
 
 ---
 
-## 8. Capturas — orden recomendado
+## 8. Capturas — **36 listas en el repo**
 
-**El widget va primero.** Es el argumento de venta y lo que diferencia la app; si alguien solo mira
-la primera captura, tiene que ver eso.
+**El pomodoro va primero, y el widget después del historial.** Seis escenas, en este orden:
 
-| # | Captura | Texto sobreimpreso (ES) | Texto sobreimpreso (EN) |
+| # | Fichero | Qué muestra |
+|---|---|---|
+| 1 | `01-pomodoro-en-marcha.png` | Un pomodoro corriendo: tomate al 70 %, 17:30, los tres controles y «a continuación» |
+| 2 | `02-descanso.png` | El descanso: tomate ámbar con el cáliz, que es la señal no cromática de la fase |
+| 3 | `03-ajustes.png` | Configuración: duraciones, los dos auto-inicios, avisos y widget |
+| 4 | `04-historial.png` | Estadísticas con 45 días sembrados: hoy, la semana y el mapa del mes |
+| 5 | `05-fin-del-intervalo.png` | Fin de intervalo: el tomate vacío, «¡Tiempo!» y la invitación a seguir |
+| 6 | `06-widget-en-el-escritorio.png` | El widget de 1×1 en un escritorio limpio, junto al dock para que se aprecie el tamaño |
+
+Están en `docs/store-assets/capturas/`, en **tres formatos por dos idiomas**:
+
+| Carpeta | Resolución | Aspecto | Requisito de Play |
 |---|---|---|---|
-| 1 | El widget de 1×1 en un escritorio real, junto a iconos de apps para que se aprecie el tamaño | Una sola casilla | One single cell |
-| 2 | Temporizador en enfoque, tomate al 70 % | Un toque y a trabajar | Tap and get to work |
-| 3 | Temporizador en descanso, tomate ámbar con el cáliz | Descansa cuando toca | Rest when it's time |
-| 4 | Estadísticas con datos de un mes | Mira lo que has enfocado | See what you focused on |
-| 5 | Ajustes, sección Duraciones | A tu medida | Your durations |
+| `telefono/{es,en}` | 1080 × 2400 | 9:20 | lados de 320 a 3840 px |
+| `tablet-7-pulgadas/{es,en}` | 1080 × 1920 | **9:16** | 9:16 o 16:9, lados de 320 a 3840 px |
+| `tablet-10-pulgadas/{es,en}` | 1440 × 2560 | **9:16** | 9:16 o 16:9, lados de 1080 a 7680 px |
 
-Formato: PNG 1080 × 2400. Sin marcos de móvil, sin fondos degradados de marketing. El texto
-sobreimpreso en Inter SemiBold blanco, abajo, sobre el propio fondo negro de la app.
+Las de tablet cumplen el 9:16 exacto que Play valida. Las de teléfono van en la resolución nativa de un
+móvil actual, que es 9:20: **si la consola pusiera problemas con esa proporción**, se regeneran en 9:16
+cambiando la resolución del AVD y volviendo a ejecutar la herramienta.
 
-**Hay cuatro capturas listas en `docs/store-assets/`**, tomadas del emulador con la build de release en
-español, sin texto sobreimpreso:
+Sin marcos de móvil, sin fondos de marketing y sin texto sobreimpreso: el fondo negro de la app ya destaca
+sobre el blanco de la ficha. Si algún día se quiere el texto encima, va en Inter SemiBold blanco, abajo.
 
-| Fichero | Qué muestra |
-|---|---|
-| `01-widget-en-el-escritorio.png` | El widget de 1×1 en el escritorio, junto a un icono de app para que se vea el tamaño |
-| `02-temporizador-enfoque.png` | Temporizador en enfoque, con los tres controles y «a continuación» |
-| `03-ajustes.png` | Ajustes, con las duraciones y los dos auto-inicios |
-| `04-onboarding-ciclo.png` | La página «Tu ciclo» del onboarding |
+**No están hechas a mano**: las genera `docs/store-assets/generar-capturas/`, con su propio README. Se
+rehacen con un par de órdenes cuando cambie una pantalla, y así no vuelve a colarse una captura en el
+idioma equivocado. Lo que hace la herramienta, en corto: siembra 45 días de historial para que Estadísticas
+no salga vacía, escribe el estado del temporizador para que el tomate salga a media asta sin esperar ocho
+minutos por escena, y coloca el widget en la segunda página del escritorio, que es la que el launcher deja
+sin «At a glance» —el único texto del sistema que se colaría en otro idioma—.
 
-**Falta la de Estadísticas**, y a propósito: con una instalación nueva sale vacía. Hazla tú desde tu móvil
-tras unos días de uso, que además es lo honesto para la ficha. Play exige un mínimo de dos capturas de
-teléfono, así que se puede subir sin ella.
+> La captura de Estadísticas **sale con datos sembrados, no reales**. Es representativa de lo que se ve tras
+> un mes y medio de uso; si prefieres las tuyas, sustituye `04-historial.png` por una captura de tu S25.
 
 ---
 
