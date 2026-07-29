@@ -1,5 +1,6 @@
 package com.jjrapps.aquihaytomate.domain.usecase
 
+import com.jjrapps.aquihaytomate.domain.model.AlertSound
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.TimerState
@@ -65,6 +66,71 @@ class TimerEngineTest {
 
     private suspend fun remaining() =
         TimerMath.remainingMs(state(), clock.millis(), elapsed.millis(), settings.current())
+
+    // ─── Los dos sonidos ────────────────────────────────────────────────────
+
+    @Test
+    fun `a pomodoro and a break do not sound the same`() = runTest {
+        settings.set(
+            TimerSettings(
+                focusAlertSound = AlertSound.BOWL,
+                breakAlertSound = AlertSound.DIGITAL,
+                autoStartBreak = false,
+            ),
+        )
+
+        start()
+        advance(focusMs)
+        assertTrue(complete())
+        assertEquals("El pomodoro acaba con el sonido suave", AlertSound.BOWL, alerts.lastSound)
+
+        start()                       // el descanso, que estaba en RINGING esperando
+        advance(shortBreakMs)
+        assertTrue(complete())
+        assertEquals("El descanso acaba con el duro", AlertSound.DIGITAL, alerts.lastSound)
+
+        assertEquals(listOf(AlertSound.BOWL, AlertSound.DIGITAL), alerts.playedSounds)
+    }
+
+    @Test
+    fun `chaining into the break still uses the sound of the slot that ended`() = runTest {
+        // Con el auto-inicio puesto, el descanso arranca solo; lo que acaba de terminar es el pomodoro, así
+        // que tiene que sonar el suyo y no el del descanso que empieza.
+        settings.set(
+            TimerSettings(
+                focusAlertSound = AlertSound.SOFT,
+                breakAlertSound = AlertSound.DIGITAL,
+                autoStartBreak = true,
+            ),
+        )
+
+        start()
+        advance(focusMs)
+        assertTrue(complete())
+
+        assertEquals(TimerStatus.RUNNING, state().status)
+        assertEquals(SlotType.SHORT_BREAK, state().slotType)
+        assertEquals(AlertSound.SOFT, alerts.lastSound)
+    }
+
+    @Test
+    fun `silencing one end leaves the other alone`() = runTest {
+        settings.set(
+            TimerSettings(
+                focusAlertSound = AlertSound.SILENT,
+                breakAlertSound = AlertSound.BELL,
+                autoStartBreak = false,
+            ),
+        )
+
+        start()
+        advance(focusMs)
+        complete()
+
+        // Sigue habiendo alerta: la decisión de no hacer ruido es del reproductor, según la política, no
+        // del motor. Lo que cambia es qué sonido se le pide.
+        assertEquals(AlertSound.SILENT, alerts.lastSound)
+    }
 
     // ─── Starting, pausing, resuming ────────────────────────────────────────
 

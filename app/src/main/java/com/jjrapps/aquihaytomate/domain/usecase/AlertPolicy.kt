@@ -1,6 +1,7 @@
 package com.jjrapps.aquihaytomate.domain.usecase
 
 import com.jjrapps.aquihaytomate.domain.model.AlertSound
+import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 
 /** The device's ringer, mapped off `AudioManager` so this file stays free of Android. */
@@ -81,14 +82,20 @@ object AlertPolicy {
         return AlertDecision(playSound = audible, vibrate = wantsVibration)
     }
 
+    /**
+     * Igual, pero tomando los ajustes y el slot que **acaba**, que es lo que decide cuál de los dos
+     * sonidos suena. Sin el slot no se puede: desde que hay uno por fase, unos ajustes solos no
+     * determinan el sonido.
+     */
     fun decide(
         settings: TimerSettings,
+        finishedType: SlotType,
         ringerMode: RingerMode,
         interruptionFilter: InterruptionFilter = InterruptionFilter.ALL,
         dndAllowsAlarms: Boolean = true,
         alarmVolumeLevel: Int = 1,
     ): AlertDecision = decide(
-        sound = settings.alertSound,
+        sound = settings.alertSoundFor(finishedType),
         vibrationSeconds = settings.vibrationSeconds,
         ringerMode = ringerMode,
         interruptionFilter = interruptionFilter,

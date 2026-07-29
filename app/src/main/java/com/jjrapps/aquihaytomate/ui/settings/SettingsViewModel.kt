@@ -7,6 +7,7 @@ import com.jjrapps.aquihaytomate.domain.model.AlertSound
 import com.jjrapps.aquihaytomate.domain.model.AppLanguage
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.WidgetBackground
+import com.jjrapps.aquihaytomate.domain.repository.AlertPlayer
 import com.jjrapps.aquihaytomate.domain.repository.SettingsRepository
 import com.jjrapps.aquihaytomate.domain.repository.TimerAlarmScheduler
 import com.jjrapps.aquihaytomate.domain.usecase.ObserveSettingsUseCase
@@ -24,6 +25,7 @@ class SettingsViewModel @Inject constructor(
     observeSettings: ObserveSettingsUseCase,
     private val settingsRepository: SettingsRepository,
     private val alarmScheduler: TimerAlarmScheduler,
+    private val alertPlayer: AlertPlayer,
 ) : ViewModel() {
 
     private val openSheet = MutableStateFlow<SettingsSheet?>(null)
@@ -62,10 +64,6 @@ class SettingsViewModel @Inject constructor(
         openSheet.value = sheet
     }
 
-    fun onSheetDismissed() {
-        openSheet.value = null
-    }
-
     fun onDurationSelected(slotType: SlotType, minutes: Int) = update {
         settingsRepository.setDurationMinutes(slotType, minutes)
     }
@@ -78,8 +76,34 @@ class SettingsViewModel @Inject constructor(
         settingsRepository.setDailyGoal(pomodoros)
     }
 
-    fun onAlertSoundSelected(sound: AlertSound) = update {
-        settingsRepository.setAlertSound(sound)
+    fun onFocusAlertSoundSelected(sound: AlertSound) = update {
+        settingsRepository.setFocusAlertSound(sound)
+        playPreview(sound)
+    }
+
+    fun onBreakAlertSoundSelected(sound: AlertSound) = update {
+        settingsRepository.setBreakAlertSound(sound)
+        playPreview(sound)
+    }
+
+    /**
+     * Lo hace sonar al elegirlo. Antes se podía cambiar el sonido pero no oírlo, así que la lista de
+     * nombres no servía de nada: nadie sabe qué es «Suave» hasta que lo escucha.
+     *
+     * Sin vibración —cero segundos—, porque lo que se está eligiendo es el sonido, y suena por el mismo
+     * camino que la alerta de verdad, de modo que respeta el silencio y el volumen de alarma igual que
+     * ella. Si el móvil está en silencio no se oye nada, que es exactamente lo que pasará al terminar el
+     * pomodoro.
+     */
+    private suspend fun playPreview(sound: AlertSound) {
+        alertPlayer.stop()
+        if (sound.isAudible) alertPlayer.play(sound, vibrationSeconds = 0)
+    }
+
+    /** Corta la escucha al cerrar el selector, para que no siga sonando por encima de la app. */
+    fun onSheetDismissed() {
+        alertPlayer.stop()
+        openSheet.value = null
     }
 
     fun onVibrationSecondsSelected(seconds: Int) = update {

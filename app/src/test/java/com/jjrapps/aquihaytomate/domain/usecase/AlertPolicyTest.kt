@@ -1,6 +1,7 @@
 package com.jjrapps.aquihaytomate.domain.usecase
 
 import com.jjrapps.aquihaytomate.domain.model.AlertSound
+import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -129,16 +130,41 @@ class AlertPolicyTest {
 
     @Test
     fun `a settings snapshot decides the same way as the raw values`() {
-        val settings = TimerSettings(alertSound = AlertSound.BOWL, vibrationSeconds = 12)
+        val settings = TimerSettings(
+            focusAlertSound = AlertSound.BOWL,
+            breakAlertSound = AlertSound.DIGITAL,
+            vibrationSeconds = 12,
+        )
 
         assertEquals(
             decide(sound = AlertSound.BOWL, vibrationSeconds = 12),
             AlertPolicy.decide(
                 settings = settings,
+                finishedType = SlotType.FOCUS,
                 ringerMode = RingerMode.NORMAL,
                 alarmVolumeLevel = 7,
             ),
         )
+    }
+
+    @Test
+    fun `the finished slot decides which of the two sounds the policy weighs`() {
+        val settings = TimerSettings(
+            focusAlertSound = AlertSound.SILENT,      // el pomodoro acaba en silencio…
+            breakAlertSound = AlertSound.DIGITAL,     // …y el descanso, no
+            vibrationSeconds = 0,
+        )
+
+        fun decidir(tipo: SlotType) = AlertPolicy.decide(
+            settings = settings,
+            finishedType = tipo,
+            ringerMode = RingerMode.NORMAL,
+            alarmVolumeLevel = 7,
+        )
+
+        assertTrue("Un pomodoro en silencio no debe sonar", decidir(SlotType.FOCUS).isSilent)
+        assertTrue("El fin del descanso sí", decidir(SlotType.SHORT_BREAK).playSound)
+        assertTrue("Y el descanso largo igual", decidir(SlotType.LONG_BREAK).playSound)
     }
 
     @Test

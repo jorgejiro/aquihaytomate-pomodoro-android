@@ -25,6 +25,36 @@ class TimerSettingsTest {
     }
 
     @Test
+    fun `the two ends of a slot sound different by default`() {
+        val defaults = TimerSettings()
+
+        assertTrue(
+            "Acabar un pomodoro es una buena noticia: cuenco, el más grave y largo de los cuatro",
+            defaults.focusAlertSound == AlertSound.BOWL,
+        )
+        assertTrue(
+            "Acabar el descanso es una orden: campana, más brillante que el cuenco y sonando 2,6 s",
+            defaults.breakAlertSound == AlertSound.BELL,
+        )
+        assertTrue(
+            "Si los dos coincidieran, la mitad de la idea se pierde",
+            defaults.focusAlertSound != defaults.breakAlertSound,
+        )
+    }
+
+    @Test
+    fun `the sound is keyed on the slot that ended, not the one coming up`() {
+        val settings = TimerSettings(
+            focusAlertSound = AlertSound.SOFT,
+            breakAlertSound = AlertSound.BELL,
+        )
+
+        assertTrue(settings.alertSoundFor(SlotType.FOCUS) == AlertSound.SOFT)
+        assertTrue(settings.alertSoundFor(SlotType.SHORT_BREAK) == AlertSound.BELL)
+        assertTrue(settings.alertSoundFor(SlotType.LONG_BREAK) == AlertSound.BELL)
+    }
+
+    @Test
     fun `auto start is keyed on the slot coming up, not the one that ended`() {
         val breakOnly = TimerSettings(autoStartBreak = true, autoStartFocus = false)
 

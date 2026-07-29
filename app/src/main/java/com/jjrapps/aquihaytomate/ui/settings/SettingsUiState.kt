@@ -8,7 +8,8 @@ sealed interface SettingsSheet {
     data class Duration(val slotType: SlotType) : SettingsSheet
     data object PomodorosPerCycle : SettingsSheet
     data object DailyGoal : SettingsSheet
-    data object AlertSound : SettingsSheet
+    data object FocusAlertSound : SettingsSheet
+    data object BreakAlertSound : SettingsSheet
     data object VibrationSeconds : SettingsSheet
     data object WidgetBackground : SettingsSheet
     data object Language : SettingsSheet

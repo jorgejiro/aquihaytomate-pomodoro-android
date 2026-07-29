@@ -22,8 +22,30 @@ enum class AlertSound(val id: String, @param:StringRes val labelRes: Int) {
     val isAudible: Boolean get() = this != SILENT
 
     companion object {
-        val DEFAULT = BELL
+        /**
+         * The sound a finished pomodoro gets by default.
+         *
+         * The singing bowl, measured as the gravest and longest of the four — spectral centroid 506 Hz,
+         * 2.9 s — so it lands as a reward rather than as an order. Ending a pomodoro is good news.
+         */
+        val DEFAULT_FOCUS = BOWL
 
-        fun fromId(id: String?): AlertSound = entries.firstOrNull { it.id == id } ?: DEFAULT
+        /**
+         * The sound the end of a break gets by default.
+         *
+         * The bell: brighter than the bowl — a 1112 Hz centroid against 506, and 11 dB more energy above
+         * 2 kHz — and it rings for 2.6 s. This one has to cut through whatever you drifted into and get
+         * you back to work.
+         *
+         * `digital` measures louder on paper (−7.2 dB RMS against −15.3, and the most total energy of the
+         * four) and was the first choice for that reason, but it lasts 0.72 s: a blip that is over before
+         * it registers if you are not looking at the phone. Chosen by ear on the author's own device, on
+         * the grounds that standing out is a matter of insisting, not of peak level. See
+         * docs/decisions/012-*.
+         */
+        val DEFAULT_BREAK = BELL
+
+        fun fromId(id: String?, fallback: AlertSound = DEFAULT_FOCUS): AlertSound =
+            entries.firstOrNull { it.id == id } ?: fallback
     }
 }
