@@ -15,6 +15,24 @@ reutilizar ni bajando la versión.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.0.1] — 2026-07-29 (versionCode 3)
+
+Dos fallos visuales que salieron al preparar las capturas para la ficha de Play, ninguno de ellos en el
+motor del temporizador. El `versionCode` sube a 3 porque el 2 ya se subió a Play con la 1.0.0.
+
+### Corregido
+
+- **El mapa del mes se comía la leyenda en pantallas anchas.** La rejilla se dibuja repartiendo el ancho
+  entre las siete columnas, pero el hueco reservado para ella se calculaba con una celda fija de 40 dp: en
+  un móvil de 411 dp se derramaba 39 dp sobre la leyenda y en una tablet de 800 dp, 317 dp, tapando también
+  las rachas y el sparkline. En un móvil estrecho la diferencia era de tres dp, y por eso no se había
+  visto. Ahora la altura sale del ancho real, con la misma aritmética que el dibujo, y `MonthHeatmapTest`
+  lo fija.
+- **La barra de estado desaparecía con el tema del sistema en claro.** `enableEdgeToEdge()` sin argumentos
+  decide el color de los iconos según el tema **del sistema**, así que en un móvil con tema claro los
+  pintaba oscuros: sobre el negro de la app no se veían ni la hora ni la batería. La app solo tiene tema
+  oscuro, de modo que ahora los pide claros siempre.
+
 ## [1.0.0] — 2026-07-28 (versionCode 2)
 
 Primera versión pública. Las 0.9.0 y 0.9.1 fueron versiones internas que nunca salieron del móvil del

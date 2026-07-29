@@ -40,21 +40,33 @@
    `~/keys/jjrapps-upload.jks` — y apuntar los dos proyectos ahí.
 3. **Activar Play App Signing** al crear la app en Play Console (viene activado por defecto). Con eso
    la clave de firma real la custodia Google y esta upload key es reemplazable si se pierde.
+5. **Rellenar la ficha con lo que ya está hecho.** Todo lo gráfico y todos los textos están en el repo,
+   así que este paso es copiar y subir:
+
+   | Campo de Play Console | De dónde sale |
+   |---|---|
+   | Icono de la aplicación | `docs/store-assets/icono-play-512.png` (§9) |
+   | Gráfico de funciones | `docs/store-assets/grafico-de-funciones-1024x500.png` (§9) |
+   | Capturas de teléfono y de tablet | los seis juegos de `docs/store-assets/capturas/` (§8): teléfono, tablet de 7" y de 10", en ES y EN |
+   | Nombre, descripción corta y completa | §2, §3 y §4, en ES y EN |
+   | Política de privacidad | la URL de `docs/web/aqui-hay-tomate.html` una vez subida (§11) |
+   | Data safety | §10 |
+   | Declaración de permisos | §14 |
 
 ### Antes de cada publicación
 
-4. Pasar la **checklist de resiliencia** de `CLAUDE.md` §10 en Android 12, 14 y 16.
-5. Pasar la **checklist del widget** en Nova Launcher, Pixel Launcher y One UI.
-6. Probar manualmente los ocho escenarios: onboarding · permiso de notificaciones · permiso de
+5. Pasar la **checklist de resiliencia** de `CLAUDE.md` §10 en Android 12, 14 y 16.
+6. Pasar la **checklist del widget** en Nova Launcher, Pixel Launcher y One UI.
+7. Probar manualmente los ocho escenarios: onboarding · permiso de notificaciones · permiso de
    alarmas exactas denegado · ciclo completo de 4 pomodoros · acciones de la notificación · widget
    con toque simple y doble · cambio de idioma en caliente · estadísticas con datos y vacías.
-7. Probar los avisos con silencio, modo vibración, DND total y DND prioritario.
-8. Verde en:
+8. Probar los avisos con silencio, modo vibración, DND total y DND prioritario.
+9. Verde en:
    ```bash
    JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew lint test
    JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew connectedDebugAndroidTest
    ```
-9. Generar el `.aab` firmado con la upload key:
+10. Generar el `.aab` firmado con la upload key:
    ```bash
    JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew bundleRelease
    # app/build/outputs/bundle/release/app-release.aab
@@ -63,11 +75,11 @@
    ```bash
    "$JAVA_HOME/bin/keytool" -printcert -jarfile app/build/outputs/bundle/release/app-release.aab
    ```
-10. Subir a **Internal testing** primero. Instalar desde Play en un dispositivo real y repetir 4 y 5:
+11. Subir a **Internal testing** primero. Instalar desde Play en un dispositivo real y repetir 5 y 6:
     la build de Play lleva R8 y puede romper cosas que el debug no.
-11. Promover a producción. Revisar antes: ficha, países, categoría, data safety, content rating,
+12. Promover a producción. Revisar antes: ficha, países, categoría, data safety, content rating,
     declaración de permisos y precio.
-12. Enviar a revisión.
+13. Enviar a revisión.
 
 ---
 
@@ -200,43 +212,81 @@ El nombre se mantiene en español en ambos idiomas: es la marca.
 
 ---
 
-## 8. Capturas — orden recomendado
+## 8. Capturas — **36 listas en el repo**
 
-**El widget va primero.** Es el argumento de venta y lo que diferencia la app; si alguien solo mira
-la primera captura, tiene que ver eso.
+**El pomodoro va primero, y el widget después del historial.** Seis escenas, en este orden:
 
-| # | Captura | Texto sobreimpreso (ES) | Texto sobreimpreso (EN) |
+| # | Fichero | Qué muestra |
+|---|---|---|
+| 1 | `01-pomodoro-en-marcha.png` | Un pomodoro corriendo: tomate al 70 %, 17:30, los tres controles y «a continuación» |
+| 2 | `02-descanso.png` | El descanso: tomate ámbar con el cáliz, que es la señal no cromática de la fase |
+| 3 | `03-ajustes.png` | Configuración: duraciones, los dos auto-inicios, avisos y widget |
+| 4 | `04-historial.png` | Estadísticas con 45 días sembrados: hoy, la semana y el mapa del mes |
+| 5 | `05-fin-del-intervalo.png` | Fin de intervalo: el tomate vacío, «¡Tiempo!» y la invitación a seguir |
+| 6 | `06-widget-en-el-escritorio.png` | El widget de 1×1 en un escritorio limpio, junto al dock para que se aprecie el tamaño |
+
+Están en `docs/store-assets/capturas/`, en **tres formatos por dos idiomas**:
+
+| Carpeta | Resolución | Aspecto | Requisito de Play |
 |---|---|---|---|
-| 1 | El widget de 1×1 en un escritorio real, junto a iconos de apps para que se aprecie el tamaño | Una sola casilla | One single cell |
-| 2 | Temporizador en enfoque, tomate al 70 % | Un toque y a trabajar | Tap and get to work |
-| 3 | Temporizador en descanso, tomate ámbar con el cáliz | Descansa cuando toca | Rest when it's time |
-| 4 | Estadísticas con datos de un mes | Mira lo que has enfocado | See what you focused on |
-| 5 | Ajustes, sección Duraciones | A tu medida | Your durations |
+| `telefono/{es,en}` | 1080 × 2400 | 9:20 | lados de 320 a 3840 px |
+| `tablet-7-pulgadas/{es,en}` | 1080 × 1920 | **9:16** | 9:16 o 16:9, lados de 320 a 3840 px |
+| `tablet-10-pulgadas/{es,en}` | 1440 × 2560 | **9:16** | 9:16 o 16:9, lados de 1080 a 7680 px |
 
-Formato: PNG 1080 × 2400. Sin marcos de móvil, sin fondos degradados de marketing. El texto
-sobreimpreso en Inter SemiBold blanco, abajo, sobre el propio fondo negro de la app.
+Las de tablet cumplen el 9:16 exacto que Play valida. Las de teléfono van en la resolución nativa de un
+móvil actual, que es 9:20: **si la consola pusiera problemas con esa proporción**, se regeneran en 9:16
+cambiando la resolución del AVD y volviendo a ejecutar la herramienta.
 
-**Hay cuatro capturas listas en `docs/store-assets/`**, tomadas del emulador con la build de release en
-español, sin texto sobreimpreso:
+Sin marcos de móvil, sin fondos de marketing y sin texto sobreimpreso: el fondo negro de la app ya destaca
+sobre el blanco de la ficha. Si algún día se quiere el texto encima, va en Inter SemiBold blanco, abajo.
 
-| Fichero | Qué muestra |
-|---|---|
-| `01-widget-en-el-escritorio.png` | El widget de 1×1 en el escritorio, junto a un icono de app para que se vea el tamaño |
-| `02-temporizador-enfoque.png` | Temporizador en enfoque, con los tres controles y «a continuación» |
-| `03-ajustes.png` | Ajustes, con las duraciones y los dos auto-inicios |
-| `04-onboarding-ciclo.png` | La página «Tu ciclo» del onboarding |
+**No están hechas a mano**: las genera `docs/store-assets/generar-capturas/`, con su propio README. Se
+rehacen con un par de órdenes cuando cambie una pantalla, y así no vuelve a colarse una captura en el
+idioma equivocado. Lo que hace la herramienta, en corto: siembra 45 días de historial para que Estadísticas
+no salga vacía, escribe el estado del temporizador para que el tomate salga a media asta sin esperar ocho
+minutos por escena, y coloca el widget en la segunda página del escritorio, que es la que el launcher deja
+sin «At a glance» —el único texto del sistema que se colaría en otro idioma—.
 
-**Falta la de Estadísticas**, y a propósito: con una instalación nueva sale vacía. Hazla tú desde tu móvil
-tras unos días de uso, que además es lo honesto para la ficha. Play exige un mínimo de dos capturas de
-teléfono, así que se puede subir sin ella.
+> La captura de Estadísticas **sale con datos sembrados, no reales**. Es representativa de lo que se ve tras
+> un mes y medio de uso; si prefieres las tuyas, sustituye `04-historial.png` por una captura de tu S25.
 
 ---
 
-## 9. Feature graphic (1024 × 500)
+## 9. Icono de la ficha y gráfico de funciones — **ya generados**
 
-Especificado al detalle en `docs/design-spec.md` §9. Resumen: fondo negro a sangre, tomate de 560 px
-cortado por abajo a la izquierda con la cifra `18:42` en negativo, y a la derecha el nombre en Inter
-SemiBold 68 px sobre el subtítulo «Pomodoro de una sola casilla» / "Pomodoro in a single cell".
+Los dos están hechos, con las medidas y el formato que Play valida al subirlos:
+
+| Asset | Fichero | Formato |
+|---|---|---|
+| Icono de la app | `docs/store-assets/icono-play-512.png` | 512 × 512, PNG de 32 bits con el alfa opaco, 33 KiB (el máximo es 1 MB) |
+| Gráfico de funciones | `docs/store-assets/grafico-de-funciones-1024x500.png` | 1024 × 500, PNG sin alfa, 60 KiB (el máximo es 15 MB) |
+
+Los sube en Play Console → **Presencia en Play → Ficha de Play principal**, en «Icono de la aplicación»
+y «Gráfico de funciones».
+
+**No son un diseño paralelo: los genera el código de la app.**
+
+```bash
+python3 docs/store-assets/generar-assets.py
+```
+
+El script reproduce los `pathData` de `res/drawable/ic_launcher_*.xml` y la onda de
+`domain/render/TomatoGeometry.kt`, con los colores de `ui/theme/Color.kt`, y al terminar comprueba
+tamaño, modo y peso de los dos ficheros. Si cambia el icono o la paleta, se ejecuta otra vez en vez de
+repintarlos a mano. Solo necesita Pillow.
+
+Dos cosas que conviene saber si se toca:
+
+- **El icono recorta la ventana visible de 72 dp** del lienzo de 108, no escala el lienzo entero. Un
+  icono adaptativo solo muestra esos 72 dp centrales, así que escalando los 108 el tomate saldría un
+  tercio más pequeño en la ficha que en el escritorio del móvil, y es en la lista de Play donde se
+  comparan los dos.
+- **El alfa se conserva pero opaco.** Play pide «PNG de 32 bits» y aplica su propia máscara redondeada:
+  sin canal alfa unas herramientas se quejan, y con un píxel translúcido en una esquina se vería una
+  muesca. El script falla si detecta transparencia.
+
+La composición está especificada en `docs/design-spec.md` §9, incluida la única desviación —el nombre en
+dos líneas, porque a 68 px no cabe en una— y por qué se resolvió así.
 
 ---
 
@@ -257,7 +307,22 @@ La app no tiene red. No declara el permiso `INTERNET`.
 
 ## 11. Política de privacidad
 
-Hay que alojarla en una URL pública (GitHub Pages del repo sirve). Texto base:
+**Ya está hecha y lista para subir**: `docs/web/aqui-hay-tomate.html`, un HTML autocontenido —sin
+dependencias externas, sin fuentes remotas— con la misma estructura bilingüe que la de Bebe Agua en
+`jorgejiro.es`, selector Español/English y enlace de vuelta al sitio.
+
+1. Súbela a tu web como `aqui-hay-tomate.html`, junto a `bebe-agua.html`.
+2. En Play Console → Contenido de la aplicación → Política de privacidad, pon la URL resultante:
+   **`https://www.jorgejiro.es/aqui-hay-tomate.html`**.
+3. Si algún día cambia cómo se tratan los datos, actualiza la página **y** la fecha de entrada en vigor que
+   figura en las dos versiones.
+
+Detalles que conviene no romper al editarla: enumera **los siete permisos exactos del manifest** y afirma
+que la app no declara `INTERNET`, que es comprobable por cualquiera en la propia ficha de Play. Si en el
+futuro se añadiera un permiso, hay que añadirlo aquí. Como en la de Bebe Agua, no aparece ningún correo: se
+remite al que Play muestra en la ficha.
+
+Texto base, por si hiciera falta reescribirla:
 
 ### EN
 

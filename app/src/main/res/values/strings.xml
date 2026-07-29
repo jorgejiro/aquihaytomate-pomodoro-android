@@ -189,6 +189,10 @@
     <string name="changelog_title">What\'s new</string>
     <string name="changelog_current_badge">Current</string>
 
+    <string-array name="changelog_1_0_1">
+        <item>The monthly map no longer overlaps the legend below it on wide screens and tablets.</item>
+        <item>The status bar is readable again when your phone is set to the light theme: the clock and the battery were being drawn dark over the app\'s black background.</item>
+    </string-array>
     <string-array name="changelog_1_0_0">
         <item>First release.</item>
         <item>Pomodoro timer with focus, short break and long break every N Pomodoros. Every duration is configurable.</item>

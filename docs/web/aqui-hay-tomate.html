@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Política de privacidad · ¡Aquí hay tomate!</title>
+<meta name="description" content="Política de privacidad de ¡Aquí hay tomate!, temporizador Pomodoro para Android. Sin cuentas, sin nube, sin anuncios y sin seguimiento.">
+<meta name="robots" content="index, follow">
+<style>
+  :root {
+    --tomate: #c8321f;
+    --texto: #1a1a1a;
+    --suave: #5b5b5b;
+    --linea: #e6e3e0;
+    --fondo: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0 20px 64px;
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+    overflow-wrap: break-word;
+  }
+  .envoltorio { max-width: 720px; margin: 0 auto; }
+  header { padding: 48px 0 24px; border-bottom: 1px solid var(--linea); }
+  h1 { margin: 0; font-size: 1.75rem; line-height: 1.25; letter-spacing: -0.01em; }
+  .subtitulo { margin: 6px 0 0; color: var(--suave); font-size: 1rem; }
+  .paquete { margin: 10px 0 0; }
+  .idiomas { margin-top: 20px; display: flex; gap: 8px; }
+  .idiomas button {
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 7px 14px;
+    border: 1px solid var(--linea);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--suave);
+    cursor: pointer;
+  }
+  .idiomas button[aria-pressed="true"] {
+    background: var(--tomate);
+    border-color: var(--tomate);
+    color: #fff;
+  }
+  h2 {
+    margin: 40px 0 8px;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--tomate);
+  }
+  p { margin: 0 0 14px; }
+  ul { margin: 0 0 14px; padding-left: 22px; }
+  li { margin-bottom: 8px; }
+  .vigor { margin-top: 24px; color: var(--suave); font-size: 0.95rem; }
+  .destacado {
+    margin: 28px 0 0;
+    padding: 16px 18px;
+    border-left: 3px solid var(--tomate);
+    background: #fbf7f6;
+  }
+  .destacado p { margin: 0; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+    background: #f4f1ef;
+    padding: 1px 5px;
+    border-radius: 4px;
+    /* `com.jjrapps.aquihaytomate` y `android.permission.INTERNET` no tienen espacios donde
+       romper: sin esto ensanchan la página y el texto se sale del móvil. */
+    overflow-wrap: anywhere;
+  }
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--linea);
+    color: var(--suave);
+    font-size: 0.95rem;
+  }
+  footer a { color: var(--tomate); }
+  /* Sin JavaScript se muestran los dos idiomas, uno detrás del otro. */
+  body.js-activo .idioma[hidden] { display: none; }
+  .idioma[hidden] { display: block; }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --tomate: #ff6b58;
+      --texto: #f2efec;
+      --suave: #a9a3a0;
+      --linea: #302b29;
+      --fondo: #121110;
+    }
+    .destacado { background: #1c1917; }
+    code { background: #211e1c; }
+  }
+</style>
+</head>
+<body>
+<div class="envoltorio">
+
+  <header>
+    <h1>¡Aquí hay tomate!</h1>
+    <p class="subtitulo">Temporizador Pomodoro · Pomodoro timer</p>
+    <p class="paquete"><code>com.jjrapps.aquihaytomate</code></p>
+    <div class="idiomas" role="group" aria-label="Idioma / Language">
+      <button type="button" data-idioma="es" aria-pressed="true">Español</button>
+      <button type="button" data-idioma="en" aria-pressed="false">English</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ───────────────────────────── Español ───────────────────────────── -->
+    <section class="idioma" id="es" lang="es">
+      <h2>Política de privacidad</h2>
+      <p class="vigor">Fecha de entrada en vigor: 28 de julio de 2026</p>
+
+      <div class="destacado">
+        <p>
+          <strong>¡Aquí hay tomate!</strong> está diseñada para funcionar de manera completamente privada:
+          sin cuentas de usuario, sin almacenamiento en la nube, sin publicidad, sin analítica y sin
+          herramientas de seguimiento. La aplicación <strong>no tiene acceso a internet</strong>.
+        </p>
+      </div>
+
+      <h2>Datos guardados en el dispositivo</h2>
+      <p>
+        La aplicación guarda en tu propio dispositivo dos cosas, y solo esas dos:
+      </p>
+      <ul>
+        <li>
+          <strong>Tus ajustes del temporizador</strong>: duraciones de enfoque y descanso, pomodoros por
+          ciclo, sonido y vibración del aviso, objetivo diario, idioma y preferencias del widget.
+        </li>
+        <li>
+          <strong>Tu historial de pomodoros</strong>: hora de inicio y de fin de cada intervalo de enfoque,
+          su duración, el tiempo realmente enfocado y si se completó o se interrumpió. Es lo que alimenta la
+          pantalla de estadísticas.
+        </li>
+      </ul>
+      <p>Estos datos nunca salen de tu móvil y no se copian a ningún servidor.</p>
+
+      <h2>Recogida de datos</h2>
+      <p>
+        La aplicación no recoge ningún dato personal. No incluye analítica, ni informes de fallos con
+        telemetría, ni identificadores publicitarios, ni SDK de terceros que recojan información. No se pide
+        ni se almacena tu nombre, tu correo, tu ubicación ni ningún identificador de tu dispositivo.
+      </p>
+
+      <h2>Acceso a la red</h2>
+      <p>
+        La aplicación <strong>no declara el permiso de internet</strong>,
+        <code>android.permission.INTERNET</code>, de modo que técnicamente no puede enviar ni recibir nada a
+        través de la red. Puedes comprobarlo en la sección de permisos de la ficha de Google Play.
+      </p>
+
+      <h2>Compartición de datos</h2>
+      <p>
+        No se comparte ningún dato con nadie —ni con el desarrollador, ni con terceros, ni con servicios de
+        publicidad— porque ningún dato sale del dispositivo.
+      </p>
+
+      <h2>Permisos de la aplicación</h2>
+      <p>Estos son todos los permisos que pide la aplicación y para qué se usa cada uno:</p>
+      <ul>
+        <li><strong>Notificaciones</strong>: mostrar el temporizador en curso con sus controles y avisarte cuando termina un intervalo.</li>
+        <li><strong>Alarmas exactas</strong>: hacer que el aviso suene en el segundo correcto aunque la pantalla esté apagada. Es opcional; sin él la aplicación funciona, solo puede ser algo menos puntual.</li>
+        <li><strong>Servicio en primer plano</strong>: mantener la cuenta atrás en marcha mientras usas otras aplicaciones.</li>
+        <li><strong>Bloqueo de suspensión</strong>: evitar que el dispositivo duerma justo durante la cuenta atrás y el aviso llegue tarde.</li>
+        <li><strong>Vibración</strong>: la vibración del aviso, cuya duración eliges tú en Ajustes.</li>
+        <li><strong>Recibir arranque completado</strong>: restaurar el estado de un temporizador que estaba en marcha si reinicias el móvil.</li>
+      </ul>
+      <p>
+        Ninguno de estos permisos da acceso a tus contactos, tus archivos, tu cámara, tu micrófono ni tu
+        ubicación.
+      </p>
+
+      <h2>Eliminación de datos</h2>
+      <p>
+        Desinstalar la aplicación borra de forma permanente todos los datos guardados: los ajustes y el
+        historial completo de pomodoros. También puedes borrarlos sin desinstalar desde los ajustes de
+        Android, en <em>Aplicaciones → ¡Aquí hay tomate! → Almacenamiento → Borrar datos</em>. No hay copia
+        en ningún otro sitio, así que la eliminación es definitiva.
+      </p>
+
+      <h2>Menores</h2>
+      <p>
+        La aplicación no está dirigida específicamente a menores y no recoge datos de nadie, con lo que no
+        trata información personal de niños.
+      </p>
+
+      <h2>Cambios en esta política</h2>
+      <p>
+        Si alguna versión futura cambiara la forma en que se tratan los datos, esta página se actualizará y
+        cambiará la fecha de entrada en vigor que figura arriba.
+      </p>
+
+      <h2>Contacto</h2>
+      <p>
+        Para cualquier duda sobre esta política, puedes escribir al desarrollador a través del correo que
+        aparece en la ficha de la aplicación en Google Play.
+      </p>
+    </section>
+
+    <!-- ───────────────────────────── English ───────────────────────────── -->
+    <section class="idioma" id="en" lang="en" hidden>
+      <h2>Privacy Policy</h2>
+      <p class="vigor">Effective date: July 28, 2026</p>
+
+      <div class="destacado">
+        <p>
+          <strong>¡Aquí hay tomate!</strong> is designed to work entirely privately: no user accounts, no
+          cloud storage, no advertising, no analytics and no tracking tools. The app <strong>has no
+          internet access</strong>.
+        </p>
+      </div>
+
+      <h2>Data stored on your device</h2>
+      <p>The app stores two things on your own device, and only those two:</p>
+      <ul>
+        <li>
+          <strong>Your timer settings</strong>: focus and break lengths, Pomodoros per cycle, alert sound and
+          vibration, daily goal, language and widget preferences.
+        </li>
+        <li>
+          <strong>Your Pomodoro history</strong>: the start and end time of each focus interval, its length,
+          the time actually spent focusing and whether it was completed or interrupted. This is what the
+          statistics screen is built from.
+        </li>
+      </ul>
+      <p>This data never leaves your phone and is not copied to any server.</p>
+
+      <h2>Data collection</h2>
+      <p>
+        The app collects no personal data. It contains no analytics, no crash reporting with telemetry, no
+        advertising identifiers and no third-party SDKs that gather information. It never asks for or stores
+        your name, your email, your location or any device identifier.
+      </p>
+
+      <h2>Network access</h2>
+      <p>
+        The app <strong>does not declare the internet permission</strong>,
+        <code>android.permission.INTERNET</code>, so it technically cannot send or receive anything over the
+        network. You can verify this in the permissions section of its Google Play listing.
+      </p>
+
+      <h2>Data sharing</h2>
+      <p>
+        No data is shared with anyone — not with the developer, not with third parties, not with advertising
+        services — because no data ever leaves the device.
+      </p>
+
+      <h2>App permissions</h2>
+      <p>These are all the permissions the app requests, and what each one is for:</p>
+      <ul>
+        <li><strong>Notifications</strong>: to show the running timer with its controls and to alert you when an interval ends.</li>
+        <li><strong>Exact alarms</strong>: to make the alert fire on the right second even with the screen off. Optional; the app works without it, it may just be slightly less punctual.</li>
+        <li><strong>Foreground service</strong>: to keep the countdown running while you use other apps.</li>
+        <li><strong>Wake lock</strong>: to stop the device from sleeping through the countdown and delivering the alert late.</li>
+        <li><strong>Vibration</strong>: the alert vibration, whose length you choose in Settings.</li>
+        <li><strong>Receive boot completed</strong>: to restore a running timer if you restart your phone.</li>
+      </ul>
+      <p>
+        None of these permissions gives access to your contacts, your files, your camera, your microphone or
+        your location.
+      </p>
+
+      <h2>Deleting your data</h2>
+      <p>
+        Uninstalling the app permanently deletes everything it stored: your settings and your entire Pomodoro
+        history. You can also clear it without uninstalling, from Android settings under
+        <em>Apps → ¡Aquí hay tomate! → Storage → Clear data</em>. There is no copy anywhere else, so deletion
+        is final.
+      </p>
+
+      <h2>Children</h2>
+      <p>
+        The app is not directed specifically at children and collects no data from anyone, so it does not
+        process children's personal information.
+      </p>
+
+      <h2>Changes to this policy</h2>
+      <p>
+        If a future version were to change how data is handled, this page will be updated and the effective
+        date above will change with it.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        For any question about this policy, you can write to the developer using the email address shown on
+        the app's Google Play listing.
+      </p>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Volver a <a href="https://www.jorgejiro.es">jorgejiro.es</a></p>
+  </footer>
+
+</div>
+
+<script>
+  // Sin JavaScript la página muestra los dos idiomas seguidos, que sigue siendo válido como política.
+  document.body.classList.add('js-activo');
+  var secciones = document.querySelectorAll('.idioma');
+  var botones = document.querySelectorAll('.idiomas button');
+
+  function mostrar(idioma) {
+    secciones.forEach(function (seccion) {
+      seccion.hidden = seccion.id !== idioma;
+    });
+    botones.forEach(function (boton) {
+      boton.setAttribute('aria-pressed', String(boton.dataset.idioma === idioma));
+    });
+    document.documentElement.lang = idioma;
+  }
+
+  botones.forEach(function (boton) {
+    boton.addEventListener('click', function () {
+      mostrar(boton.dataset.idioma);
+    });
+  });
+
+  // Arranca en el idioma del navegador, español por defecto.
+  mostrar((navigator.language || 'es').toLowerCase().startsWith('en') ? 'en' : 'es');
+</script>
+
+</body>
+</html>
