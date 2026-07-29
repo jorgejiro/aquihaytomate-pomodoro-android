@@ -7,6 +7,8 @@ import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
 import android.provider.Settings
+import android.graphics.Color
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.activity.enableEdgeToEdge
@@ -45,7 +47,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // Iconos de las barras del sistema siempre claros, porque el fondo de esta app siempre es negro.
+        // `enableEdgeToEdge()` sin argumentos los decide según el tema **del sistema**, así que en un
+        // móvil con el tema claro los pintaba oscuros: sobre nuestro negro desaparecían y el usuario se
+        // quedaba sin hora ni batería mientras la app estaba abierta. Solo hay tema oscuro (§1 de
+        // CLAUDE.md), de modo que aquí no hay nada que decidir.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+        )
 
         setContent {
             val state by viewModel.uiState.collectAsStateWithLifecycle()

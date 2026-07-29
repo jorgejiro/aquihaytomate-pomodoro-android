@@ -2,6 +2,7 @@ package com.jjrapps.aquihaytomate.ui.common
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +25,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jjrapps.aquihaytomate.R
 import com.jjrapps.aquihaytomate.domain.model.DayStats
@@ -39,7 +41,6 @@ import java.time.YearMonth
 import java.util.Locale
 
 private const val COLUMNS = 7
-private val CELL_SIZE = 40.dp
 private val CELL_GAP = 6.dp
 private val CELL_CORNER = 8.dp
 private val TODAY_RING = 1.5.dp
@@ -70,22 +71,43 @@ fun MonthHeatmap(
 ) {
     val rows = grid.size
 
-    Column(modifier.fillMaxWidth()) {
-        Spacer(
-            Modifier
-                .fillMaxWidth()
-                .height(CELL_SIZE * rows + CELL_GAP * (rows - 1).coerceAtLeast(0))
-                .pointerInput(grid) {
-                    detectTapGestures { offset ->
-                        cellAt(offset, size.width.toFloat(), grid)?.let(onDayClick)
+    // La altura se mide con el ancho que hay de verdad, no con un tamaño de celda fijo. `drawGrid`
+    // reparte el ancho disponible entre las siete columnas, así que en cuanto la pantalla da más de
+    // ~46 dp por celda la rejilla dibujada es más alta que el hueco reservado y se derrama sobre la
+    // leyenda: +39 dp en un móvil de 411 dp y +317 dp en una tablet de 800 dp. Ver gridHeight.
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val alto = gridHeight(maxWidth, rows)
+        Column(Modifier.fillMaxWidth()) {
+            Spacer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(alto)
+                    .pointerInput(grid) {
+                        detectTapGestures { offset ->
+                            cellAt(offset, size.width.toFloat(), grid)?.let(onDayClick)
+                        }
                     }
-                }
-                .drawBehind { drawGrid(grid, dailyGoal, today, selectedDate) },
-        )
+                    .drawBehind { drawGrid(grid, dailyGoal, today, selectedDate) },
+            )
 
-        Spacer(Modifier.height(LEGEND_GAP))
-        Legend(totalPomodoros)
+            Spacer(Modifier.height(LEGEND_GAP))
+            Legend(totalPomodoros)
+        }
     }
+}
+
+/**
+ * Alto exacto de la rejilla para un ancho dado: la misma aritmética que [drawGrid], que reparte el ancho
+ * entre las siete columnas y usa celdas cuadradas.
+ *
+ * Aparte y `internal` para poder fijarlo con un test unitario. El bug que corrige era invisible en un
+ * móvil estrecho —tres dp de derrame— y arrasaba la pantalla en una tablet, que es la clase de fallo que
+ * solo se ve cuando ya está publicado.
+ */
+internal fun gridHeight(width: Dp, rows: Int): Dp {
+    if (rows <= 0 || width <= 0.dp) return 0.dp
+    val cell = (width - CELL_GAP * (COLUMNS - 1)) / COLUMNS
+    return cell * rows + CELL_GAP * (rows - 1)
 }
 
 /**
