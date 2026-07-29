@@ -15,10 +15,10 @@ reutilizar ni bajando la versión.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
-## [Sin publicar]
+## [1.0.1] — 2026-07-29 (versionCode 3)
 
-Dos fallos visuales que salieron al preparar las capturas para la ficha de Play. **Cuando se suba, hay que
-darles número de versión y tocar los cuatro sitios de arriba.**
+Dos fallos visuales que salieron al preparar las capturas para la ficha de Play, ninguno de ellos en el
+motor del temporizador. El `versionCode` sube a 3 porque el 2 ya se subió a Play con la 1.0.0.
 
 ### Corregido
 
