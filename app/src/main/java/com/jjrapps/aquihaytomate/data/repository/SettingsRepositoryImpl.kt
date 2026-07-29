@@ -31,7 +31,11 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setAutoStartFocus(enabled: Boolean) =
         dataSource.setAutoStartFocus(enabled)
 
-    override suspend fun setAlertSound(sound: AlertSound) = dataSource.setAlertSound(sound)
+    override suspend fun setFocusAlertSound(sound: AlertSound) =
+        dataSource.setFocusAlertSound(sound)
+
+    override suspend fun setBreakAlertSound(sound: AlertSound) =
+        dataSource.setBreakAlertSound(sound)
 
     override suspend fun setVibrationSeconds(seconds: Int) =
         dataSource.setVibrationSeconds(seconds)

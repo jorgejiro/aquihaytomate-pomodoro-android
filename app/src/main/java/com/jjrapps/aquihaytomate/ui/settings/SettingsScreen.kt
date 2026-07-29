@@ -71,7 +71,8 @@ fun SettingsScreen(
         onDurationSelected = viewModel::onDurationSelected,
         onPomodorosPerCycleSelected = viewModel::onPomodorosPerCycleSelected,
         onDailyGoalSelected = viewModel::onDailyGoalSelected,
-        onAlertSoundSelected = viewModel::onAlertSoundSelected,
+        onFocusAlertSoundSelected = viewModel::onFocusAlertSoundSelected,
+        onBreakAlertSoundSelected = viewModel::onBreakAlertSoundSelected,
         onVibrationSecondsSelected = viewModel::onVibrationSecondsSelected,
         onWidgetBackgroundSelected = viewModel::onWidgetBackgroundSelected,
         onLanguageSelected = viewModel::onLanguageSelected,
@@ -108,7 +109,8 @@ private fun SettingsContent(
     onDurationSelected: (SlotType, Int) -> Unit,
     onPomodorosPerCycleSelected: (Int) -> Unit,
     onDailyGoalSelected: (Int) -> Unit,
-    onAlertSoundSelected: (AlertSound) -> Unit,
+    onFocusAlertSoundSelected: (AlertSound) -> Unit,
+    onBreakAlertSoundSelected: (AlertSound) -> Unit,
     onVibrationSecondsSelected: (Int) -> Unit,
     onWidgetBackgroundSelected: (WidgetBackground) -> Unit,
     onLanguageSelected: (AppLanguage) -> Unit,
@@ -156,7 +158,8 @@ private fun SettingsContent(
                 onDurationSelected = onDurationSelected,
                 onPomodorosPerCycleSelected = onPomodorosPerCycleSelected,
                 onDailyGoalSelected = onDailyGoalSelected,
-                onAlertSoundSelected = onAlertSoundSelected,
+                onFocusAlertSoundSelected = onFocusAlertSoundSelected,
+                onBreakAlertSoundSelected = onBreakAlertSoundSelected,
                 onVibrationSecondsSelected = onVibrationSecondsSelected,
                 onWidgetBackgroundSelected = onWidgetBackgroundSelected,
                 onLanguageSelected = onLanguageSelected,
@@ -243,9 +246,17 @@ private fun AlertsSection(
 ) {
     Section(stringResource(R.string.settings_section_alerts)) {
         SettingsRow(
-            label = stringResource(R.string.settings_alert_sound),
-            value = stringResource(settings.alertSound.labelRes),
-            onClick = { onSheetRequested(SettingsSheet.AlertSound) },
+            label = stringResource(R.string.settings_alert_sound_focus),
+            sublabel = stringResource(R.string.settings_alert_sound_focus_sublabel),
+            value = stringResource(settings.focusAlertSound.labelRes),
+            onClick = { onSheetRequested(SettingsSheet.FocusAlertSound) },
+        )
+        Divider()
+        SettingsRow(
+            label = stringResource(R.string.settings_alert_sound_break),
+            sublabel = stringResource(R.string.settings_alert_sound_break_sublabel),
+            value = stringResource(settings.breakAlertSound.labelRes),
+            onClick = { onSheetRequested(SettingsSheet.BreakAlertSound) },
         )
         Divider()
         SettingsRow(
@@ -362,7 +373,8 @@ private fun Sheets(
     onDurationSelected: (SlotType, Int) -> Unit,
     onPomodorosPerCycleSelected: (Int) -> Unit,
     onDailyGoalSelected: (Int) -> Unit,
-    onAlertSoundSelected: (AlertSound) -> Unit,
+    onFocusAlertSoundSelected: (AlertSound) -> Unit,
+    onBreakAlertSoundSelected: (AlertSound) -> Unit,
     onVibrationSecondsSelected: (Int) -> Unit,
     onWidgetBackgroundSelected: (WidgetBackground) -> Unit,
     onLanguageSelected: (AppLanguage) -> Unit,
@@ -406,12 +418,27 @@ private fun Sheets(
             onDismiss = onDismiss,
         )
 
-        SettingsSheet.AlertSound -> ValuePickerSheet(
-            title = stringResource(R.string.settings_alert_sound),
+        // Los dos selectores de sonido se quedan abiertos y suenan al tocarlos, para poder comparar.
+        SettingsSheet.FocusAlertSound -> ValuePickerSheet(
+            title = stringResource(R.string.settings_alert_sound_focus),
+            hint = stringResource(R.string.settings_alert_sound_hint),
             options = AlertSound.entries.map { PickerOption(it, stringResource(it.labelRes)) },
-            selected = state.settings.alertSound,
-            onSelect = onAlertSoundSelected,
+            selected = state.settings.focusAlertSound,
+            onSelect = onFocusAlertSoundSelected,
             onDismiss = onDismiss,
+            stayOpen = true,
+            doneLabel = stringResource(R.string.action_done),
+        )
+
+        SettingsSheet.BreakAlertSound -> ValuePickerSheet(
+            title = stringResource(R.string.settings_alert_sound_break),
+            hint = stringResource(R.string.settings_alert_sound_hint),
+            options = AlertSound.entries.map { PickerOption(it, stringResource(it.labelRes)) },
+            selected = state.settings.breakAlertSound,
+            onSelect = onBreakAlertSoundSelected,
+            onDismiss = onDismiss,
+            stayOpen = true,
+            doneLabel = stringResource(R.string.action_done),
         )
 
         SettingsSheet.VibrationSeconds -> ValuePickerSheet(
@@ -482,7 +509,8 @@ private fun SettingsScreenPreview() {
             onDurationSelected = { _, _ -> },
             onPomodorosPerCycleSelected = {},
             onDailyGoalSelected = {},
-            onAlertSoundSelected = {},
+            onFocusAlertSoundSelected = {},
+            onBreakAlertSoundSelected = {},
             onVibrationSecondsSelected = {},
             onWidgetBackgroundSelected = {},
             onLanguageSelected = {},

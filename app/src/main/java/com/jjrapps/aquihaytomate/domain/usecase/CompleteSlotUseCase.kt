@@ -114,7 +114,13 @@ class CompleteSlotUseCase @Inject constructor(
                 if (nextStatus == TimerStatus.RUNNING) {
                     notifier.showSlotFinished(timerStateRepository.current(), chained = true)
                 }
-                alertPlayer.play(settings.alertSound, settings.vibrationSeconds)
+                // El sonido lo elige el slot que **acaba**, no el que empieza: acabar un pomodoro suena
+                // suave y acabar un descanso suena duro. `state.slotType` sigue siendo el que se cierra
+                // aquí, porque el avance se hizo sobre una copia del estado.
+                alertPlayer.play(
+                    settings.alertSoundFor(state.slotType),
+                    settings.vibrationSeconds,
+                )
             }
         }
         return closedByUs

@@ -101,8 +101,12 @@ class FakeSettingsRepository(initial: TimerSettings = TimerSettings()) : Setting
         flow.value = flow.value.copy(autoStartFocus = enabled)
     }
 
-    override suspend fun setAlertSound(sound: AlertSound) {
-        flow.value = flow.value.copy(alertSound = sound)
+    override suspend fun setFocusAlertSound(sound: AlertSound) {
+        flow.value = flow.value.copy(focusAlertSound = sound)
+    }
+
+    override suspend fun setBreakAlertSound(sound: AlertSound) {
+        flow.value = flow.value.copy(breakAlertSound = sound)
     }
 
     override suspend fun setVibrationSeconds(seconds: Int) {
@@ -249,20 +253,24 @@ class FakeTimerRuntime : TimerAlarmScheduler, TimerServiceController, TimerNotif
 
 class FakeAlertPlayer : AlertPlayer {
 
-    var playCount: Int = 0
-        private set
-    var lastSound: AlertSound? = null
+    /** Cada sonido reproducido, en orden: un ciclo alterna el del pomodoro y el del descanso. */
+    val playedSounds: MutableList<AlertSound> = mutableListOf()
+    var stopCount: Int = 0
         private set
     var lastVibrationSeconds: Int? = null
         private set
 
+    val playCount: Int get() = playedSounds.size
+    val lastSound: AlertSound? get() = playedSounds.lastOrNull()
+
     override suspend fun play(sound: AlertSound, vibrationSeconds: Int) {
-        playCount++
-        lastSound = sound
+        playedSounds += sound
         lastVibrationSeconds = vibrationSeconds
     }
 
-    override fun stop() = Unit
+    override fun stop() {
+        stopCount++
+    }
 }
 
 /** A `Clock` whose instant the test moves by hand. */

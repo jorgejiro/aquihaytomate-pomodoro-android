@@ -95,7 +95,12 @@
     <string name="settings_auto_start_focus_sublabel">Al terminar un descanso</string>
     <string name="settings_keep_screen_on">Mantener pantalla encendida</string>
     <string name="settings_daily_goal">Objetivo diario</string>
-    <string name="settings_alert_sound">Sonido al terminar</string>
+    <string name="settings_alert_sound_focus">Sonido al terminar el pomodoro</string>
+    <string name="settings_alert_sound_focus_sublabel">Toca descansar</string>
+    <string name="settings_alert_sound_break">Sonido al terminar el descanso</string>
+    <string name="settings_alert_sound_break_sublabel">Vuelta al tajo</string>
+    <string name="settings_alert_sound_hint">Toca para escucharlo</string>
+    <string name="action_done">Hecho</string>
     <string name="settings_vibration">Vibración</string>
     <string name="settings_vibration_off">Desactivada</string>
     <string name="settings_widget_background">Fondo</string>

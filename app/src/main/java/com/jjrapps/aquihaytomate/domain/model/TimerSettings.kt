@@ -22,7 +22,10 @@ data class TimerSettings(
      * symmetric with [autoStartBreak]: a break often runs long on purpose.
      */
     val autoStartFocus: Boolean = false,
-    val alertSound: AlertSound = AlertSound.DEFAULT,
+    /** Sound when a pomodoro ends. Soft by default: finishing one is good news. */
+    val focusAlertSound: AlertSound = AlertSound.DEFAULT_FOCUS,
+    /** Sound when a break ends. Harder by default: this one has to get you back to work. */
+    val breakAlertSound: AlertSound = AlertSound.DEFAULT_BREAK,
     val vibrationSeconds: Int = DEFAULT_VIBRATION_SECONDS,
     val keepScreenOn: Boolean = false,
     val dailyGoal: Int = DEFAULT_DAILY_GOAL,
@@ -39,6 +42,19 @@ data class TimerSettings(
     }
 
     fun durationMsFor(type: SlotType): Long = durationMinutesFor(type) * MINUTE_MS
+
+    /**
+     * The sound for the slot that has just **ended**, not the one coming up.
+     *
+     * Two sounds rather than one because the two moments say opposite things: a pomodoro ending is a
+     * reward and a break ending is an order. With a single sound, whoever wants a gentle chime for the
+     * pomodoro gets the same chime asking them to go back to work, which is exactly what nobody notices.
+     *
+     * Keyed on the slot that ended so `CompleteSlotUseCase` and anything else that alerts cannot
+     * disagree, the same reason [autoStartsInto] exists.
+     */
+    fun alertSoundFor(finishedType: SlotType): AlertSound =
+        if (finishedType.isBreak) breakAlertSound else focusAlertSound
 
     /** Vibration disabled is expressed as zero seconds, not as a separate flag. */
     val vibrationEnabled: Boolean get() = vibrationSeconds > 0

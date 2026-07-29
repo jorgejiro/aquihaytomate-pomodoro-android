@@ -48,7 +48,11 @@ arbitrarias:
    muñeca a cambio de que la muñeca solo vibre cuando hay algo que decidir.
 7. **La notificación vuelve si se descarta** con un intervalo en marcha. Es deliberadamente insistente y
    está documentado dónde retirarlo si Play lo señalara (ADR 010).
-8. **`1.0.0` se publicó tras revisión en dispositivo real.** Las 0.9.0 y 0.9.1 fueron internas. El
+8. **Los dos extremos de un slot suenan distinto.** Acabar el pomodoro es una recompensa (cuenco, grave y
+   largo) y acabar el descanso es una orden (digital, cuatro veces más brillante). Son dos ajustes
+   independientes y el sonido lo decide el slot que **acaba**, no el que empieza — importa con el
+   auto-inicio, donde ambas cosas pasan en el mismo instante. Ver ADR 012.
+9. **`1.0.0` se publicó tras revisión en dispositivo real.** Las 0.9.0 y 0.9.1 fueron internas. El
    `versionCode` sube de uno en uno **en cada subida a Play**, aunque el `versionName` solo cambie el patch.
 
 ---

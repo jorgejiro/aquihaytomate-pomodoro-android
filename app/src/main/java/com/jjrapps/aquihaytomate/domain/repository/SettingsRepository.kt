@@ -22,7 +22,9 @@ interface SettingsRepository {
 
     suspend fun setAutoStartFocus(enabled: Boolean)
 
-    suspend fun setAlertSound(sound: AlertSound)
+    suspend fun setFocusAlertSound(sound: AlertSound)
+
+    suspend fun setBreakAlertSound(sound: AlertSound)
 
     suspend fun setVibrationSeconds(seconds: Int)
 

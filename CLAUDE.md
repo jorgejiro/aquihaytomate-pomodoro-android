@@ -68,7 +68,8 @@ Todo dibujado con Compose `Canvas`. **Sin librería de gráficos** — ver `docs
 | Pomodoros por ciclo | **4** | 2–12 |
 | **Auto-iniciar el descanso** (al terminar un pomodoro) | **activado** | — |
 | **Auto-iniciar el pomodoro** (al terminar un descanso) | desactivado | — |
-| Sonido al terminar | Campana | `silent`, `bell`, `bowl`, `digital`, `soft` |
+| **Sonido al terminar el pomodoro** | **Cuenco tibetano** | `silent`, `bell`, `bowl`, `digital`, `soft` |
+| **Sonido al terminar el descanso** | **Digital** | los mismos cinco |
 | **Duración de la vibración** | **5 s** | 0 (= desactivada) – 30 |
 | Mantener pantalla encendida | desactivado | — |
 | Objetivo diario de pomodoros | 8 | 1–24 |
@@ -101,7 +102,7 @@ En la tercera página los permisos son **filas con su estado escrito** (`Pendien
 
 ### 2.6 Alertas de fin de slot ✅ Implementadas
 
-- Sonido seleccionable de un catálogo de 4 más silencio, reproducido con `USAGE_ALARM` (usa el volumen de alarma, no el de multimedia). Los clips son **Opus mono en contenedor `.ogg`** —no Vorbis—, sintetizados para la app: mismo contenedor, soportado desde API 21 y comprime mejor en mono.
+- Sonido seleccionable de un catálogo de 4 más silencio, reproducido con `USAGE_ALARM` (usa el volumen de alarma, no el de multimedia). **Hay dos ajustes, uno por extremo del slot**: acabar un pomodoro suena suave —cuenco, el más grave y largo— y acabar el descanso suena duro —digital, cuatro veces más brillante—, porque uno es una recompensa y el otro una orden. Lo decide el slot que **acaba**, en `TimerSettings.alertSoundFor`. El selector reproduce cada opción al tocarla y no se cierra, que es lo que hace el ajuste utilizable: los nombres no significan nada hasta oírlos. Ver `docs/decisions/012-*`. Los clips son **Opus mono en contenedor `.ogg`** —no Vorbis—, sintetizados para la app: mismo contenedor, soportado desde API 21 y comprime mejor en mono.
 - **Vibración de duración configurable en segundos**, por defecto 5 s, en pulsos de 400 ms con huecos de 250 ms.
 - Respeta modo silencio y No molestar.
 - **La alerta la toca la app, no el canal de notificación.** Ver `docs/decisions/004-alerta-propia-en-vez-de-sonido-de-canal.md`.

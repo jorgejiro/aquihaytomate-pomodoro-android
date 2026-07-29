@@ -15,6 +15,21 @@ reutilizar ni bajando la versión.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
+## [Sin publicar]
+
+### Añadido
+
+- **Un sonido para acabar el pomodoro y otro para acabar el descanso**, configurables por separado. Por
+  defecto, cuenco tibetano al terminar de trabajar y digital al terminar el descanso: acabar un pomodoro es
+  una buena noticia y volver al tajo es una orden, así que no tienen por qué sonar igual. Los dos valores
+  se eligieron midiendo los clips —el cuenco es el más grave y largo, el digital cuatro veces más brillante
+  y seco—. Quien ya tenía un sonido elegido lo conserva en los dos extremos hasta que toque uno de los dos
+  ajustes. Ver `docs/decisions/012-*`.
+- **El selector de sonido suena al tocarlo** y se queda abierto para poder comparar, con un «Hecho» para
+  cerrar. Antes cambiaba el sonido y se cerraba sin dejar oír nada, con lo que elegir entre cinco nombres
+  era adivinar. Suena por el mismo camino que la alerta real, así que respeta el silencio y el volumen de
+  alarma igual que ella.
+
 ## [1.0.1] — 2026-07-29 (versionCode 3)
 
 Dos fallos visuales que salieron al preparar las capturas para la ficha de Play, ninguno de ellos en el

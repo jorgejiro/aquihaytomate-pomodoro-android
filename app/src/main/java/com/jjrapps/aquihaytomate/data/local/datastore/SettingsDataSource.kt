@@ -69,7 +69,11 @@ class SettingsDataSource @Inject constructor(
 
     suspend fun setOnboardingDone(done: Boolean) = edit(Keys.ONBOARDING_DONE) { done }
 
-    suspend fun setAlertSound(sound: AlertSound) = edit(Keys.ALERT_SOUND) { sound.id }
+    suspend fun setFocusAlertSound(sound: AlertSound) =
+        edit(Keys.FOCUS_ALERT_SOUND) { sound.id }
+
+    suspend fun setBreakAlertSound(sound: AlertSound) =
+        edit(Keys.BREAK_ALERT_SOUND) { sound.id }
 
     suspend fun setWidgetBackground(background: WidgetBackground) =
         edit(Keys.WIDGET_BACKGROUND) { background.id }
@@ -105,7 +109,17 @@ class SettingsDataSource @Inject constructor(
             autoStartFocus = this[Keys.AUTO_START_FOCUS]
                 ?: this[Keys.RETIRED_AUTO_START_NEXT]
                 ?: defaults.autoStartFocus,
-            alertSound = AlertSound.fromId(this[Keys.ALERT_SOUND]),
+            // Ambos caen en el `alert_sound` único que sustituyen, así que quien ya había elegido un
+            // sonido lo conserva en las dos fases hasta que toque uno de los dos ajustes nuevos. Leer una
+            // clave retirada cuesta una línea y evita una migración.
+            focusAlertSound = AlertSound.fromId(
+                this[Keys.FOCUS_ALERT_SOUND] ?: this[Keys.RETIRED_ALERT_SOUND],
+                fallback = defaults.focusAlertSound,
+            ),
+            breakAlertSound = AlertSound.fromId(
+                this[Keys.BREAK_ALERT_SOUND] ?: this[Keys.RETIRED_ALERT_SOUND],
+                fallback = defaults.breakAlertSound,
+            ),
             vibrationSeconds = (this[Keys.VIBRATION_SECONDS] ?: defaults.vibrationSeconds)
                 .coerceIn(TimerSettings.VIBRATION_SECONDS_RANGE),
             keepScreenOn = this[Keys.KEEP_SCREEN_ON] ?: defaults.keepScreenOn,
@@ -138,7 +152,14 @@ class SettingsDataSource @Inject constructor(
          * fallback; deleting it would silently turn the setting off for whoever had it on.
          */
         val RETIRED_AUTO_START_NEXT = booleanPreferencesKey("auto_start_next")
-        val ALERT_SOUND = stringPreferencesKey("alert_sound")
+        val FOCUS_ALERT_SOUND = stringPreferencesKey("focus_alert_sound")
+        val BREAK_ALERT_SOUND = stringPreferencesKey("break_alert_sound")
+
+        /**
+         * El sonido único que se convirtió en los dos de arriba. Ya no se escribe, solo se lee como su
+         * respaldo; borrarlo devolvería a los valores por defecto a quien hubiera elegido otro.
+         */
+        val RETIRED_ALERT_SOUND = stringPreferencesKey("alert_sound")
         val VIBRATION_SECONDS = intPreferencesKey("vibration_seconds")
         val KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
         val DAILY_GOAL = intPreferencesKey("daily_goal")
