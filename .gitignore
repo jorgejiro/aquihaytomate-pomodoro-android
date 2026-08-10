@@ -20,3 +20,7 @@ keystore.properties
 *.pwd.txt
 /app/release/
 .kotlin
+
+# La base sembrada para las capturas: la genera sembrar_historial.py y depende de la fecha del día,
+# así que versionarla solo añade un binario que cambia cada vez que se rehacen las capturas.
+docs/store-assets/generar-capturas/siembra/
