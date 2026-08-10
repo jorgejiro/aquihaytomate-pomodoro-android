@@ -209,50 +209,10 @@ El nombre se mantiene en español en ambos idiomas: es la marca.
 
 ## 7. Novedades de esta versión
 
-**ES (1.3.0)** — 442 caracteres, el límite de Play son 500
-> El icono es ahora un reloj que marca las cinco y cinco: las cinco son los 25 minutos de un pomodoro y
-> la una, los 5 del descanso.
->
-> El sonido de fin se puede repetir hasta diez veces, con un ajuste aparte para el pomodoro y para el
-> descanso. Y la pantalla se mantiene encendida mientras el móvil carga.
->
-> Corregido: el temporizador se salía de la pantalla con el móvil girado, y el icono aparecía dentro de un
-> círculo negro sobre fondos claros.
-
-**EN (1.3.0)**
-> The icon is a clock now, reading five past five: five o'clock is the 25 minutes of a pomodoro and one
-> o'clock the 5 of a break.
->
-> The end sound can repeat up to ten times, with a separate setting for the pomodoro and for the break.
-> And the screen stays awake while your phone is charging.
->
-> Fixed: the timer ran off the screen with the phone on its side, and the icon sat inside a black circle
-> on light wallpapers.
-
-> **Este texto suma la 1.3.0 y la 1.2.0 a propósito**, porque las dos llegan juntas al usuario. Es la
-> única excepción a la regla de abajo: dentro de la app las dos versiones se leen por separado, cada una
-> con su `string-array`, que es lo que corresponde a un historial. Un texto de Play no es un historial,
-> es lo que cambia respecto a lo último que el usuario tiene instalado.
-
-**ES (1.2.0)** — redactado en su día y **absorbido por el de la 1.3.0**, que es el que se envía
-> La pantalla se mantiene encendida mientras el móvil carga, así puedes ver la cuenta atrás sin tocar
-> nada. Se puede poner en «nunca» o «siempre» en Ajustes.
->
-> Corregido: el temporizador se salía de la pantalla con el móvil girado y «Saltar» quedaba fuera.
-> El icono ya no aparece dentro de un círculo negro sobre fondos claros.
->
-> Además: «Reiniciar» y «Saltar» se ven en blanco, y hay una opción nueva para escribirme por correo.
-
-**ES (1.0.0)**
-> Primera versión. Temporizador Pomodoro con widget de una sola casilla, estadísticas, avisos
-> configurables y tema oscuro. Sin anuncios ni seguimiento.
-
-**EN (1.0.0)**
-> First release. Pomodoro timer with a one-cell home screen widget, statistics, configurable alerts
-> and a dark theme. No ads, no tracking.
-
-> Los textos de cada versión tienen que decir lo mismo que su `string-array` `changelog_*` de la app:
-> es la misma versión contada dos veces y el usuario puede leer las dos.
+**Los textos viven en [`play-release-notes.md`](play-release-notes.md)**, con el bloque de cada versión y
+el formato con etiquetas `<es-ES>` / `<en-US>` listo para pegar en Play Console. Están ahí y no aquí
+porque son lo único de la ficha que cambia en cada publicación, y tenerlos en dos sitios acaba en dos
+versiones distintas del mismo texto. Misma separación que en Bebe Agua.
 
 ---
 
