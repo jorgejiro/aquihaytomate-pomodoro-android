@@ -672,8 +672,10 @@ El copy se escribe **para una pantalla de reloj**, que muestra título y cuerpo 
 
 | Asset | Fichero | Especificación |
 |---|---|---|
-| Icono adaptativo — fondo | `drawable/ic_launcher_background.xml` | 108 × 108 dp. `#0A0908` plano con radial sutil a `#1A0C0A` |
-| Icono adaptativo — primer plano | `drawable/ic_launcher_foreground.xml` | 108 × 108 dp, arte dentro de la zona segura de 66 dp. Tomate con degradado `TomateBright → TomateFill` a 135°, hendidura superior, cáliz de 3 hojas y brillo elíptico blanco al 22 % arriba a la izquierda |
+| Icono adaptativo — fondo | `drawable/ic_launcher_background.xml` | 108 × 108 dp. **Es el cuerpo del tomate**: degradado lineal `#FF5240 → #B4241A` a 135° llenando el lienzo entero, para que la máscara del launcher sea la que da forma a la fruta |
+| Icono adaptativo — primer plano | `drawable/ic_launcher_foreground.xml` | 108 × 108 dp, arte dentro de la zona segura de 66 dp: **solo el rabillo, el cáliz de 3 hojas y el brillo** blanco al 20 % arriba a la izquierda, más una sombra al 18 % bajo el cáliz. El cuerpo va en la capa de fondo |
+
+> **El fondo del icono es la fruta, no una placa.** Hasta la 1.1.0 el fondo era casi negro y el tomate se dibujaba pequeño dentro del primer plano, en la zona segura de 66 dp. Sobre cualquier fondo de pantalla que no fuera negro eso se leía como una pegatina negra con un tomate dentro, porque el launcher **siempre** pinta la capa de fondo y **siempre** recorta las dos con su propia máscara —círculo en Pixel, squircle en One UI—: no hay forma de publicar un icono con silueta libre. La única salida es que la placa sea el propio tomate. El cáliz lleva una sombra al 18 % porque verde y rojo son complementarios de luminancia parecida y sin ella las hojas se aplastan contra el cuerpo.
 | Icono monocromo | `drawable/ic_launcher_monochrome.xml` | 108 × 108 dp, **un solo path blanco**. Obligatorio para iconos temáticos en Android 13+ |
 | `mipmap-anydpi/ic_launcher.xml` | | `<adaptive-icon>` con `<background>`, `<foreground>` y **`<monochrome>`** |
 | Icono de notificación | `drawable/ic_notif_tomate.xml` | 24 × 24 dp, **máscara alfa pura** (el sistema lo tiñe de blanco). Silueta simplificada, sin agujeros finos |

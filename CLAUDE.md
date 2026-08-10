@@ -531,7 +531,7 @@ El cuerpo de la notificación lo decora cada fabricante, así que hay que mirarl
 - **Package**: `com.jjrapps.aquihaytomate`
 - **Paleta**: negro puro de fondo. Enfoque `#FF4433` (rojo tomate), descanso corto `#F2A03D` (ámbar), descanso largo `#FFD166` (dorado). Paleta completa en `docs/design-spec.md` y `ui/theme/Color.kt`.
 - **Tipografía**: Inter (textos) + Space Grotesk (cifras), ambas OFL, empaquetadas.
-- **Icono adaptativo**: tomate con degradado rojo sobre fondo casi negro, con variante monocroma obligatoria para los iconos temáticos de Android 13+.
+- **Icono adaptativo**: el degradado rojo **llena el lienzo** y es el cuerpo del tomate —la máscara del launcher le da la forma—, con el rabillo y el brillo en el primer plano. Sin placa oscura: sobre un fondo de pantalla claro se leía como una pegatina negra. Variante monocroma obligatoria para los iconos temáticos de Android 13+.
 - **Capturas para Play** (5): **el widget en el escritorio primero** — es el argumento de venta —, luego Temporizador en enfoque, Temporizador en descanso, Estadísticas y Ajustes.
 - **Feature graphic** 1024×500: tomate cortado por abajo sobre negro, con la cifra en negativo.
 

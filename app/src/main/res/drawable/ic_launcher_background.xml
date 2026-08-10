@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Adaptive icon background — and, since 1.2.0, the body of the tomato itself.
+
+  It used to be a near-black plate with the tomato drawn small inside the foreground, which on any
+  wallpaper that is not black read as a black sticker with a little tomato in the middle. The launcher
+  always paints this layer and always crops both layers with its own mask, so the way to have no plate
+  is for the plate to *be* the fruit: the gradient fills all 108 dp, the mask turns it into the round
+  tomato, and the foreground only carries the stem and the highlight. See docs/design-spec.md §9.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
@@ -9,12 +18,13 @@
     <path android:pathData="M0,0h108v108h-108z">
         <aapt:attr name="android:fillColor">
             <gradient
-                android:type="radial"
-                android:centerX="54"
-                android:centerY="52"
-                android:gradientRadius="66"
-                android:startColor="#1A0C0A"
-                android:endColor="#0A0908" />
+                android:type="linear"
+                android:startX="18"
+                android:startY="14"
+                android:endX="94"
+                android:endY="98"
+                android:startColor="#FF5240"
+                android:endColor="#B4241A" />
         </aapt:attr>
     </path>
 </vector>

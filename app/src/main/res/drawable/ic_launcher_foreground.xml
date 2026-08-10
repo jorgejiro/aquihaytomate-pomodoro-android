@@ -1,42 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Adaptive icon foreground. All artwork stays inside the 66 dp safe zone (x and y from 21 to 87),
-  so no launcher mask can clip the tomato. See docs/design-spec.md §9.
+  Adaptive icon foreground: the stem and the specular highlight only. The body of the tomato is the
+  background layer, which fills the whole canvas so that the launcher's mask is what shapes the fruit —
+  see ic_launcher_background.xml.
+
+  Everything stays inside the 66 dp safe zone (21..87 on both axes), so no launcher mask can clip it.
+  The stem sits high in that zone, near the top of the circle, which is where a tomato's calyx is.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Body -->
-    <path android:pathData="M54,35 C68.5,35 80,46.5 80,61 C80,75.5 68.5,87 54,87 C39.5,87 28,75.5 28,61 C28,46.5 39.5,35 54,35 Z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:type="linear"
-                android:startX="34"
-                android:startY="41"
-                android:endX="76"
-                android:endY="83"
-                android:startColor="#FF4433"
-                android:endColor="#C42D1F" />
-        </aapt:attr>
-    </path>
-
-    <!-- Specular highlight, top left -->
+    <!-- Specular highlight, top left. Scaled with the fruit: the body is now the whole icon. -->
     <path
-        android:pathData="M42,48 C45,44 50,42 54,43 C50,45 46,48 44,53 C42.5,52.5 41.5,50.5 42,48 Z"
+        android:pathData="M36,45 C40.5,39 48,36 54,37.5 C48,40.5 42,45 39,52.5 C36.75,51.75 35.25,49 36,45 Z"
         android:fillColor="#FFFFFF"
-        android:fillAlpha="0.22" />
+        android:fillAlpha="0.20" />
+
+    <!--
+      A soft shadow under the calyx, offset 1.2 dp. Green on red is a complementary pair of similar
+      lightness, so without it the leaves sit flat on the body instead of on top of it.
+    -->
+    <path
+        android:pathData="M54,32.6 L64.4,28.7 L73.5,32.6 L63.1,41.7 L54,43 L44.9,41.7 L34.5,32.6 L43.6,28.7 Z"
+        android:fillColor="#000000"
+        android:fillAlpha="0.18" />
 
     <!-- Stem -->
     <path
-        android:pathData="M52.5,25 L55.5,25 L55.5,36 L52.5,36 Z"
-        android:fillColor="#3F6B2E" />
+        android:pathData="M52.3,24 L55.7,24 L55.7,36 L52.3,36 Z"
+        android:fillColor="#37622A" />
 
     <!-- Calyx, three leaves -->
     <path
-        android:pathData="M54,32 L62,29 L69,32 L61,39 L54,40 L47,39 L39,32 L46,29 Z"
-        android:fillColor="#4A7A3B" />
+        android:pathData="M54,31.4 L64.4,27.5 L73.5,31.4 L63.1,40.5 L54,41.8 L44.9,40.5 L34.5,31.4 L43.6,27.5 Z"
+        android:fillColor="#57943E" />
 </vector>
