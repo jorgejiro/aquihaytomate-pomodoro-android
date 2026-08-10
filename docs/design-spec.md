@@ -220,7 +220,7 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 
 | Elemento | Valor |
 |---|---|
-| Diámetro del tomate | **268 dp**. En pantallas < 600 dp de alto: **224 dp** |
+| Diámetro del tomate | **268 dp**. En pantallas < 600 dp de alto: **224 dp**. En horizontal: `0,84 × alto`, acotado a 140–268 dp |
 | Contorno (visible donde no hay líquido) | 2 dp en `phase.deep` |
 | Hueco sin líquido | relleno `phase.ghost` |
 | Contador | `displayTimer`, centrado con `offsetY = -2.dp` (compensa el descender vacío) |
@@ -252,6 +252,14 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 **Toda la superficie del tomate es el control primario**: `LiquidCountdown` acepta `onClick`, con recorte a `CircleShape` para que el ripple sea circular y con el `onClick` declarado también dentro de `clearAndSetSemantics` — ese bloque sustituye la semántica del subárbol, así que la acción del `clickable` no sobreviviría a él. Un objetivo de 268 dp de diámetro es lo más cómodo que hay en la pantalla; la etiqueta de texto se queda porque es lo que *nombra* la acción.
 
 Funciona de 560 a 900 dp de alto sin recortes: a 560 dp los pesos se comprimen a cero y quedan los espaciados fijos con el tomate de 224 dp.
+
+**En horizontal el bloque se parte en dos columnas.** Un móvil de lado deja unos 370 dp de alto y la columna vertical no cabe en ellos: hasta la 1.1.0, `SALTAR` y los puntos de ciclo quedaban **por debajo del borde inferior de la pantalla**, sin scroll ni forma de alcanzarlos. Cuando `maxWidth > maxHeight`:
+
+- El tomate va solo en la mitad izquierda, centrado, y su diámetro se calcula sobre el alto disponible —`0,84 × maxHeight`, entre 140 dp y los 268 dp de vertical— en vez de ser un número fijo. Girar el móvil no lo hace más grande que en vertical.
+- La mitad derecha apila etiqueta de fase, control primario, secundarios, «SIGUIENTE» y puntos de ciclo, centrada verticalmente y con espaciados fijos: no hay alto sobrante que repartir con pesos.
+- Los puntos de ciclo dejan de estar pegados al borde inferior. En horizontal no hay un «abajo de la pantalla» lo bastante lejos para que se lean como un indicador aparte, así que acompañan a los controles.
+
+El `@Preview` `TimerScreenLandscapePreview` (900 × 370 dp) existe para que la regresión no vuelva a pasar desapercibida.
 
 **Estados del control primario:**
 

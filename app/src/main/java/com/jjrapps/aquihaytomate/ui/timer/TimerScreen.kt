@@ -67,6 +67,18 @@ private val NEXT_UP_HEIGHT = 20.dp
 private val SECONDARY_GAP = 24.dp
 
 /**
+ * Landscape sizing. The tomato takes this much of the height it is offered — enough to stay the biggest
+ * thing on screen, with room left for the phase label to breathe — and never grows past the portrait
+ * diameter, so turning the phone does not make it bigger.
+ */
+private const val LANDSCAPE_TOMATO_FRACTION = 0.84f
+private val LANDSCAPE_TOMATO_MIN = 140.dp
+private val LANDSCAPE_COLUMN_GAP = 24.dp
+
+/** Replaces the elastic weight of portrait: there is no spare height to distribute. */
+private val LANDSCAPE_CONTROLS_TO_NEXT = 20.dp
+
+/**
  * The free vertical space is split above and below the tomato block. Below weighs more so the block sits
  * a little above the optical centre and the cycle dots settle near the bottom edge, where they belong:
  * they are a status readout, not part of the control cluster.
@@ -103,22 +115,40 @@ private fun TimerContent(
     BoxWithConstraints(
         modifier = modifier.fillMaxSize().padding(horizontal = SCREEN_PADDING),
     ) {
-        // 224 dp on a short screen, so the whole block still fits without clipping. See §5.1.
-        val diameter = if (maxHeight < COMPACT_HEIGHT_THRESHOLD) {
-            TOMATO_DIAMETER_COMPACT
-        } else {
-            TOMATO_DIAMETER
+        val landscape = maxWidth > maxHeight
+        val diameter = when {
+            // Landscape has width to spare and no height at all, so the tomato is sized off the height
+            // it is given rather than off a fixed number, and the block turns into two columns.
+            landscape -> (maxHeight * LANDSCAPE_TOMATO_FRACTION)
+                .coerceIn(LANDSCAPE_TOMATO_MIN, TOMATO_DIAMETER)
+            // 224 dp on a short screen, so the whole block still fits without clipping. See §5.1.
+            maxHeight < COMPACT_HEIGHT_THRESHOLD -> TOMATO_DIAMETER_COMPACT
+            else -> TOMATO_DIAMETER
         }
 
         when (state) {
             TimerUiState.Loading -> Unit
-            is TimerUiState.Success -> TimerBlock(
-                state = state,
-                diameter = diameter,
-                onPrimaryClick = onPrimaryClick,
-                onResetClick = onResetClick,
-                onSkipClick = onSkipClick,
-            )
+            is TimerUiState.Success -> {
+                KeepScreenOn(state.keepScreenOn)
+
+                if (landscape) {
+                    TimerBlockLandscape(
+                        state = state,
+                        diameter = diameter,
+                        onPrimaryClick = onPrimaryClick,
+                        onResetClick = onResetClick,
+                        onSkipClick = onSkipClick,
+                    )
+                } else {
+                    TimerBlock(
+                        state = state,
+                        diameter = diameter,
+                        onPrimaryClick = onPrimaryClick,
+                        onResetClick = onResetClick,
+                        onSkipClick = onSkipClick,
+                    )
+                }
+            }
         }
     }
 }
@@ -131,8 +161,6 @@ private fun TimerBlock(
     onResetClick: () -> Unit,
     onSkipClick: () -> Unit,
 ) {
-    KeepScreenOn(state.keepScreenOn)
-
     val colors = phaseColorsOf(state.slotType)
     val primaryLabel = stringResource(state.primaryControl.labelRes)
 
@@ -183,6 +211,85 @@ private fun TimerBlock(
             accent = colors.bright,
         )
         Spacer(Modifier.height(DOTS_BOTTOM_MARGIN))
+    }
+}
+
+/**
+ * The same block laid out as two columns, for landscape.
+ *
+ * A phone on its side has around 370 dp of height, and the portrait column needs more than that: the
+ * tomato alone eats two thirds of it, and `SALTAR` ended up off the bottom of the screen — the bug this
+ * fixes. Two columns spend the width that landscape does have instead, and the tomato stays the biggest
+ * thing on screen, which is the whole design.
+ *
+ * The right column is centred on the tomato rather than pinned to the bottom edge: the cycle dots go
+ * with the controls here, because there is no "bottom of the screen" far enough away to make them read
+ * as a separate status readout the way they do in portrait.
+ */
+@Composable
+private fun TimerBlockLandscape(
+    state: TimerUiState.Success,
+    diameter: Dp,
+    onPrimaryClick: () -> Unit,
+    onResetClick: () -> Unit,
+    onSkipClick: () -> Unit,
+) {
+    val colors = phaseColorsOf(state.slotType)
+    val primaryLabel = stringResource(state.primaryControl.labelRes)
+
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(LANDSCAPE_COLUMN_GAP),
+    ) {
+        Box(
+            modifier = Modifier.weight(1f),
+            contentAlignment = Alignment.Center,
+        ) {
+            LiquidCountdown(
+                timeText = state.timeText,
+                fillFraction = state.fillFraction,
+                colors = colors,
+                contentDescription = tomatoContentDescription(state),
+                onClick = onPrimaryClick,
+                onClickLabel = primaryLabel,
+                modifier = Modifier.size(diameter),
+            )
+        }
+
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            PhaseLabel(slotType = state.slotType, status = state.status, accent = colors.bright)
+
+            Spacer(Modifier.height(PHASE_TO_CONTROL))
+            TextControl(
+                label = primaryLabel,
+                onClick = onPrimaryClick,
+                glyph = state.primaryControl.glyph,
+                style = ControlLabelLarge,
+                height = PRIMARY_HEIGHT,
+            )
+
+            SecondaryControls(
+                showReset = state.showReset,
+                showSkip = state.showSkip,
+                onResetClick = onResetClick,
+                onSkipClick = onSkipClick,
+            )
+
+            Spacer(Modifier.height(LANDSCAPE_CONTROLS_TO_NEXT))
+            NextUpLine(state.nextSlot)
+
+            Spacer(Modifier.height(NEXT_UP_TO_DOTS))
+            CycleDots(
+                completed = state.completedInCycle,
+                current = state.cyclePosition,
+                total = state.pomodorosPerCycle,
+                accent = colors.bright,
+            )
+        }
     }
 }
 
@@ -406,6 +513,15 @@ private fun TimerScreenRingingPreview() {
 @Preview(showBackground = true, backgroundColor = 0xFF000000, heightDp = 560)
 @Composable
 private fun TimerScreenCompactPreview() {
+    AquiHayTomateTheme {
+        TimerContent(previewState(), onPrimaryClick = {}, onResetClick = {}, onSkipClick = {})
+    }
+}
+
+/** A phone on its side, which is where `SALTAR` used to fall off the bottom of the screen. */
+@Preview(showBackground = true, backgroundColor = 0xFF000000, widthDp = 900, heightDp = 370)
+@Composable
+private fun TimerScreenLandscapePreview() {
     AquiHayTomateTheme {
         TimerContent(previewState(), onPrimaryClick = {}, onResetClick = {}, onSkipClick = {})
     }

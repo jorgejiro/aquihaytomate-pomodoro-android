@@ -46,6 +46,7 @@ El nombre juega con el tomate (*pomodoro* en italiano, de donde viene el nombre 
 - Control primario en texto, sin caja: `▸ INICIAR` / `❚❚ PAUSAR` / `▸ REANUDAR`. **Tocar el círculo hace lo mismo que el control primario**: es el objetivo táctil más grande de la pantalla.
 - Controles secundarios `REINICIAR` y `SALTAR` en una fila debajo, con su hueco reservado para que el tomate no salte al aparecer. Son las tres acciones que tiene un pomodoro en marcha, y **saltar tiene que estar en la pantalla, no solo en la notificación**.
 - Línea `SIGUIENTE: DESCANSO · 5 MIN`, de `SlotPlanner.upcomingSlot` — la misma función pura que alimenta la notificación ongoing.
+- **En horizontal el bloque se parte en dos columnas** —tomate a la izquierda, controles a la derecha—, porque en vertical no cabía y `SALTAR` se salía de la pantalla. Ver `docs/design-spec.md` §5.1.
 - Puntos de ciclo **pegados al borde inferior** (`● ● ○ ○   2/4`) indicando en qué pomodoro del ciclo vamos. No forman parte del grupo de controles.
 
 ### 2.2 Pantalla Estadísticas ✅ Implementada
