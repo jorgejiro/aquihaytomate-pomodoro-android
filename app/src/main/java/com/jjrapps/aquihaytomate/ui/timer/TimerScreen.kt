@@ -238,11 +238,12 @@ private fun SecondaryControls(
 }
 
 /**
- * `A CONTINUACIÓN: DESCANSO · 5 MIN`, in the same `sectionLabel` as the headers of Settings.
+ * `SIGUIENTE: DESCANSO · 5 MIN`, in the same `sectionLabel` as the headers of Settings.
  *
  * It answers the question the old screen left hanging — what happens when this runs out — which matters
- * most right at the end of a slot. Same string and same pure planner as the ongoing notification, so the
- * two cannot disagree. The height is reserved so the dots below do not shift when it goes away.
+ * most right at the end of a slot. Fed by the same pure planner as the ongoing notification, so the two
+ * cannot disagree about what is coming. The height is reserved so the dots below do not shift when it
+ * goes away.
  */
 @Composable
 private fun NextUpLine(nextSlot: NextSlot?) {

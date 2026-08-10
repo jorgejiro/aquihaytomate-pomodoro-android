@@ -23,7 +23,7 @@
     <string name="control_reset">Reset</string>
     <string name="control_skip">Skip</string>
     <!-- Shared by the timer screen and the ongoing notification: phase, then its length. -->
-    <string name="next_up">Up next: %1$s · %2$s</string>
+    <string name="next_up">Next: %1$s · %2$s</string>
 
     <!-- Cycle readout, e.g. 2/4 -->
     <string name="cycle_progress">%1$d/%2$d</string>

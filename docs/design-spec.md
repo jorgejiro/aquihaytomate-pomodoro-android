@@ -211,7 +211,7 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 │                                      │
 │      R E I N I C I A R   S A L T A R │  controlLabel · TextPrimary · fila de 48 dp
 │                                      │  ← todo el aire sobrante, peso 1,35
-│   A CONTINUACIÓN: DESCANSO · 5 MIN   │  sectionLabel · TextMuted · hueco de 20 dp
+│      SIGUIENTE: DESCANSO · 5 MIN     │  sectionLabel · TextMuted · hueco de 20 dp
 │                                      │  16 dp
 │          ● ● ○ ○      2/4            │  puntos 7 dp, gap 10 dp
 └──────────────────────────────────────┘  32 dp de aire inferior
@@ -228,7 +228,7 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 | Etiqueta → control primario | 20 dp |
 | Control primario | `controlLabelLarge`, alto táctil **56 dp**, ancho `wrap`, ripple sin límites, **sin fondo** |
 | Controles secundarios | `REINICIAR` y `SALTAR` en una fila, `controlLabel` en **`TextPrimary`**, **en mayúsculas igual que el primario**, gap 24 dp, en un hueco de 48 dp reservado siempre; entran con `fadeIn(150 ms)`. Van en el mismo tinte que el primario a propósito: en `TextMuted` se leían como deshabilitados, y en una pantalla sin cajas el color es la única señal de que algo se puede pulsar. La jerarquía la marcan el tamaño y el glifo |
-| «A continuación» | `sectionLabel` `TextMuted` vía `SectionLabel`, hueco de 20 dp reservado, 16 dp por encima de los puntos |
+| «Siguiente» | `sectionLabel` `TextMuted` vía `SectionLabel`, hueco de 20 dp reservado, 16 dp por encima de los puntos |
 | Puntos de ciclo | 7 dp Ø, gap 10 dp. Completado: relleno `phase.bright`. Actual: anillo de 1,5 dp `phase.bright` + relleno al 25 %. Pendiente: anillo de 1 dp `TextGhost` |
 | `2/4` | `numberSmall` `TextMuted`, 12 dp a la derecha del último punto |
 
@@ -246,7 +246,7 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 | `REINICIAR` | `status != IDLE` | En `IDLE` no hay progreso que tirar, y `ResetTimerUseCase` no haría nada |
 | `SALTAR` | `status != IDLE` **o** el slot pendiente es un descanso | Saltarse un descanso que aún no ha empezado es algo que se quiere de verdad; saltarse el primer enfoque antes de empezarlo lleva a un descanso que nadie ha ganado |
 
-**La línea «A CONTINUACIÓN: DESCANSO · 5 MIN»** sale de `SlotPlanner.upcomingSlot(state, settings)`, la misma función pura que usa la notificación ongoing y la misma que ejecuta el motor cuando el slot termina de verdad. No se muestra en `RINGING`: allí el estado ya apunta al slot siguiente, así que la predicción hablaría del que viene *después*, y el control primario ya nombra el inmediato.
+**La línea «SIGUIENTE: DESCANSO · 5 MIN»** sale de `SlotPlanner.upcomingSlot(state, settings)`, la misma función pura que usa la notificación ongoing y la misma que ejecuta el motor cuando el slot termina de verdad. No se muestra en `RINGING`: allí el estado ya apunta al slot siguiente, así que la predicción hablaría del que viene *después*, y el control primario ya nombra el inmediato.
 
 **Toda la superficie del tomate es el control primario**: `LiquidCountdown` acepta `onClick`, con recorte a `CircleShape` para que el ripple sea circular y con el `onClick` declarado también dentro de `clearAndSetSemantics` — ese bloque sustituye la semántica del subárbol, así que la acción del `clickable` no sobreviviría a él. Un objetivo de 268 dp de diámetro es lo más cómodo que hay en la pantalla; la etiqueta de texto se queda porque es lo que *nombra* la acción.
 
@@ -637,7 +637,7 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
 - La plantilla estándar daba la cifra al hueco del timestamp — 11 sp, arriba a la derecha, inmodificable — y todo el peso al título, donde estaba el `2/4`. Con el cuerpo propio se invierte: la cifra manda y la fase con el ciclo bajan a 13 sp.
 - **Colores del cuerpo por cualificador** (`values/colors.xml` y `values-night/colors.xml`), no de la paleta del tomate ni de `?android:attr/textColorPrimary`, que resuelve oscuro en ambos temas. Es la única superficie de la app con esquema claro, porque su fondo lo pinta SystemUI.
 - Pausado: `TextView` al mismo tamaño con la cifra congelada —un `Chronometer` no se puede detener en un valor arbitrario— y `· Pausado` al final de la línea de fase.
-- **No hay línea de «A continuación».** Ocupaba el renglón que ahora es la cifra y decía algo que el usuario ya sabe. En la pantalla del temporizador se mantiene, donde no compite con nada.
+- **No hay línea de «Siguiente».** Ocupaba el renglón que ahora es la cifra y decía algo que el usuario ya sabe. En la pantalla del temporizador se mantiene, donde no compite con nada.
 - `setContentTitle` se sigue rellenando aunque no se vea: es el fallback de las superficies que rechazan vistas propias y lo que lee un lector de pantalla.
 - **Si el usuario la descarta por swipe con un slot en marcha, vuelve.** `setOngoing(true)` dejó de impedirlo en Android 13, y sin notificación no hay cifra ni controles. Un `deleteIntent` la republica mientras el estado sea `RUNNING` o `PAUSED`; en `RINGING` e `IDLE` no, porque ahí descartar es lo que el usuario quiere decir. Ver `docs/decisions/010-*`.
 - Flags: `setOngoing`, `setSilent`, `setOnlyAlertOnce`, `CATEGORY_STOPWATCH`, `VISIBILITY_PUBLIC`, y **`setForegroundServiceBehavior(FOREGROUND_SERVICE_IMMEDIATE)`** — sin esto Android 12+ retrasa la aparición hasta 10 s y el usuario cree que no ha arrancado.
