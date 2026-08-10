@@ -4,7 +4,7 @@
 > nada**: `CLAUDE.md` dice cómo se trabaja aquí, `docs/design-spec.md` cómo se ve, y esto **por qué está
 > como está** y con qué trampas de plataforma nos hemos peleado ya.
 >
-> Última revisión: 2026-07-28 · Versión publicada: **1.0.0 (versionCode 2)**
+> Última revisión: 2026-08-10 · Versión publicada: **1.1.0 (versionCode 4)** · Lista para subir: **1.2.0 (versionCode 5)**
 
 ---
 
@@ -12,6 +12,14 @@
 
 Funcionalidad de la v1.0 completa y revisada en un **Samsung Galaxy S25** real (temporizador, widget,
 notificación y aviso al reloj). Firmada con la upload key de Bebe Agua y lista para subir a Google Play.
+
+**La 1.2.0 es la primera tanda escrita mirando la app en un dispositivo que no es el del autor** —un Pixel
+10 con Android 17— y eso es casi todo lo que hay que saber de ella: los dos fallos serios que corrige no se
+ven en el móvil de Jorge ni en un emulador recién creado. El temporizador se salía de la pantalla en
+horizontal (`SALTAR` y los puntos, por debajo del borde, sin scroll), y el icono adaptativo se leía como una
+pegatina negra porque su fondo era casi negro y el tomate ocupaba solo la zona segura: invisible con
+wallpaper negro, que es el que usa el autor. Lo mismo la placa del widget. Ver `CHANGELOG.md` y
+`docs/decisions/013-*`.
 
 | Superficie | Estado |
 |---|---|
@@ -78,6 +86,11 @@ Cada una de estas costó una iteración de depuración. Están en los ADR, pero 
 | `enableEdgeToEdge()` sin argumentos | Con el tema del **sistema** en claro, los iconos de la barra de estado se pintan oscuros y desaparecen sobre el negro de la app | `SystemBarStyle.dark(...)` explícito: la app solo tiene tema oscuro |
 | Play exige que la política **hable de conservación**, no que se deduzca | Rechazo de una actualización de Bebe Agua: «No se especifica una política de conservación de datos» | Sección propia que declara conservación cero del lado del desarrollador y control del usuario en el dispositivo |
 | El emulador no deja cambiar el idioma del sistema | `setprop persist.sys.locale` lo bloquea SELinux y Ajustes se cierra al buscar idiomas | Para las capturas, el widget va en la segunda página del escritorio, que no lleva «At a glance» |
+| Un icono adaptativo **no** puede tener silueta libre | El launcher siempre pinta la capa de fondo y siempre recorta con su máscara: fondo negro + tomate pequeño = pegatina negra sobre wallpaper claro | Que el fondo **sea** la fruta: el degradado llena los 108 dp y la máscara da la forma |
+| Gmail resuelve `ACTION_SENDTO` por la URI y **descarta `EXTRA_SUBJECT`** | El correo de comentarios se abría con el destinatario puesto y el asunto vacío | El asunto va en la URI `mailto:?subject=` (con `Uri.encode`) **y** en el extra |
+| Una `Column` sin scroll no avisa de que no cabe | En horizontal, los controles secundarios quedaban fuera de la pantalla | Dos columnas en landscape; `@Preview` de 900 × 370 dp para verlo sin dispositivo |
+| Dos proyectos hermanos con artefacto homónimo | Se subió a Play el `app-release.aab` de Bebe Agua: «firmado con la clave incorrecta» | `archivesName` con nombre y versión; comprobar la huella antes de subir (`play-store-publication-texts.md` §1) |
+| El pipeline de capturas asume un escritorio limpio | Salió el widget de Bebe Agua, dos tomates duplicados y el widget de Calendar | `limpiar_escritorio()`: desinstala la otra app y hace `pm clear` del launcher |
 
 ---
 
@@ -109,7 +122,10 @@ localiza y **luego** toca; y recuerda que el onboarding tiene cuatro páginas.
 Por orden de valor aparente:
 
 - **Cerrar §10 en dispositivo** sobre la build de Play y anotar los resultados en
-  `docs/f9-verificacion-en-emulador.md`.
+  `docs/f9-verificacion-en-emulador.md`. Con la 1.2.0 hay dos cosas concretas que mirar en la build de
+  Play, no en la de debug: que el modo de pantalla encendida **persista** tras cerrar y abrir —es un enum
+  nuevo guardado por `id`, y R8 ya renombró constantes de enums una vez en este proyecto— y el widget en
+  Nova Launcher, que ahora sale sin placa.
 - **Quick Settings Tile** para iniciar y pausar desde la persiana. Es la superficie que falta y encaja con
   la filosofía del proyecto.
 - **Etiquetas o proyectos por sesión**, con estadísticas desglosadas. La columna `slot_type` de

@@ -69,12 +69,22 @@
 10. Generar el `.aab` firmado con la upload key:
    ```bash
    JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew bundleRelease
-   # app/build/outputs/bundle/release/app-release.aab
+   # app/build/outputs/bundle/release/aquihaytomate-<versionName>-vc<versionCode>-release.aab
    ```
-   Comprobar que sale firmado, que es lo que un `assembleRelease` sin `keystore.properties` no avisa:
+   Comprobar que sale firmado, que es lo que un `assembleRelease` sin `keystore.properties` no avisa, y
+   **que la huella es la de la upload key de esta app**:
    ```bash
-   "$JAVA_HOME/bin/keytool" -printcert -jarfile app/build/outputs/bundle/release/app-release.aab
+   "$JAVA_HOME/bin/keytool" -printcert -jarfile app/build/outputs/bundle/release/aquihaytomate-*-release.aab
+   # SHA1 esperado: 9E:D3:7C:F1:51:26:CB:D2:21:45:3B:9B:94:B5:4D:B0:E4:67:F3:36
    ```
+
+   > **Cuidado con subir el bundle de Bebe Agua.** Pasó al publicar la 1.2.0: las dos apps viven en
+   > carpetas hermanas de `~/dev`, su artefacto se llamaba igual —`app-release.aab`— y el diálogo de
+   > subida recuerda la última carpeta. Play lo rechaza con «tu Android App Bundle está firmado con la
+   > clave incorrecta», porque comparten cuenta y carpeta **pero no clave de firma**: Bebe Agua es
+   > `A0:1B:59:6B…` y esta app es `9E:D3:7C:F1…` —aunque el keystore se llame `bebeagua-release.jks` y su
+   > alias sea `bebeagua`, heredado de aquel proyecto—. Por eso el `archivesName` de `build.gradle.kts`
+   > lleva ahora nombre y versión.
 11. Subir a **Internal testing** primero. Instalar desde Play en un dispositivo real y repetir 5 y 6:
     la build de Play lleva R8 y puede romper cosas que el debug no.
 12. Promover a producción. Revisar antes: ficha, países, categoría, data safety, content rating,

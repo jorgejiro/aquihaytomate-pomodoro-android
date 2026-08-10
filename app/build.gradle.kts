@@ -69,6 +69,19 @@ android {
     }
 }
 
+/**
+ * El artefacto sale como `aquihaytomate-1.2.0-vc5-release.aab` en vez de `app-release.aab`.
+ *
+ * No es cosmética: Bebe Agua vive en la carpeta hermana de este proyecto y su bundle se llamaba
+ * exactamente igual, así que al subir la 1.2.0 se cogió el de la otra app y Play la rechazó por estar
+ * firmada con otra clave —las dos apps comparten cuenta y carpeta de trabajo, pero no clave de firma—.
+ * Con la versión en el nombre, el fichero que hay que subir se distingue de un vistazo, y de paso queda
+ * claro a qué `versionCode` corresponde un bundle guardado.
+ */
+base {
+    archivesName = "aquihaytomate-${android.defaultConfig.versionName}-vc${android.defaultConfig.versionCode}"
+}
+
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }

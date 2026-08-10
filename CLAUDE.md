@@ -474,7 +474,22 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 - [x] **F8** Widget 1×1. *Código completo; probarlo en Nova, Pixel Launcher y One UI sigue pendiente.*
 - [x] **F9** Endurecimiento y publicación: R8, batería, prueba en OEM agresivo, ficha de Play. *R8 verificado y corregido (renombraba las constantes de los enums persistidos); 28 tests instrumentados en verde; **firma configurada con la upload key de Bebe Agua y `.aab` de release firmado y verificado** (4,5 MiB, certificado hasta 2051); ficha, data safety, política y declaración de `specialUse` redactadas. **Falta lo que solo se puede hacer en dispositivo real**: la checklist §10 en Android 12/14/16, la del widget en Nova / Pixel Launcher / One UI, batería restringida y OEM agresivo. Después, subir a pruebas internas. Ver `docs/f9-verificacion-en-emulador.md` y `docs/play-store-publication-texts.md` §1.*
 
-**v1.1 (eventual)**
+**v1.2.0 — pulido en dispositivo real** (`versionCode 5`, 2026-08-10)
+
+La primera tanda escrita **mirando la app en un Pixel 10 con Android 17**, y de ahí sale casi todo: los dos
+fallos gordos —el temporizador se salía de la pantalla en horizontal y el icono se veía como una pegatina
+negra sobre un fondo de pantalla claro— no se ven en un emulador con el escritorio por defecto ni en el
+móvil del autor, que usa wallpaper negro. Lo mismo la placa del widget.
+
+- [x] Pantalla encendida en tres modos, **mientras carga por defecto**, sin depender de que el reloj corra. Ver `docs/decisions/013-*`.
+- [x] Enviar comentarios al autor por correo, con nombre y versión en el asunto.
+- [x] El temporizador en dos columnas en horizontal; el onboarding, con scroll.
+- [x] Icono sin placa: el degradado rojo llena el lienzo y la máscara del launcher da la forma.
+- [x] Widget sin placa negra por defecto; el cáliz del tomate, retirado.
+- [x] `archivesName` con nombre y versión, tras subir a Play el bundle de Bebe Agua por llamarse los dos `app-release.aab`.
+- [x] Pipeline de capturas arreglado: escritorio limpio, punto de soltado relativo e idioma explícito.
+
+**v1.3 (eventual)**
 
 - [ ] Etiquetas / proyectos por sesión, con estadísticas desglosadas.
 - [ ] Quick Settings Tile para iniciar/pausar desde la persiana.
