@@ -43,6 +43,7 @@ import com.jjrapps.aquihaytomate.ui.theme.AquiHayTomateTheme
 import com.jjrapps.aquihaytomate.ui.theme.ControlLabelLarge
 import com.jjrapps.aquihaytomate.ui.theme.SectionLabelStyle
 import com.jjrapps.aquihaytomate.ui.theme.TextMuted
+import com.jjrapps.aquihaytomate.ui.theme.TextPrimary
 import com.jjrapps.aquihaytomate.ui.theme.phaseColorsOf
 
 private val TOMATO_DIAMETER = 268.dp
@@ -192,7 +193,9 @@ private fun TimerBlock(
  * The two of them plus the primary are the three things there are to do with a running pomodoro, and the
  * screen used to offer only two — reset was there, skip was reachable from the notification alone. They
  * share the row rather than stacking so the whole cluster stays one glance wide; both are `controlLabel`
- * in `TextMuted`, a clear step below the primary, because neither is the ordinary thing to do.
+ * in `TextPrimary`, the same ink as the primary. `TextMuted` read as disabled — a greyed-out label in a
+ * screen with no boxes has nothing else to say "you can press me". The step below the primary is carried
+ * by size and by the glyph, which is enough.
  *
  * The row keeps its height even when both are hidden, so the tomato above it never moves.
  */
@@ -216,7 +219,7 @@ private fun SecondaryControls(
             TextControl(
                 label = stringResource(R.string.control_reset),
                 onClick = onResetClick,
-                color = TextMuted,
+                color = TextPrimary,
             )
         }
 
@@ -228,7 +231,7 @@ private fun SecondaryControls(
             TextControl(
                 label = stringResource(R.string.control_skip),
                 onClick = onSkipClick,
-                color = TextMuted,
+                color = TextPrimary,
             )
         }
     }

@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import com.jjrapps.aquihaytomate.ui.theme.AquiHayTomateTheme
 import com.jjrapps.aquihaytomate.ui.theme.ControlLabel
 import com.jjrapps.aquihaytomate.ui.theme.ControlLabelLarge
-import com.jjrapps.aquihaytomate.ui.theme.TextMuted
 import com.jjrapps.aquihaytomate.ui.theme.TextPrimary
 
 private val TOUCH_HEIGHT = 48.dp
@@ -159,6 +158,6 @@ private fun TextControlPausePreview() {
 @Composable
 private fun TextControlSecondaryPreview() {
     AquiHayTomateTheme {
-        TextControl(label = "Reiniciar", onClick = {}, color = TextMuted)
+        TextControl(label = "Reiniciar", onClick = {}, color = TextPrimary)
     }
 }

@@ -209,7 +209,7 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 │                                      │  20 dp
 │             ❚❚  P A U S A R          │  controlLabelLarge · alto táctil 56 dp
 │                                      │
-│      R E I N I C I A R   S A L T A R │  controlLabel · TextMuted · fila de 48 dp
+│      R E I N I C I A R   S A L T A R │  controlLabel · TextPrimary · fila de 48 dp
 │                                      │  ← todo el aire sobrante, peso 1,35
 │   A CONTINUACIÓN: DESCANSO · 5 MIN   │  sectionLabel · TextMuted · hueco de 20 dp
 │                                      │  16 dp
@@ -227,7 +227,7 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 | Tomate → etiqueta de fase | 28 dp |
 | Etiqueta → control primario | 20 dp |
 | Control primario | `controlLabelLarge`, alto táctil **56 dp**, ancho `wrap`, ripple sin límites, **sin fondo** |
-| Controles secundarios | `REINICIAR` y `SALTAR` en una fila, `controlLabel` en `TextMuted`, **en mayúsculas igual que el primario**, gap 24 dp, en un hueco de 48 dp reservado siempre; entran con `fadeIn(150 ms)` |
+| Controles secundarios | `REINICIAR` y `SALTAR` en una fila, `controlLabel` en **`TextPrimary`**, **en mayúsculas igual que el primario**, gap 24 dp, en un hueco de 48 dp reservado siempre; entran con `fadeIn(150 ms)`. Van en el mismo tinte que el primario a propósito: en `TextMuted` se leían como deshabilitados, y en una pantalla sin cajas el color es la única señal de que algo se puede pulsar. La jerarquía la marcan el tamaño y el glifo |
 | «A continuación» | `sectionLabel` `TextMuted` vía `SectionLabel`, hueco de 20 dp reservado, 16 dp por encima de los puntos |
 | Puntos de ciclo | 7 dp Ø, gap 10 dp. Completado: relleno `phase.bright`. Actual: anillo de 1,5 dp `phase.bright` + relleno al 25 %. Pendiente: anillo de 1 dp `TextGhost` |
 | `2/4` | `numberSmall` `TextMuted`, 12 dp a la derecha del último punto |
