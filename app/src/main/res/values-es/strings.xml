@@ -105,6 +105,10 @@
     <string name="settings_alert_sound_break">Sonido al terminar el descanso</string>
     <string name="settings_alert_sound_break_sublabel">Vuelta al tajo</string>
     <string name="settings_alert_sound_hint">Toca para escucharlo</string>
+    <string name="settings_alert_repeats_focus">Repetir ese sonido</string>
+    <string name="settings_alert_repeats_focus_sublabel">Para que no se escape desde la cocina</string>
+    <string name="settings_alert_repeats_break">Repetir ese sonido</string>
+    <string name="settings_alert_repeats_break_sublabel">Para que no se pueda ignorar</string>
     <string name="action_done">Hecho</string>
     <string name="settings_vibration">Vibración</string>
     <string name="settings_vibration_off">Desactivada</string>
@@ -122,6 +126,11 @@
     <string name="settings_version">Versión</string>
     <string name="settings_version_value">%1$s (%2$d)</string>
 
+    <plurals name="settings_alert_repeats_value">
+        <item quantity="one">%d vez</item>
+        <item quantity="many">%d veces</item>
+        <item quantity="other">%d veces</item>
+    </plurals>
     <plurals name="settings_minutes">
         <item quantity="one">%d min</item>
         <item quantity="many">%d min</item>

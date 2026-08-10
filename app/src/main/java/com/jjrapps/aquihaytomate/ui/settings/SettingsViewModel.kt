@@ -88,6 +88,23 @@ class SettingsViewModel @Inject constructor(
     }
 
     /**
+     * Cuántas veces suena seguido el sonido del pomodoro. Se escucha al elegirlo, con el sonido que ese
+     * extremo tenga configurado: el número solo significa algo al oír el resultado, igual que pasaba con
+     * los nombres de los sonidos.
+     */
+    fun onFocusAlertRepeatsSelected(count: Int) = update {
+        settingsRepository.setFocusAlertRepeats(count)
+        val settings = settingsRepository.current()
+        playPreview(settings.focusAlertSound, repeats = count)
+    }
+
+    fun onBreakAlertRepeatsSelected(count: Int) = update {
+        settingsRepository.setBreakAlertRepeats(count)
+        val settings = settingsRepository.current()
+        playPreview(settings.breakAlertSound, repeats = count)
+    }
+
+    /**
      * Lo hace sonar al elegirlo. Antes se podía cambiar el sonido pero no oírlo, así que la lista de
      * nombres no servía de nada: nadie sabe qué es «Suave» hasta que lo escucha.
      *
@@ -96,9 +113,9 @@ class SettingsViewModel @Inject constructor(
      * ella. Si el móvil está en silencio no se oye nada, que es exactamente lo que pasará al terminar el
      * pomodoro.
      */
-    private suspend fun playPreview(sound: AlertSound) {
+    private suspend fun playPreview(sound: AlertSound, repeats: Int = 1) {
         alertPlayer.stop()
-        if (sound.isAudible) alertPlayer.play(sound, vibrationSeconds = 0)
+        if (sound.isAudible) alertPlayer.play(sound, vibrationSeconds = 0, repeats = repeats)
     }
 
     /** Corta la escucha al cerrar el selector, para que no siga sonando por encima de la app. */

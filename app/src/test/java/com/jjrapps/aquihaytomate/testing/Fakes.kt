@@ -111,6 +111,18 @@ class FakeSettingsRepository(initial: TimerSettings = TimerSettings()) : Setting
         flow.value = flow.value.copy(breakAlertSound = sound)
     }
 
+    override suspend fun setFocusAlertRepeats(count: Int) {
+        flow.value = flow.value.copy(
+            focusAlertRepeats = count.coerceIn(TimerSettings.ALERT_REPEATS_RANGE),
+        )
+    }
+
+    override suspend fun setBreakAlertRepeats(count: Int) {
+        flow.value = flow.value.copy(
+            breakAlertRepeats = count.coerceIn(TimerSettings.ALERT_REPEATS_RANGE),
+        )
+    }
+
     override suspend fun setVibrationSeconds(seconds: Int) {
         flow.value = flow.value.copy(
             vibrationSeconds = seconds.coerceIn(TimerSettings.VIBRATION_SECONDS_RANGE),
@@ -262,11 +274,16 @@ class FakeAlertPlayer : AlertPlayer {
     var lastVibrationSeconds: Int? = null
         private set
 
+    /** Repeticiones pedidas en cada llamada, en el mismo orden que [playedSounds]. */
+    val playedRepeats: MutableList<Int> = mutableListOf()
+
     val playCount: Int get() = playedSounds.size
     val lastSound: AlertSound? get() = playedSounds.lastOrNull()
+    val lastRepeats: Int? get() = playedRepeats.lastOrNull()
 
-    override suspend fun play(sound: AlertSound, vibrationSeconds: Int) {
+    override suspend fun play(sound: AlertSound, vibrationSeconds: Int, repeats: Int) {
         playedSounds += sound
+        playedRepeats += repeats
         lastVibrationSeconds = vibrationSeconds
     }
 

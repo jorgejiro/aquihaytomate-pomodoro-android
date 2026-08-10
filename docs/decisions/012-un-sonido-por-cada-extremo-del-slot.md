@@ -83,3 +83,33 @@ móvil está en silencio no se oye nada, que es exactamente lo que pasará cuand
   «Vuelta al tajo»— para que se entienda cuál es cuál sin abrirlas.
 - Un pomodoro puede quedar en silencio y el descanso no, o al revés. La decisión de no hacer ruido sigue
   siendo del reproductor según la política; lo que cambia es qué sonido se le pide.
+
+---
+
+## Apéndice · 1.3: cuántas veces suena
+
+El mismo razonamiento se extiende a la **repetición**. Un aviso que suena una vez es fácil de perder si
+te has ido a la cocina, y cuántas repeticiones hacen falta para que sea imposible ignorarlo depende del
+sonido, de la casa y de la persona. Así que se añaden **dos ajustes más, uno por extremo**, de **1 a 10,
+por defecto 1** —lo que la app hacía antes—, resueltos por `TimerSettings.alertRepeatsFor(finishedType)`,
+gemela de `alertSoundFor`. Que sean dos y no uno es exactamente el argumento de este ADR: levantarse del
+escritorio y volver a él no cuestan lo mismo.
+
+Tres decisiones de implementación que no se ven en la pantalla:
+
+- **Encadenadas sin hueco.** Se reutiliza el mismo `MediaPlayer` con `seekTo(0)`, en vez de crearlo de
+  nuevo por repetición: recrearlo suelta y vuelve a pedir el foco de audio entre pasadas, que en algunos
+  dispositivos se oye como un salto de volumen. Una repetición tiene que leerse como una alerta más larga,
+  no como dos alertas.
+- **La cadena se cuenta; nunca `isLooping`.** Un bucle es ilimitado, y lo único que lo pararía —este
+  proceso— es justo lo que el sistema puede matar a mitad de alerta. Es el mismo error que
+  `VibrationEffect` con `repeat >= 0`, que este proyecto tiene prohibido. Con la cadena contada, el peor
+  caso es que el proceso muera y el sonido se corte antes de tiempo, que es el fallo que cualquiera
+  prefiere.
+- **`stop()` pone el contador a cero antes de liberar**, porque liberar no dispara la llamada de
+  terminación pero sí puede haber una ya encolada en el hilo principal: sin poner el contador a cero, un
+  descarte del usuario podía ser seguido de una repetición más.
+
+El selector se comporta como los de sonido —se queda abierto y suena al tocar— y **reproduce las N veces
+con el sonido que ese extremo tenga configurado**, por la misma razón que allí: «3 veces» no significa
+nada hasta que se oye. El límite de 10 acota lo que eso puede durar; el botón de hecho lo corta.

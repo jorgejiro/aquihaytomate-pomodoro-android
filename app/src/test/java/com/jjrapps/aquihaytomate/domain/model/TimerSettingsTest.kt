@@ -55,6 +55,24 @@ class TimerSettingsTest {
     }
 
     @Test
+    fun `the repeat count is keyed on the slot that ended, like the sound is`() {
+        val settings = TimerSettings(focusAlertRepeats = 2, breakAlertRepeats = 4)
+
+        assertTrue(settings.alertRepeatsFor(SlotType.FOCUS) == 2)
+        assertTrue(settings.alertRepeatsFor(SlotType.SHORT_BREAK) == 4)
+        assertTrue(settings.alertRepeatsFor(SlotType.LONG_BREAK) == 4)
+    }
+
+    @Test
+    fun `both repeat counts default to a single play`() {
+        val settings = TimerSettings()
+
+        assertTrue(settings.alertRepeatsFor(SlotType.FOCUS) == 1)
+        assertTrue(settings.alertRepeatsFor(SlotType.SHORT_BREAK) == 1)
+        assertTrue(TimerSettings.ALERT_REPEATS_RANGE == 1..10)
+    }
+
+    @Test
     fun `auto start is keyed on the slot coming up, not the one that ended`() {
         val breakOnly = TimerSettings(autoStartBreak = true, autoStartFocus = false)
 

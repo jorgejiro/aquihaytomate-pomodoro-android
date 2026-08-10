@@ -27,6 +27,12 @@ interface SettingsRepository {
 
     suspend fun setBreakAlertSound(sound: AlertSound)
 
+    /** How many times the pomodoro's end sound plays back to back, 1..10. */
+    suspend fun setFocusAlertRepeats(count: Int)
+
+    /** The same for the break's end sound, and set independently. */
+    suspend fun setBreakAlertRepeats(count: Int)
+
     suspend fun setVibrationSeconds(seconds: Int)
 
     suspend fun setKeepScreenOn(mode: KeepScreenOnMode)

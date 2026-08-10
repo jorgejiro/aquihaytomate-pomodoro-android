@@ -103,6 +103,10 @@
     <string name="settings_alert_sound_break">Sound when a break ends</string>
     <string name="settings_alert_sound_break_sublabel">Back to work</string>
     <string name="settings_alert_sound_hint">Tap to hear it</string>
+    <string name="settings_alert_repeats_focus">Repeat that sound</string>
+    <string name="settings_alert_repeats_focus_sublabel">Harder to miss from the kitchen</string>
+    <string name="settings_alert_repeats_break">Repeat that sound</string>
+    <string name="settings_alert_repeats_break_sublabel">Harder to sleep through</string>
     <string name="action_done">Done</string>
     <string name="settings_vibration">Vibration</string>
     <string name="settings_vibration_off">Off</string>
@@ -123,6 +127,10 @@
     <string name="settings_version">Version</string>
     <string name="settings_version_value">%1$s (%2$d)</string>
 
+    <plurals name="settings_alert_repeats_value">
+        <item quantity="one">%d time</item>
+        <item quantity="other">%d times</item>
+    </plurals>
     <plurals name="settings_minutes">
         <item quantity="one">%d min</item>
         <item quantity="other">%d min</item>

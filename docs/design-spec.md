@@ -348,8 +348,12 @@ Fila estándar: **52 dp** de alto, padding horizontal 16 dp. Etiqueta `rowLabel`
 │ ┌──────────────────────────────────┐ │
 │ │ Sonido al terminar el pomodoro   │ │
 │ │ Toca descansar        Cuenco   › │ │
+│ │ Repetir ese sonido               │ │
+│ │ Desde la cocina       1 vez    › │ │  1–10, encadenadas sin hueco
 │ │ Sonido al terminar el descanso   │ │
 │ │ Vuelta al tajo        Campana  › │ │
+│ │ Repetir ese sonido               │ │
+│ │ Sin poder ignorarlo   1 vez    › │ │  independiente del de arriba
 │ │ Vibración                  5 s › │ │  0 s = desactivada
 │ └──────────────────────────────────┘ │
 │  WIDGET                              │

@@ -38,6 +38,12 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setBreakAlertSound(sound: AlertSound) =
         dataSource.setBreakAlertSound(sound)
 
+    override suspend fun setFocusAlertRepeats(count: Int) =
+        dataSource.setFocusAlertRepeats(count)
+
+    override suspend fun setBreakAlertRepeats(count: Int) =
+        dataSource.setBreakAlertRepeats(count)
+
     override suspend fun setVibrationSeconds(seconds: Int) =
         dataSource.setVibrationSeconds(seconds)
 

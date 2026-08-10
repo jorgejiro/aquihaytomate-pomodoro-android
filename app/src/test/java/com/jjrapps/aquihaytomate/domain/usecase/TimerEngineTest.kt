@@ -93,6 +93,40 @@ class TimerEngineTest {
     }
 
     @Test
+    fun `each end of the slot carries its own repeat count`() = runTest {
+        settings.set(
+            TimerSettings(
+                focusAlertRepeats = 2,
+                breakAlertRepeats = 5,
+                autoStartBreak = false,
+            ),
+        )
+
+        start()
+        advance(focusMs)
+        assertTrue(complete())
+        assertEquals("El pomodoro suena las veces del pomodoro", 2, alerts.lastRepeats)
+
+        start()                       // el descanso, que estaba en RINGING esperando
+        advance(shortBreakMs)
+        assertTrue(complete())
+        assertEquals("El descanso, las del descanso", 5, alerts.lastRepeats)
+
+        assertEquals(listOf(2, 5), alerts.playedRepeats)
+    }
+
+    @Test
+    fun `repeats default to a single play`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
+
+        start()
+        advance(focusMs)
+        assertTrue(complete())
+
+        assertEquals("Sin tocar el ajuste, la alerta suena una vez", 1, alerts.lastRepeats)
+    }
+
+    @Test
     fun `chaining into the break still uses the sound of the slot that ended`() = runTest {
         // Con el auto-inicio puesto, el descanso arranca solo; lo que acaba de terminar es el pomodoro, así
         // que tiene que sonar el suyo y no el del descanso que empieza.

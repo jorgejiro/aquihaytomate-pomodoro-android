@@ -26,6 +26,10 @@ data class TimerSettings(
     val focusAlertSound: AlertSound = AlertSound.DEFAULT_FOCUS,
     /** Sound when a break ends. Harder by default: this one has to get you back to work. */
     val breakAlertSound: AlertSound = AlertSound.DEFAULT_BREAK,
+    /** How many times the pomodoro's sound plays back to back. See [alertRepeatsFor]. */
+    val focusAlertRepeats: Int = DEFAULT_ALERT_REPEATS,
+    /** Same for the break's sound, and independent on purpose. See [alertRepeatsFor]. */
+    val breakAlertRepeats: Int = DEFAULT_ALERT_REPEATS,
     val vibrationSeconds: Int = DEFAULT_VIBRATION_SECONDS,
     /** When the Timer screen holds the display awake. Plugged in by default; see [KeepScreenOnMode]. */
     val keepScreenOn: KeepScreenOnMode = KeepScreenOnMode.DEFAULT,
@@ -57,6 +61,20 @@ data class TimerSettings(
     fun alertSoundFor(finishedType: SlotType): AlertSound =
         if (finishedType.isBreak) breakAlertSound else focusAlertSound
 
+    /**
+     * How many times the alert sound plays back to back for the slot that has just **ended**.
+     *
+     * One by default, which is the behaviour the app has always had. It goes up to ten because a single
+     * chime is easy to miss from another room, and how many repeats it takes to be impossible to miss
+     * depends on the sound, the room and the person — the same reason there are two of these and not one:
+     * getting up from the desk and coming back to it are not equally easy to sleep through.
+     *
+     * Keyed on the slot that ended, exactly like [alertSoundFor], so the repeat count and the sound it
+     * repeats cannot end up describing different moments.
+     */
+    fun alertRepeatsFor(finishedType: SlotType): Int =
+        if (finishedType.isBreak) breakAlertRepeats else focusAlertRepeats
+
     /** Vibration disabled is expressed as zero seconds, not as a separate flag. */
     val vibrationEnabled: Boolean get() = vibrationSeconds > 0
 
@@ -84,6 +102,9 @@ data class TimerSettings(
         const val DEFAULT_VIBRATION_SECONDS = 5
         const val DEFAULT_DAILY_GOAL = 8
 
+        /** One play, which is what the app did before the setting existed. */
+        const val DEFAULT_ALERT_REPEATS = 1
+
         const val MIN_FOCUS_MINUTES = 1
         const val MAX_FOCUS_MINUTES = 180
         const val MIN_SHORT_BREAK_MINUTES = 1
@@ -96,6 +117,8 @@ data class TimerSettings(
         const val MAX_VIBRATION_SECONDS = 30
         const val MIN_DAILY_GOAL = 1
         const val MAX_DAILY_GOAL = 24
+        const val MIN_ALERT_REPEATS = 1
+        const val MAX_ALERT_REPEATS = 10
 
         val FOCUS_MINUTES_RANGE = MIN_FOCUS_MINUTES..MAX_FOCUS_MINUTES
         val SHORT_BREAK_MINUTES_RANGE = MIN_SHORT_BREAK_MINUTES..MAX_SHORT_BREAK_MINUTES
@@ -103,6 +126,7 @@ data class TimerSettings(
         val POMODOROS_PER_CYCLE_RANGE = MIN_POMODOROS_PER_CYCLE..MAX_POMODOROS_PER_CYCLE
         val VIBRATION_SECONDS_RANGE = MIN_VIBRATION_SECONDS..MAX_VIBRATION_SECONDS
         val DAILY_GOAL_RANGE = MIN_DAILY_GOAL..MAX_DAILY_GOAL
+        val ALERT_REPEATS_RANGE = MIN_ALERT_REPEATS..MAX_ALERT_REPEATS
 
         fun minutesRangeFor(type: SlotType): IntRange = when (type) {
             SlotType.FOCUS -> FOCUS_MINUTES_RANGE

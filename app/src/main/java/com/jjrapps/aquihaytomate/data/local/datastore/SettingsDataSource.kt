@@ -76,6 +76,14 @@ class SettingsDataSource @Inject constructor(
     suspend fun setBreakAlertSound(sound: AlertSound) =
         edit(Keys.BREAK_ALERT_SOUND) { sound.id }
 
+    suspend fun setFocusAlertRepeats(count: Int) = edit(Keys.FOCUS_ALERT_REPEATS) {
+        count.coerceIn(TimerSettings.ALERT_REPEATS_RANGE)
+    }
+
+    suspend fun setBreakAlertRepeats(count: Int) = edit(Keys.BREAK_ALERT_REPEATS) {
+        count.coerceIn(TimerSettings.ALERT_REPEATS_RANGE)
+    }
+
     suspend fun setWidgetBackground(background: WidgetBackground) =
         edit(Keys.WIDGET_BACKGROUND) { background.id }
 
@@ -121,6 +129,10 @@ class SettingsDataSource @Inject constructor(
                 this[Keys.BREAK_ALERT_SOUND] ?: this[Keys.RETIRED_ALERT_SOUND],
                 fallback = defaults.breakAlertSound,
             ),
+            focusAlertRepeats = (this[Keys.FOCUS_ALERT_REPEATS] ?: defaults.focusAlertRepeats)
+                .coerceIn(TimerSettings.ALERT_REPEATS_RANGE),
+            breakAlertRepeats = (this[Keys.BREAK_ALERT_REPEATS] ?: defaults.breakAlertRepeats)
+                .coerceIn(TimerSettings.ALERT_REPEATS_RANGE),
             vibrationSeconds = (this[Keys.VIBRATION_SECONDS] ?: defaults.vibrationSeconds)
                 .coerceIn(TimerSettings.VIBRATION_SECONDS_RANGE),
             // El interruptor que fue este ajuste solo se lee cuando estaba encendido, y entonces vale
@@ -165,6 +177,8 @@ class SettingsDataSource @Inject constructor(
         val RETIRED_AUTO_START_NEXT = booleanPreferencesKey("auto_start_next")
         val FOCUS_ALERT_SOUND = stringPreferencesKey("focus_alert_sound")
         val BREAK_ALERT_SOUND = stringPreferencesKey("break_alert_sound")
+        val FOCUS_ALERT_REPEATS = intPreferencesKey("focus_alert_repeats")
+        val BREAK_ALERT_REPEATS = intPreferencesKey("break_alert_repeats")
 
         /**
          * El sonido único que se convirtió en los dos de arriba. Ya no se escribe, solo se lee como su

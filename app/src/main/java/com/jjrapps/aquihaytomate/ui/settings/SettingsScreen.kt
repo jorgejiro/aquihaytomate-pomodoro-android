@@ -62,6 +62,7 @@ private val LONG_BREAK_MINUTES = listOf(5, 10, 15, 20, 25, 30, 45, 60)
 private val CYCLE_LENGTHS = (2..12).toList()
 private val DAILY_GOALS = (1..24).toList()
 private val VIBRATION_SECONDS = listOf(0, 1, 2, 3, 5, 8, 10, 15, 20, 30)
+private val ALERT_REPEATS = TimerSettings.ALERT_REPEATS_RANGE.toList()
 
 @Composable
 fun SettingsScreen(
@@ -86,6 +87,8 @@ fun SettingsScreen(
         onDailyGoalSelected = viewModel::onDailyGoalSelected,
         onFocusAlertSoundSelected = viewModel::onFocusAlertSoundSelected,
         onBreakAlertSoundSelected = viewModel::onBreakAlertSoundSelected,
+        onFocusAlertRepeatsSelected = viewModel::onFocusAlertRepeatsSelected,
+        onBreakAlertRepeatsSelected = viewModel::onBreakAlertRepeatsSelected,
         onVibrationSecondsSelected = viewModel::onVibrationSecondsSelected,
         onWidgetBackgroundSelected = viewModel::onWidgetBackgroundSelected,
         onLanguageSelected = viewModel::onLanguageSelected,
@@ -139,6 +142,8 @@ private fun SettingsContent(
     onDailyGoalSelected: (Int) -> Unit,
     onFocusAlertSoundSelected: (AlertSound) -> Unit,
     onBreakAlertSoundSelected: (AlertSound) -> Unit,
+    onFocusAlertRepeatsSelected: (Int) -> Unit,
+    onBreakAlertRepeatsSelected: (Int) -> Unit,
     onVibrationSecondsSelected: (Int) -> Unit,
     onWidgetBackgroundSelected: (WidgetBackground) -> Unit,
     onLanguageSelected: (AppLanguage) -> Unit,
@@ -188,6 +193,8 @@ private fun SettingsContent(
                 onDailyGoalSelected = onDailyGoalSelected,
                 onFocusAlertSoundSelected = onFocusAlertSoundSelected,
                 onBreakAlertSoundSelected = onBreakAlertSoundSelected,
+                onFocusAlertRepeatsSelected = onFocusAlertRepeatsSelected,
+                onBreakAlertRepeatsSelected = onBreakAlertRepeatsSelected,
                 onVibrationSecondsSelected = onVibrationSecondsSelected,
                 onKeepScreenOnSelected = onKeepScreenOnSelected,
                 onWidgetBackgroundSelected = onWidgetBackgroundSelected,
@@ -282,10 +289,24 @@ private fun AlertsSection(
         )
         Divider()
         SettingsRow(
+            label = stringResource(R.string.settings_alert_repeats_focus),
+            sublabel = stringResource(R.string.settings_alert_repeats_focus_sublabel),
+            value = repeatsLabel(settings.focusAlertRepeats),
+            onClick = { onSheetRequested(SettingsSheet.FocusAlertRepeats) },
+        )
+        Divider()
+        SettingsRow(
             label = stringResource(R.string.settings_alert_sound_break),
             sublabel = stringResource(R.string.settings_alert_sound_break_sublabel),
             value = stringResource(settings.breakAlertSound.labelRes),
             onClick = { onSheetRequested(SettingsSheet.BreakAlertSound) },
+        )
+        Divider()
+        SettingsRow(
+            label = stringResource(R.string.settings_alert_repeats_break),
+            sublabel = stringResource(R.string.settings_alert_repeats_break_sublabel),
+            value = repeatsLabel(settings.breakAlertRepeats),
+            onClick = { onSheetRequested(SettingsSheet.BreakAlertRepeats) },
         )
         Divider()
         SettingsRow(
@@ -419,6 +440,8 @@ private fun Sheets(
     onDailyGoalSelected: (Int) -> Unit,
     onFocusAlertSoundSelected: (AlertSound) -> Unit,
     onBreakAlertSoundSelected: (AlertSound) -> Unit,
+    onFocusAlertRepeatsSelected: (Int) -> Unit,
+    onBreakAlertRepeatsSelected: (Int) -> Unit,
     onVibrationSecondsSelected: (Int) -> Unit,
     onKeepScreenOnSelected: (KeepScreenOnMode) -> Unit,
     onWidgetBackgroundSelected: (WidgetBackground) -> Unit,
@@ -486,6 +509,30 @@ private fun Sheets(
             doneLabel = stringResource(R.string.action_done),
         )
 
+        // Igual que los de sonido: se quedan abiertos y suenan al tocarlos, porque «3 veces» no
+        // significa nada hasta que se oye.
+        SettingsSheet.FocusAlertRepeats -> ValuePickerSheet(
+            title = stringResource(R.string.settings_alert_repeats_focus),
+            hint = stringResource(R.string.settings_alert_sound_hint),
+            options = ALERT_REPEATS.map { PickerOption(it, repeatsLabel(it)) },
+            selected = state.settings.focusAlertRepeats,
+            onSelect = onFocusAlertRepeatsSelected,
+            onDismiss = onDismiss,
+            stayOpen = true,
+            doneLabel = stringResource(R.string.action_done),
+        )
+
+        SettingsSheet.BreakAlertRepeats -> ValuePickerSheet(
+            title = stringResource(R.string.settings_alert_repeats_break),
+            hint = stringResource(R.string.settings_alert_sound_hint),
+            options = ALERT_REPEATS.map { PickerOption(it, repeatsLabel(it)) },
+            selected = state.settings.breakAlertRepeats,
+            onSelect = onBreakAlertRepeatsSelected,
+            onDismiss = onDismiss,
+            stayOpen = true,
+            doneLabel = stringResource(R.string.action_done),
+        )
+
         SettingsSheet.VibrationSeconds -> ValuePickerSheet(
             title = stringResource(R.string.settings_vibration),
             options = VIBRATION_SECONDS.map { PickerOption(it, vibrationLabel(it)) },
@@ -538,6 +585,11 @@ private fun Section(
 private fun minutesLabel(minutes: Int): String =
     pluralStringResource(R.plurals.settings_minutes, minutes, minutes)
 
+/** "1 time" / "3 times": a bare number in the row would read as a duration next to the others. */
+@Composable
+private fun repeatsLabel(times: Int): String =
+    pluralStringResource(R.plurals.settings_alert_repeats_value, times, times)
+
 /** Zero seconds is the off switch for vibration, so it reads as "off" rather than as "0 s". */
 @Composable
 private fun vibrationLabel(seconds: Int): String = if (seconds <= 0) {
@@ -567,6 +619,8 @@ private fun SettingsScreenPreview() {
             onDailyGoalSelected = {},
             onFocusAlertSoundSelected = {},
             onBreakAlertSoundSelected = {},
+            onFocusAlertRepeatsSelected = {},
+            onBreakAlertRepeatsSelected = {},
             onVibrationSecondsSelected = {},
             onWidgetBackgroundSelected = {},
             onLanguageSelected = {},

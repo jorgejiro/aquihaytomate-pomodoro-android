@@ -14,8 +14,11 @@ interface AlertPlayer {
      *
      * @param vibrationSeconds 0 means no vibration. The waveform is always finite; a repeating one
      *   whose `cancel()` is lost with the process would buzz until reboot.
+     * @param repeats how many times the clip plays back to back, 1..10. Returns as soon as the first
+     *   play starts: the chain runs on the player's completion callback, so a ten-times alert does not
+     *   hold up whoever fired it. [stop] cuts the chain wherever it is.
      */
-    suspend fun play(sound: AlertSound, vibrationSeconds: Int)
+    suspend fun play(sound: AlertSound, vibrationSeconds: Int, repeats: Int = 1)
 
     /** Stops anything still sounding, e.g. because the user dismissed the alert. */
     fun stop()

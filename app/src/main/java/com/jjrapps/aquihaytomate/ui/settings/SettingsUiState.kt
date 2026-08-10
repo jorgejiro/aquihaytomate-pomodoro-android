@@ -10,6 +10,8 @@ sealed interface SettingsSheet {
     data object DailyGoal : SettingsSheet
     data object FocusAlertSound : SettingsSheet
     data object BreakAlertSound : SettingsSheet
+    data object FocusAlertRepeats : SettingsSheet
+    data object BreakAlertRepeats : SettingsSheet
     data object VibrationSeconds : SettingsSheet
     data object KeepScreenOn : SettingsSheet
     data object WidgetBackground : SettingsSheet

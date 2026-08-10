@@ -12,6 +12,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import com.jjrapps.aquihaytomate.domain.model.AlertSound
+import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.repository.AlertPlayer
 import com.jjrapps.aquihaytomate.domain.usecase.AlertPolicy
 import com.jjrapps.aquihaytomate.domain.usecase.InterruptionFilter
@@ -35,6 +36,10 @@ import timber.log.Timber
  * - **The waveform is always finite.** A repeating `VibrationEffect` whose `cancel()` is lost because
  *   the process died leaves the phone buzzing until reboot. There are apps on Play that have shipped
  *   that bug.
+ * - **Repeats are a counted chain, never `isLooping`.** Looping is unbounded, and the thing that would
+ *   stop it — this process — is exactly what the system may kill mid-alert, so a loop is the audio
+ *   version of the bug above. The chain counts down instead: worst case the process dies and the sound
+ *   stops early, which is the failure everyone prefers.
  */
 @Singleton
 class AlertPlayerImpl @Inject constructor(
@@ -49,7 +54,14 @@ class AlertPlayerImpl @Inject constructor(
     private var player: MediaPlayer? = null
     private var focusRequest: AudioFocusRequest? = null
 
-    override suspend fun play(sound: AlertSound, vibrationSeconds: Int) {
+    /**
+     * Plays still owed by the chain, counting the one currently sounding. Only touched from the main
+     * thread — `play` under the mutex, and the completion callback, which `MediaPlayer` posts to the
+     * thread that created it.
+     */
+    private var playsLeft: Int = 0
+
+    override suspend fun play(sound: AlertSound, vibrationSeconds: Int, repeats: Int) {
         val decision = AlertPolicy.decide(
             sound = sound,
             vibrationSeconds = vibrationSeconds,
@@ -58,13 +70,23 @@ class AlertPlayerImpl @Inject constructor(
             dndAllowsAlarms = dndAllowsAlarms(),
             alarmVolumeLevel = alarmVolumeLevel(),
         )
-        Timber.d("Alert decision: %s for %s / %ds", decision, sound.id, vibrationSeconds)
+        Timber.d(
+            "Alert decision: %s for %s / %ds / ×%d", decision, sound.id, vibrationSeconds, repeats,
+        )
 
         if (decision.vibrate) vibrate(vibrationSeconds)
-        if (decision.playSound) mutex.withLock { startSound(sound) }
+        if (decision.playSound) {
+            mutex.withLock {
+                playsLeft = repeats.coerceIn(TimerSettings.ALERT_REPEATS_RANGE)
+                startSound(sound)
+            }
+        }
     }
 
     override fun stop() {
+        // Zero first: releasing the player fires no completion callback, but a chain already queued on
+        // the main thread would otherwise start the next play over the top of a stop the user asked for.
+        playsLeft = 0
         releasePlayer()
         vibrator()?.cancel()
     }
@@ -86,17 +108,43 @@ class AlertPlayerImpl @Inject constructor(
         try {
             player = MediaPlayer.create(context, rawRes)?.apply {
                 setAudioAttributes(attributes)
-                setOnCompletionListener { releasePlayer() }
+                setOnCompletionListener { finished -> onClipFinished(finished) }
                 setOnErrorListener { _, what, extra ->
                     Timber.w("MediaPlayer error %d/%d", what, extra)
+                    playsLeft = 0
                     releasePlayer()
                     true
                 }
                 start()
             }
+            if (player != null) playsLeft--
         } catch (e: Exception) {
             // A missing or corrupt clip must never take the timer down with it.
             Timber.e(e, "Could not play the alert sound %s", sound.id)
+            playsLeft = 0
+            releasePlayer()
+        }
+    }
+
+    /**
+     * Rewinds and plays again while the chain has plays left, and tears everything down when it does not.
+     *
+     * The same `MediaPlayer` is reused rather than built again per repeat: recreating it would drop and
+     * re-request audio focus between plays, which on some devices is audible as a gap and a volume step.
+     * Back to back with no gap on purpose — a repeat is meant to read as one longer alert, not as two.
+     */
+    private fun onClipFinished(finished: MediaPlayer) {
+        if (playsLeft <= 0) {
+            releasePlayer()
+            return
+        }
+        playsLeft--
+        val restarted = runCatching {
+            finished.seekTo(0)
+            finished.start()
+        }.isSuccess
+        if (!restarted) {
+            playsLeft = 0
             releasePlayer()
         }
     }

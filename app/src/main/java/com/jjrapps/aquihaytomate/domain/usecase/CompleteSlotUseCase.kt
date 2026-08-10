@@ -120,6 +120,7 @@ class CompleteSlotUseCase @Inject constructor(
                 alertPlayer.play(
                     settings.alertSoundFor(state.slotType),
                     settings.vibrationSeconds,
+                    settings.alertRepeatsFor(state.slotType),
                 )
             }
         }
