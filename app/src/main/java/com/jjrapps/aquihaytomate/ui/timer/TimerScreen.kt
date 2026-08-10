@@ -53,6 +53,13 @@ private val COMPACT_HEIGHT_THRESHOLD = 600.dp
 private val TOMATO_TO_PHASE = 28.dp
 private val PHASE_TO_CONTROL = 20.dp
 private val PRIMARY_HEIGHT = 56.dp
+
+/**
+ * Minimum air above and below the control cluster in portrait, for when there is no free height to
+ * distribute. It is half of [PHASE_TO_CONTROL] on each side, so on a screen with nothing to spare the
+ * spacing ends up exactly as it was before the cluster started floating.
+ */
+private val CONTROLS_MIN_GAP = 10.dp
 private val SCREEN_PADDING = 20.dp
 private val DOTS_BOTTOM_MARGIN = 32.dp
 private val NEXT_UP_TO_DOTS = 16.dp
@@ -79,12 +86,18 @@ private val LANDSCAPE_COLUMN_GAP = 24.dp
 private val LANDSCAPE_CONTROLS_TO_NEXT = 20.dp
 
 /**
- * The free vertical space is split above and below the tomato block. Below weighs more so the block sits
- * a little above the optical centre and the cycle dots settle near the bottom edge, where they belong:
- * they are a status readout, not part of the control cluster.
+ * How the free vertical space is spent in portrait.
+ *
+ * [SPACE_ABOVE_WEIGHT] goes above the tomato, and the rest is split **evenly above and below the control
+ * cluster**, which is what centres `PAUSAR` / `REINICIAR` / `SALTAR` in the gap between the fruit and the
+ * "up next" line.
+ *
+ * Until 1.3 the controls hung directly off the phase label and the whole remainder piled up underneath
+ * them, so on a tall phone the cluster was crammed against the tomato with a hole below it. The two
+ * weights add up to the old single one, so the tomato does not move — only the controls do.
  */
 private const val SPACE_ABOVE_WEIGHT = 1f
-private const val SPACE_BELOW_WEIGHT = 1.35f
+private const val CONTROLS_SLACK_WEIGHT = 0.675f
 
 private const val CONTROL_FADE_MS = 150
 
@@ -184,23 +197,30 @@ private fun TimerBlock(
         Spacer(Modifier.height(TOMATO_TO_PHASE))
         PhaseLabel(slotType = state.slotType, status = state.status, accent = colors.bright)
 
-        Spacer(Modifier.height(PHASE_TO_CONTROL))
-        TextControl(
-            label = primaryLabel,
-            onClick = onPrimaryClick,
-            glyph = state.primaryControl.glyph,
-            style = ControlLabelLarge,
-            height = PRIMARY_HEIGHT,
-        )
+        // Equal slack on both sides: the cluster floats in the middle of what is left between the fruit
+        // and the "up next" line instead of hanging off the phase label.
+        Spacer(Modifier.weight(CONTROLS_SLACK_WEIGHT))
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(vertical = CONTROLS_MIN_GAP),
+        ) {
+            TextControl(
+                label = primaryLabel,
+                onClick = onPrimaryClick,
+                glyph = state.primaryControl.glyph,
+                style = ControlLabelLarge,
+                height = PRIMARY_HEIGHT,
+            )
 
-        SecondaryControls(
-            showReset = state.showReset,
-            showSkip = state.showSkip,
-            onResetClick = onResetClick,
-            onSkipClick = onSkipClick,
-        )
+            SecondaryControls(
+                showReset = state.showReset,
+                showSkip = state.showSkip,
+                onResetClick = onResetClick,
+                onSkipClick = onSkipClick,
+            )
+        }
+        Spacer(Modifier.weight(CONTROLS_SLACK_WEIGHT))
 
-        Spacer(Modifier.weight(SPACE_BELOW_WEIGHT))
         NextUpLine(state.nextSlot)
 
         Spacer(Modifier.height(NEXT_UP_TO_DOTS))

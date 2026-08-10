@@ -207,11 +207,11 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 │           ╰──────────────╯           │  ← el círculo entero es área táctil
 │                                      │  28 dp
 │              E N F O Q U E           │  phaseLabel · TomateBright
-│                                      │  20 dp
+│                                      │  ← aire elástico, peso 0,675 (mínimo 10 dp)
 │             ❚❚  P A U S A R          │  controlLabelLarge · alto táctil 56 dp
 │                                      │
 │      R E I N I C I A R   S A L T A R │  controlLabel · TextPrimary · fila de 48 dp
-│                                      │  ← todo el aire sobrante, peso 1,35
+│                                      │  ← el mismo aire, peso 0,675 → el grupo va centrado
 │      SIGUIENTE: DESCANSO · 5 MIN     │  sectionLabel · TextMuted · hueco de 20 dp
 │                                      │  16 dp
 │          ● ● ○ ○      2/4            │  puntos 7 dp, gap 10 dp
@@ -226,17 +226,18 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 | Contador | `displayTimer`, centrado con `offsetY = -2.dp` (compensa el descender vacío) |
 | Línea de superficie | 1,5 dp en `SurfaceHighlight`, alpha 0,9 |
 | Tomate → etiqueta de fase | 28 dp |
-| Etiqueta → control primario | 20 dp |
+| Etiqueta → control primario | **elástico**: la mitad del aire sobrante, con un mínimo de 10 dp. En horizontal, 20 dp fijos |
 | Control primario | `controlLabelLarge`, alto táctil **56 dp**, ancho `wrap`, ripple sin límites, **sin fondo** |
 | Controles secundarios | `REINICIAR` y `SALTAR` en una fila, `controlLabel` en **`TextPrimary`**, **en mayúsculas igual que el primario**, gap 24 dp, en un hueco de 48 dp reservado siempre; entran con `fadeIn(150 ms)`. Van en el mismo tinte que el primario a propósito: en `TextMuted` se leían como deshabilitados, y en una pantalla sin cajas el color es la única señal de que algo se puede pulsar. La jerarquía la marcan el tamaño y el glifo |
 | «Siguiente» | `sectionLabel` `TextMuted` vía `SectionLabel`, hueco de 20 dp reservado, 16 dp por encima de los puntos |
 | Puntos de ciclo | 7 dp Ø, gap 10 dp. Completado: relleno `phase.bright`. Actual: anillo de 1,5 dp `phase.bright` + relleno al 25 %. Pendiente: anillo de 1 dp `TextGhost` |
 | `2/4` | `numberSmall` `TextMuted`, 12 dp a la derecha del último punto |
 
-**El reparto vertical no es un `Arrangement.Center` con espaciados fijos.** El aire libre se divide en dos `Spacer` con peso, **1 arriba y 1,35 abajo**, con los puntos de ciclo pegados al borde inferior a 32 dp. Dos razones:
+**El reparto vertical no es un `Arrangement.Center` con espaciados fijos.** El aire libre se divide en tres `Spacer` con peso: **1 encima del tomate** y **0,675 a cada lado del grupo de controles**, con los puntos de ciclo pegados al borde inferior a 32 dp. Tres razones:
 
 1. Con todo centrado en bloque, el tomate, la etiqueta, los dos controles y los puntos formaban una sola masa apelotonada en el centro con dos franjas negras enormes arriba y abajo. Los puntos de ciclo son un indicador de estado, no parte del grupo de controles, y su sitio es abajo.
-2. El peso mayor abajo deja el tomate ligeramente por encima del centro óptico, que es donde el ojo lo espera.
+2. Los dos pesos de abajo suman 1,35, que es el peso único que había antes bajo los controles, así que **el tomate queda exactamente donde estaba** y sigue ligeramente por encima del centro óptico, que es donde el ojo lo espera.
+3. **Repartirlo a los dos lados del grupo de controles es lo que los centra.** Hasta la 1.3 los controles colgaban de la etiqueta de fase con 20 dp fijos y todo el sobrante se acumulaba debajo: en un móvil alto el grupo salía pegado al tomate con un agujero negro bajo él. El mínimo de 10 dp por lado —la mitad de esos 20 dp— es lo que mantiene el espaciado de antes en pantallas donde no sobra nada.
 
 **El hueco de los controles secundarios se reserva esté o no visible.** Si no, `REINICIAR` empujaba el tomate 48 dp arriba y abajo cada vez que se pausaba o se reiniciaba. Lo mismo con la línea de «a continuación», que no existe en `RINGING`.
 
