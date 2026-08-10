@@ -95,8 +95,27 @@ def buscar(aguja, xml=None, exacto=False):
     return (exactos + parciales)[:1]
 
 
-def tocar(aguja):
-    halladas = buscar(aguja)
+def esperar(aguja, limite=20, exacto=False):
+    """
+    Espera a que [aguja] aparezca y devuelve sus nodos, o None si no llega a tiempo.
+
+    Existe porque un `sleep` fijo seguido de un `tocar` es la forma más fácil de que el pipeline se
+    rompa al cambiar de dispositivo: la bandeja de widgets de la tablet de 10" tarda más de tres
+    segundos en pintarse y el «Search» no estaba todavía. Es la misma regla que ya seguían las
+    capturas —esperar por contenido, nunca por tiempo— aplicada también a la navegación.
+    """
+    fin = time.time() + limite
+    while True:
+        halladas = buscar(aguja, exacto=exacto)
+        if halladas:
+            return halladas
+        if time.time() >= fin:
+            return None
+        time.sleep(1)
+
+
+def tocar(aguja, limite=20, exacto=False):
+    halladas = esperar(aguja, limite=limite, exacto=exacto)
     if not halladas:
         raise SystemExit(f"no encontrado: {aguja!r}")
     x, y = halladas[0]["centro"]

@@ -26,10 +26,12 @@ TEXTOS = {
            "idioma": "Idioma", "eleccion": "Español",
            "pausar": "PAUSAR", "descanso": "DESCANSO", "duraciones": "DURACIONES",
            "hoy": "HOY", "racha": "mejor racha", "fin": "¡TIEMPO!", "descartar": "Descartar"},
+    # «fin» es el texto completo a propósito: en inglés, «TIME» es subcadena de «TIMER», el nombre de la
+    # pestaña, así que esperar por «TIME» se cumple sin que la pantalla de fin haya llegado.
     "en": {"temporizador": "TIMER", "estadisticas": "STATISTICS", "ajustes": "SETTINGS",
            "idioma": "Language", "eleccion": "English",
            "pausar": "PAUSE", "descanso": "BREAK", "duraciones": "DURATIONS",
-           "hoy": "TODAY", "racha": "best streak", "fin": "TIME", "descartar": "Dismiss"},
+           "hoy": "TODAY", "racha": "best streak", "fin": "TIME'S UP!", "descartar": "Dismiss"},
 }
 
 
@@ -90,26 +92,32 @@ def poner_idioma(idioma):
     print(f"  idioma → {idioma}")
 
 
-def esperar(texto, limite=20):
+def esperar(texto, limite=20, exacto=False):
     """
     Espera a que el texto esté en pantalla antes de capturar.
 
     Con un `sleep` fijo salían capturas en negro: tras un `force-stop` la pantalla del temporizador tarda
     en componer y el cronómetro aún no está. Esperar por contenido es además lo único que aguanta el
     cambio de dispositivo, porque una tablet no tarda lo mismo que un teléfono.
+
+    **Y esperar por una subcadena no es esperar.** La escena del descanso aguardaba «DESCANSO», que ya
+    está en la pantalla de enfoque dentro de «SIGUIENTE: DESCANSO · 5 MIN»: la espera se cumplía sola y la
+    captura salía negra en la tablet de 10, que es la que más tarda en componer. Con [exacto] solo cuenta
+    el nodo cuyo texto es ese y nada más — la etiqueta de fase—. Es la misma trampa que ya obligó a usar
+    `exacto` con «SIGUIENTE» en el onboarding.
     """
     fin = time.time() + limite
     while time.time() < fin:
-        if ui.buscar(texto):
+        if ui.buscar(texto, exacto=exacto):
             time.sleep(0.4)          # un pelín más: que acabe de asentarse el primer fotograma
             return True
         time.sleep(0.7)
     raise SystemExit(f"no apareció en pantalla: {texto!r}")
 
 
-def escena(nombre, destino, esperando=None, reposo=0.0):
+def escena(nombre, destino, esperando=None, reposo=0.0, exacto=False):
     if esperando:
-        esperar(esperando)
+        esperar(esperando, exacto=exacto)
     if reposo:
         time.sleep(reposo)
     ruta = os.path.join(destino, nombre + ".png")
@@ -130,7 +138,7 @@ def tanda(destino, idioma):
     # 2 · El descanso, con su color ámbar y el cáliz.
     estado.escribir("descanso")
     abrir_app()
-    escena("02-descanso", destino, esperando=t["descanso"])
+    escena("02-descanso", destino, esperando=t["descanso"], exacto=True)
 
     # 3 · Ajustes, desde arriba: duraciones y comportamiento.
     ui.tocar(t["ajustes"])
@@ -154,7 +162,7 @@ def tanda(destino, idioma):
     time.sleep(1)
     estado.escribir("fin")
     abrir_app()
-    escena("05-fin-del-intervalo", destino, esperando=t["fin"], reposo=6)
+    escena("05-fin-del-intervalo", destino, esperando=t["fin"], reposo=6, exacto=True)
 
     # Volver al temporizador, que es donde conviene dejar la app.
     ui.tocar(t["temporizador"])

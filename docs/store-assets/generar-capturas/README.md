@@ -15,12 +15,19 @@ Con un emulador arrancado y la app instalada:
 python3 sembrar_historial.py siembra          # una vez: la base de datos con historial
 python3 capturar.py <destino>                 # las doce capturas del dispositivo conectado
 python3 recolocar.py <destino>                # opcional: centra el widget y rehace su captura
+python3 revisar.py                            # al final: control de las 36 antes de subirlas
 ```
+
+**Pasa siempre `revisar.py` antes de subir.** Comprueba las dimensiones exactas, que `es` y `en` no sean
+idénticas —un idioma colado—, que ninguna escena esté a medio pintar y que estén las 36. Devuelve código
+de salida 1 si algo falla, así que sirve tal cual en un script.
 
 `capturar.py --sin-widget` salta la colocación del widget, para cuando ya está puesto en el escritorio.
 
 Los tres emuladores usados, creados a mano en `~/.android/avd` (no hay `avdmanager` instalado), con las
-resoluciones que Play exige:
+resoluciones que Play exige. **Estas medidas no salen del AVD**: los tres `config.ini` dicen
+2560 × 1600 @ 320 dpi, y las de verdad las fija `capturar.py` con `wm size` y `wm density` en cada pase
+—ver `PANTALLAS`—, precisamente para no depender de lo que haya quedado guardado en el emulador:
 
 | AVD | Resolución | Densidad | En dp | Aspecto |
 |---|---|---|---|---|
@@ -52,6 +59,16 @@ de ancho y la grande en 800 dp, que son los dos umbrales con los que Android dec
 
 - **Esperar por contenido, nunca por tiempo.** Con un `sleep` fijo, las dos primeras capturas salían en
   negro: tras un `force-stop` la pantalla del temporizador tarda en componer.
+- **Y esperar por una subcadena no es esperar.** La escena del descanso aguardaba «DESCANSO», que ya está
+  en la pantalla de enfoque dentro de «SIGUIENTE: DESCANSO · 5 MIN»: la espera se cumplía sola y la
+  captura salía **negra** en la tablet de 10", la que más tarda en componer. En inglés la trampa es peor,
+  porque «TIME» es subcadena de «TIMER», el nombre de la pestaña. Las escenas 2 y 5 esperan ahora con
+  `exacto=True`, igual que ya hacía «SIGUIENTE» en el onboarding.
+- **Una captura mala no da error**, sale negra y se sube. Merece la pena pasar el juego por un control que
+  mire dimensiones, aspecto, que `es` y `en` no sean idénticas —un idioma colado— y que ninguna esté casi
+  vacía de tinta. El umbral de tinta hay que leerlo con la cabeza: en tablet el contenido ocupa
+  proporcionalmente menos y una pantalla correcta baja del 2 %, así que sirve para señalar candidatas, no
+  para decidir.
 - **`am force-stop` deja el widget en blanco**, con el marcador de carga del launcher. Hay que reabrir la
   app para que el colector republique sus `RemoteViews` antes de ir al escritorio.
 - **El widget va en la segunda página del escritorio.** En la primera, el launcher pinta «At a glance» con
@@ -61,3 +78,17 @@ de ancho y la grande en 800 dp, que son los dos umbrales con los que Android dec
   iguales no arrastra: hay que usar `input motionevent` con esperas dentro del dispositivo.
 - **La bandeja de widgets tiene dos formas.** En el teléfono la fila de la app se despliega en el sitio; en
   una tablet es un panel doble y la vista previa aparece a la derecha.
+- **La densidad no persiste igual que la resolución.** En un pase, la tablet de 7" conservaba
+  1080 × 1920 pero había vuelto a 320 dpi, y a 320 dpi se queda en **540 dp de ancho en vez de 600**, que
+  es el umbral con el que Android decide que algo es una tablet. Las capturas habrían salido con el layout
+  de un teléfono grande **sin que nada fallara**, que es la peor clase de fallo. Ahora las fija el propio
+  script.
+- **Esperar por contenido también al navegar, no solo al capturar.** La regla estaba aplicada a las
+  capturas pero quedaban tres `sleep` fijos en la colocación del widget, y los tres se caían en la tablet
+  de 10": la bandeja tarda más de tres segundos en pintarse, y encima allí «Search» solo existe como
+  `content-desc`, no como texto.
+- **El campo de búsqueda de la bandeja tarda en coger el foco.** Un `input text` inmediato se pierde y la
+  lista se queda sin filtrar, así que el widget «no aparece en la bandeja» aunque esté. Se espera al botón
+  «Back» —que es lo que sale cuando el buscador está abierto de verdad— antes de teclear, y el filtrado se
+  espera aparte, porque tarda bastante más que el tecleo. Si aun así no cumple, `buscar_en_bandeja`
+  recorre la lista a mano.

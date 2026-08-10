@@ -56,6 +56,39 @@ def ancho_pantalla():
     return int(adb("shell", "wm", "size").strip().split(":")[-1].split("x")[0])
 
 
+def alto_pantalla():
+    return int(adb("shell", "wm", "size").strip().split(":")[-1].split("x")[1])
+
+
+# Resolución y densidad que Play exige de cada formato, por carpeta de destino. **No salen del AVD**:
+# los tres `config.ini` dicen 2560×1600 @ 320, y los valores de verdad se fijan con `wm size` y
+# `wm density`, que persisten en el emulador… pero no siempre los dos. En un pase la tablet de 7" había
+# conservado la resolución y perdido la densidad, y a 320 dpi se queda en 540 dp de ancho en vez de 600,
+# que es el umbral con el que Android decide que algo es una tablet: las capturas habrían salido con el
+# layout de un teléfono grande sin que nada fallara. Se fijan aquí para no depender de eso.
+PANTALLAS = {
+    "telefono": (1080, 2400, 420),
+    "tablet-7-pulgadas": (1080, 1920, 288),
+    "tablet-10-pulgadas": (1440, 2560, 288),
+}
+
+
+def fijar_pantalla(raiz):
+    """Aplica la resolución y la densidad del formato que toca, deducidas del directorio de destino."""
+    formato = os.path.basename(os.path.normpath(raiz))
+    medidas = PANTALLAS.get(formato)
+    if not medidas:
+        print(f"aviso: '{formato}' no está en PANTALLAS, se deja la pantalla como esté")
+        return
+    ancho, alto, dpi = medidas
+    adb("shell", "wm", "size", f"{ancho}x{alto}")
+    adb("shell", "wm", "density", str(dpi))
+    time.sleep(5)
+    real = adb("shell", "wm", "size").strip().split(":")[-1].strip()
+    print(f"pantalla: {formato} → {ancho}x{alto} @ {dpi} dpi "
+          f"({round(ancho / (dpi / 160))} dp de ancho), efectiva {real}")
+
+
 def preparar():
     """Permisos, historial sembrado, sin animaciones y onboarding pasado."""
     adb("shell", "pm", "grant", PKG, "android.permission.POST_NOTIFICATIONS")
@@ -68,7 +101,13 @@ def preparar():
     adb("push", semilla, "/data/local/tmp/seed.db")
     adb("shell", f"run-as {PKG} mkdir -p databases")
     adb("shell", f"run-as {PKG} sh -c 'cat /data/local/tmp/seed.db > databases/aquihaytomate.db'")
-    print("preparado: permisos, historial sembrado, animaciones apagadas")
+    # **Y fuera el WAL y el shm de la sesión anterior.** Sustituir el fichero principal de una base SQLite
+    # sin borrarlos deja a Room aplicando por encima un diario que no corresponde: en la tablet de 7" el
+    # `.db` era el sembrado y el `-wal` de siete horas antes, y la pantalla de Estadísticas salió a cero
+    # —con la captura hecha y subida, sin que nada fallara—.
+    adb("shell", f"run-as {PKG} sh -c 'rm -f databases/aquihaytomate.db-wal "
+                 f"databases/aquihaytomate.db-shm'")
+    print("preparado: permisos, historial sembrado (sin WAL viejo), animaciones apagadas")
 
     tanda.abrir_app()
     for _ in range(6):                       # el onboarding, si aparece, son cuatro páginas
@@ -102,6 +141,42 @@ def limpiar_escritorio():
     print("escritorio limpio")
 
 
+def buscar_en_bandeja():
+    """
+    Deja la bandeja de widgets mostrando solo nuestra app.
+
+    Tres esperas por contenido, y cada una está por un fallo distinto de la tablet de 10":
+
+    1. **La bandeja tarda en pintarse.** Con los tres segundos fijos de antes, el pase moría en
+       «no encontrado: 'Search'». Y ojo: en esa tablet «Search» solo existe como `content-desc`.
+    2. **El campo de búsqueda tarda en coger el foco**, así que un `input text` inmediato se pierde en el
+       vacío y la lista se queda sin filtrar. Se espera al botón «Back», que es lo que aparece cuando el
+       buscador ya está abierto de verdad, antes de teclear.
+    3. **El filtrado tarda** bastante más que el tecleo, sobre todo con el emulador cargado.
+
+    Y si el buscador no cumple, queda la red de seguridad: recorrer la lista a mano. Es más lento pero no
+    depende de que el foco caiga donde debe.
+    """
+    ui.tocar("Search", limite=25)
+    if not ui.esperar("Back", limite=10):
+        time.sleep(1.5)
+    adb("shell", "input", "text", "tomate")
+    if ui.esperar("¡Aquí hay tomate!", limite=25):
+        return
+
+    print("  el buscador no filtró; recorriendo la bandeja")
+    adb("shell", "input", "keyevent", "KEYCODE_ESCAPE")
+    time.sleep(1.5)
+    ancho, alto = ancho_pantalla(), alto_pantalla()
+    for _ in range(12):
+        if ui.buscar("¡Aquí hay tomate!"):
+            return
+        adb("shell", "input", "swipe", str(ancho // 2), str(int(alto * 0.7)),
+            str(ancho // 2), str(int(alto * 0.35)), "400")
+        time.sleep(1.2)
+    raise SystemExit("el widget no aparece en la bandeja, ni buscando ni recorriéndola")
+
+
 def colocar_widget():
     """
     Añade el widget de 1×1 y lo deja en la segunda página del escritorio.
@@ -128,29 +203,22 @@ def colocar_widget():
         adb("shell", "input", "keyevent", "KEYCODE_ESCAPE")
         time.sleep(1)
     ui.tocar("Widgets")
-    time.sleep(3)
-
-    # El buscador de la bandeja evita recorrer una lista larguísima de widgets.
-    ui.tocar("Search")
-    time.sleep(2)
-    adb("shell", "input", "text", "tomate")
-    time.sleep(3)
+    buscar_en_bandeja()
 
     # Abrir la ficha de la app. En el teléfono la fila se despliega en el sitio; en una tablet la bandeja
     # tiene dos paneles y la vista previa aparece en el de la derecha. Tocar la fila vale para los dos, y
     # si no basta se prueba el chevron del extremo derecho.
-    titulo = ui.buscar("¡Aquí hay tomate!")
+    titulo = ui.esperar("¡Aquí hay tomate!", limite=20)
     if not titulo:
         raise SystemExit("el widget no aparece en la bandeja")
     ui.tocar("¡Aquí hay tomate!")
     time.sleep(2.5)
 
-    etiqueta = ui.buscar("1 × 1") or ui.buscar("1 x 1")
+    etiqueta = ui.esperar("1 × 1", limite=8) or ui.buscar("1 x 1")
     if not etiqueta:
         adb("shell", "input", "tap", str(titulo[0]["caja"][2] + dp(30)),
             str(titulo[0]["centro"][1]))
-        time.sleep(2.5)
-        etiqueta = ui.buscar("1 × 1") or ui.buscar("1 x 1")
+        etiqueta = ui.esperar("1 × 1", limite=10) or ui.buscar("1 x 1")
     if not etiqueta:
         raise SystemExit("no encuentro la ficha del widget en la bandeja")
     x = etiqueta[0]["centro"][0]
@@ -219,6 +287,7 @@ def capturar_widget(destino, idioma):
 
 if __name__ == "__main__":
     raiz = sys.argv[1]
+    fijar_pantalla(raiz)
     preparar()
     if "--sin-widget" not in sys.argv:
         colocar_widget()
