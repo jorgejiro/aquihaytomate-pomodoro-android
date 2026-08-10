@@ -1,6 +1,7 @@
 package com.jjrapps.aquihaytomate.ui.settings
 
 import android.content.Intent
+import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -99,9 +100,16 @@ fun SettingsScreen(
             )
         },
         onSendFeedback = { subject ->
-            // ACTION_SENDTO with a mailto: URI, so only email apps answer and the address travels in the
-            // URI, which is the part every client honours. EXTRA_EMAIL alone gets dropped by some.
-            val intent = Intent(Intent.ACTION_SENDTO, "mailto:$FEEDBACK_EMAIL".toUri())
+            // ACTION_SENDTO with a mailto: URI, so only email apps answer rather than the whole share
+            // sheet.
+            //
+            // The subject goes in the URI *and* in EXTRA_SUBJECT. Gmail parses the mailto: URI and
+            // ignores the extra — that is why the subject came through empty on the Pixel with the extra
+            // alone — while other clients read only the extra. Sending both is what makes it land
+            // everywhere. `Uri.encode` is not optional: the subject starts with «¡» and has spaces and
+            // brackets in it.
+            val mailto = "mailto:$FEEDBACK_EMAIL?subject=${Uri.encode(subject)}"
+            val intent = Intent(Intent.ACTION_SENDTO, mailto.toUri())
                 .putExtra(Intent.EXTRA_SUBJECT, subject)
             runCatching { context.startActivity(intent) }
                 .onFailure { Timber.w(it, "No email app to send feedback with") }
