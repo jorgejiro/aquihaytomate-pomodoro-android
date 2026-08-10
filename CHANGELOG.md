@@ -15,6 +15,51 @@ reutilizar ni bajando la versión.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.2.0] — 2026-08-10 (versionCode 5)
+
+Sube el minor porque hay funcionalidad nueva —los tres modos de pantalla encendida y el correo al
+autor—, aunque el peso de la versión está en dos fallos que solo se ven en un dispositivo real: el
+temporizador no cabía girado y el icono se leía como una pegatina negra.
+
+### Añadido
+
+- **La pantalla se mantiene encendida mientras el móvil carga**, en la pantalla Temporizador. El
+  interruptor de sí/no pasa a tres modos —nunca, mientras carga, siempre— y **mientras carga es el nuevo
+  valor por defecto**: enchufado en el escritorio, la pantalla no cuesta batería y un temporizador que hay
+  que despertar para leer es un temporizador que se deja de mirar. Ya no depende de que el reloj esté
+  corriendo, así que pausar deja de apagar la pantalla. Quien tenía el interruptor encendido pasa a
+  «siempre», que es lo que tenía. Ver `docs/decisions/013-*`.
+- **Enviar comentarios al autor** desde Acerca de: abre la app de correo con el destinatario puesto y el
+  nombre y la versión de la app en el asunto, porque un informe sin versión no se puede atender. La
+  dirección no se imprime en la pantalla de Ajustes.
+
+### Cambiado
+
+- **Los controles `REINICIAR` y `SALTAR` pasan a blanco.** En `TextMuted` se leían como deshabilitados, y
+  en una pantalla sin cajas el color es la única señal de que algo se puede pulsar. La jerarquía la marcan
+  ahora el tamaño y el glifo del control primario.
+- **`A CONTINUACIÓN:` se queda en `SIGUIENTE:`.** A 10 sp y con tracking, esa etiqueta pesaba más que el
+  dato que introduce.
+- **El tomate pierde el cáliz.** Las tres hojas que se dibujaban en los descansos se solapaban entre ellas
+  y se fundían en un bloque de base recta pintado por encima del contorno, así que parecían un recorte
+  pegado al círculo y no parte de él. La fase la sigue diciendo la etiqueta escrita debajo.
+
+### Corregido
+
+- **El temporizador se salía de la pantalla con el móvil girado.** En horizontal quedan unos 370 dp de
+  alto y la columna necesita más, así que `SALTAR` y los puntos de ciclo caían por debajo del borde
+  inferior, sin scroll ni forma de alcanzarlos. Girado, el bloque se parte en dos columnas —tomate a la
+  izquierda, controles a la derecha— y el diámetro se calcula sobre el alto disponible. El onboarding
+  sufría lo mismo, con `EMPEZAR` fuera de alcance: sus páginas quedan centradas cuando caben y con scroll
+  cuando no, lo que cubre además las escalas de fuente grandes.
+- **El icono de la app se veía como una pegatina negra** sobre cualquier fondo de pantalla que no fuera
+  oscuro: el fondo del icono adaptativo era casi negro y el tomate se dibujaba pequeño dentro de la zona
+  segura. Como el launcher siempre pinta la capa de fondo y siempre recorta con su propia máscara, ahora
+  el degradado rojo **es** el cuerpo del tomate y llena el lienzo; en la capa delantera quedan el rabillo
+  y el brillo.
+- **El asunto del correo de comentarios llegaba vacío en Gmail**, que resuelve `ACTION_SENDTO` leyendo la
+  URI `mailto:` y descarta `EXTRA_SUBJECT`. Ahora viaja en los dos sitios.
+
 ## [1.1.0] — 2026-07-29 (versionCode 4)
 
 Sube el minor y no el patch porque hay funcionalidad nueva: los dos sonidos. El `versionCode` va a 4 porque

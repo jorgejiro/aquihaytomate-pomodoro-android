@@ -199,6 +199,14 @@
     <string name="changelog_title">Novedades</string>
     <string name="changelog_current_badge">Actual</string>
 
+    <string-array name="changelog_1_2_0">
+        <item>La pantalla se mantiene encendida mientras el móvil está cargando, para que puedas ver la cuenta atrás sin tocar nada. Se puede cambiar a «nunca» o «siempre» en Ajustes.</item>
+        <item>El temporizador ya cabe con el móvil girado: antes, en horizontal, «Saltar» se quedaba fuera de la pantalla.</item>
+        <item>«Reiniciar» y «Saltar» se ven en blanco. En gris parecían desactivados.</item>
+        <item>Nueva opción en Ajustes para escribir al autor por correo.</item>
+        <item>El icono de la app ya no lleva un círculo negro alrededor sobre fondos de pantalla claros.</item>
+        <item>El tomate del temporizador pierde las hojas que le salían en los descansos.</item>
+    </string-array>
     <string-array name="changelog_1_1_0">
         <item>El final del pomodoro y el del descanso ya suenan distinto, y cada uno se cambia por separado. Por defecto, cuenco tibetano al terminar de trabajar y campana al acabar el descanso: uno es una recompensa y el otro una orden.</item>
         <item>El selector de sonido reproduce cada opción al tocarla y se queda abierto para poder compararlas. Antes cambiaba el sonido y se cerraba sin dejar oír nada.</item>

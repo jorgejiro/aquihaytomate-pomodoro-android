@@ -199,6 +199,24 @@ El nombre se mantiene en español en ambos idiomas: es la marca.
 
 ## 7. Novedades de esta versión
 
+**ES (1.2.0)** — 425 caracteres, el límite de Play son 500
+> La pantalla se mantiene encendida mientras el móvil carga, así puedes ver la cuenta atrás sin tocar
+> nada. Se puede poner en «nunca» o «siempre» en Ajustes.
+>
+> Corregido: el temporizador se salía de la pantalla con el móvil girado y «Saltar» quedaba fuera.
+> El icono ya no aparece dentro de un círculo negro sobre fondos claros.
+>
+> Además: «Reiniciar» y «Saltar» se ven en blanco, y hay una opción nueva para escribirme por correo.
+
+**EN (1.2.0)**
+> The screen stays awake while your phone is charging, so you can watch the countdown without touching
+> anything. You can set it to never or always in Settings.
+>
+> Fixed: the timer ran off the screen with the phone on its side and «Skip» was out of reach. The app
+> icon no longer sits inside a black circle on light wallpapers.
+>
+> Also: «Reset» and «Skip» are white now, and there is a new entry to email me.
+
 **ES (1.0.0)**
 > Primera versión. Temporizador Pomodoro con widget de una sola casilla, estadísticas, avisos
 > configurables y tema oscuro. Sin anuncios ni seguimiento.
@@ -207,8 +225,8 @@ El nombre se mantiene en español en ambos idiomas: es la marca.
 > First release. Pomodoro timer with a one-cell home screen widget, statistics, configurable alerts
 > and a dark theme. No ads, no tracking.
 
-> Los dos textos tienen que decir lo mismo que el `string-array` `changelog_1_0_0` de la app: es la
-> misma versión contada dos veces y el usuario puede leer las dos.
+> Los textos de cada versión tienen que decir lo mismo que su `string-array` `changelog_*` de la app:
+> es la misma versión contada dos veces y el usuario puede leer las dos.
 
 ---
 

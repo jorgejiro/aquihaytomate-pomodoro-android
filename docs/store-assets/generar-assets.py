@@ -176,55 +176,48 @@ def mascara_liquido(tamano, fraccion, fase, periodos):
 
 
 # ── Icono de Play ───────────────────────────────────────────────────────────────────────────────────
-# Los `pathData` de res/drawable/ic_launcher_foreground.xml, literalmente.
-CUERPO = ("M54,35 C68.5,35 80,46.5 80,61 C80,75.5 68.5,87 54,87 "
-          "C39.5,87 28,75.5 28,61 C28,46.5 39.5,35 54,35 Z")
-BRILLO = "M42,48 C45,44 50,42 54,43 C50,45 46,48 44,53 C42.5,52.5 41.5,50.5 42,48 Z"
-TALLO = "M52.5,25 L55.5,25 L55.5,36 L52.5,36 Z"
-CALIZ = "M54,32 L62,29 L69,32 L61,39 L54,40 L47,39 L39,32 L46,29 Z"
+# Los `pathData` de res/drawable/ic_launcher_foreground.xml, literalmente. El cuerpo del tomate ya no
+# es un path: es el degradado de ic_launcher_background.xml, que llena el lienzo entero.
+BRILLO = "M36,45 C40.5,39 48,36 54,37.5 C48,40.5 42,45 39,52.5 C36.75,51.75 35.25,49 36,45 Z"
+SOMBRA_CALIZ = ("M54,32.6 L64.4,28.7 L73.5,32.6 L63.1,41.7 L54,43 L44.9,41.7 L34.5,32.6 "
+                "L43.6,28.7 Z")
+TALLO = "M52.3,24 L55.7,24 L55.7,36 L52.3,36 Z"
+CALIZ = "M54,31.4 L64.4,27.5 L73.5,31.4 L63.1,40.5 L54,41.8 L44.9,40.5 L34.5,31.4 L43.6,27.5 Z"
 
 
 def icono_play(lado=512):
     """
     Reproduce el icono adaptativo y recorta la ventana visible.
 
-    El arte del `foreground` vive en la zona segura de 66 dp del lienzo de 108, pero el launcher solo
-    muestra los 72 dp centrales. Si se escalara el lienzo entero a 512, el tomate saldría un 33 % más
-    pequeño que en el escritorio del móvil; recortando [18,90] el icono de la ficha se ve **igual** que
-    el instalado, que es lo que se compara al mirar la lista de Play.
+    El launcher solo muestra los 72 dp centrales del lienzo de 108. Si se escalara el lienzo entero a
+    512, el tomate saldría un 33 % más pequeño que en el escritorio del móvil; recortando [18,90] el
+    icono de la ficha se ve **igual** que el instalado, que es lo que se compara al mirar la lista de
+    Play.
+
+    Desde la 1.2.0 el fondo es el cuerpo de la fruta y llena el lienzo, así que aquí no hay silueta que
+    recortar: el círculo lo pone el recorte de la ventana, igual que en el móvil lo pone la máscara.
     """
     escala = lado * SUPERMUESTREO / 72.0   # 72 unidades de la ventana visible → lado final
     lienzo = int(round(108 * escala))
 
-    img = degradado_radial(
+    img = degradado_lineal(
         (lienzo, lienzo),
-        centro=(54 * escala, 52 * escala),
-        radio=66 * escala,
-        color_centro=(0x1A, 0x0C, 0x0A),
-        color_borde=(0x0A, 0x09, 0x08),
+        inicio=(18 * escala, 14 * escala),
+        fin=(94 * escala, 98 * escala),
+        color_inicio=(0xFF, 0x52, 0x40),
+        color_fin=(0xB4, 0x24, 0x1A),
     ).convert("RGBA")
 
-    # Cuerpo: su propio degradado lineal, recortado por la silueta.
-    cuerpo = Image.new("L", (lienzo, lienzo), 0)
-    ImageDraw.Draw(cuerpo).polygon(puntos_de_path(CUERPO, escala), fill=255)
-    relleno = degradado_lineal(
-        (lienzo, lienzo),
-        inicio=(34 * escala, 41 * escala),
-        fin=(76 * escala, 83 * escala),
-        color_inicio=(0xFF, 0x44, 0x33),
-        color_fin=(0xC4, 0x2D, 0x1F),
-    )
-    img.paste(relleno, (0, 0), cuerpo)
+    brillo = Image.new("RGBA", (lienzo, lienzo), (0, 0, 0, 0))
+    ImageDraw.Draw(brillo).polygon(puntos_de_path(BRILLO, escala), fill=(255, 255, 255, 51))
+    img = Image.alpha_composite(img, brillo)
 
     capa = Image.new("RGBA", (lienzo, lienzo), (0, 0, 0, 0))
     dibujo = ImageDraw.Draw(capa)
-    dibujo.polygon(puntos_de_path(TALLO, escala), fill=(0x3F, 0x6B, 0x2E, 255))
-    dibujo.polygon(puntos_de_path(CALIZ, escala), fill=(0x4A, 0x7A, 0x3B, 255))
+    dibujo.polygon(puntos_de_path(SOMBRA_CALIZ, escala), fill=(0, 0, 0, 46))
+    dibujo.polygon(puntos_de_path(TALLO, escala), fill=(0x37, 0x62, 0x2A, 255))
+    dibujo.polygon(puntos_de_path(CALIZ, escala), fill=(0x57, 0x94, 0x3E, 255))
     img = Image.alpha_composite(img, capa)
-
-    brillo = Image.new("RGBA", (lienzo, lienzo), (0, 0, 0, 0))
-    ImageDraw.Draw(brillo).polygon(puntos_de_path(BRILLO, escala), fill=(255, 255, 255, 56))
-    img = Image.alpha_composite(img, brillo)
 
     ventana = int(round(18 * escala))
     img = img.crop((ventana, ventana, lienzo - ventana, lienzo - ventana))
