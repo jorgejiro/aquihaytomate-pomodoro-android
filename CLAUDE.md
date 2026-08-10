@@ -77,7 +77,7 @@ Todo dibujado con Compose `Canvas`. **Sin librería de gráficos** — ver `docs
 | Fondo del widget | Sólido | Sólido / Transparente |
 | Idioma | Auto | Auto / Español / English |
 
-Más: estado de los permisos (notificaciones y alarmas exactas) con botón a los ajustes del sistema, refrescado en `onResume`; y **Acerca de** con **Enviar comentarios** —correo al autor con el nombre y la versión en el asunto—, la versión instalada y acceso a **Novedades**.
+Más: estado de los permisos (notificaciones y alarmas exactas) con botón a los ajustes del sistema, refrescado en `onResume`; y **Acerca de** con **Enviar comentarios** —correo al autor con el nombre y la versión en el asunto; la dirección **no se imprime en la pantalla**, se ve en la app de correo al abrirse—, la versión instalada y acceso a **Novedades**.
 
 ### 2.4 Pantalla Onboarding ✅ Implementada
 

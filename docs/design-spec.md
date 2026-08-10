@@ -367,8 +367,8 @@ Fila estándar: **52 dp** de alto, padding horizontal 16 dp. Etiqueta `rowLabel`
 │ └──────────────────────────────────┘ │
 │  ACERCA DE                           │
 │ ┌──────────────────────────────────┐ │
-│ │ Enviar comentarios             › │ │
-│ │ jjrmobileapps@gmail.com          │ │  sublabel: el destinatario
+│ │ Enviar comentarios             › │ │  sin sublabel: la dirección
+│ │                                  │ │  solo se ve en la app de correo
 │ │ Novedades                      › │ │
 │ │ Licencias                      › │ │
 │ │ Versión                 1.0.0 (1)│ │

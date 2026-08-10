@@ -42,8 +42,11 @@ import timber.log.Timber
 
 /**
  * Where feedback goes. A constant rather than a string resource: it is the author's address, the same in
- * every language, and it has to be impossible for the row's subtitle and the actual recipient to drift
- * apart.
+ * every language, and nothing about it is translatable.
+ *
+ * **The row does not show it.** An address printed in Settings is a line of text nobody needs — whoever
+ * taps the row is about to read it in the To: field of their own mail app, and whoever does not tap it
+ * was never going to write. Keeping it off the screen also keeps it out of screenshots.
  */
 private const val FEEDBACK_EMAIL = "jjrmobileapps@gmail.com"
 
@@ -374,7 +377,6 @@ private fun AboutSection(
     Section(stringResource(R.string.settings_section_about)) {
         SettingsRow(
             label = stringResource(R.string.settings_feedback),
-            sublabel = FEEDBACK_EMAIL,
             onClick = { onSendFeedback(feedbackSubject) },
         )
         Divider()
