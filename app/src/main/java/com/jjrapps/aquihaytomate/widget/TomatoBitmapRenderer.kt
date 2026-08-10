@@ -60,7 +60,6 @@ class TomatoBitmapRenderer @Inject constructor(
         slotType: SlotType,
         fillFraction: Float,
         dimmed: Boolean,
-        showCalyx: Boolean,
         glyph: WidgetGlyph = WidgetGlyph.NONE,
         glyphLarge: Boolean = false,
         sizeDp: Int = DEFAULT_SIZE_DP,
@@ -99,10 +98,6 @@ class TomatoBitmapRenderer @Inject constructor(
                 strokePaint,
             )
         }
-
-        // The calyx is the non-chromatic cue for breaks, exactly as in the app: at 40 dp there is no room
-        // for a label, so colour alone would be the only signal without it.
-        if (showCalyx) drawCalyx(canvas, size, colors.bright.toArgb())
 
         drawGlyph(canvas, size, glyph, glyphLarge)
 
@@ -189,35 +184,10 @@ class TomatoBitmapRenderer @Inject constructor(
         liquidPath.close()
     }
 
-    private fun drawCalyx(canvas: Canvas, size: Float, color: Int) {
-        val width = size * CALYX_WIDTH_FRACTION
-        val height = width / 2f
-        val centreX = size / 2f
-        val baseY = height * 0.55f
-
-        fillPaint.color = color
-        val path = Path()
-        listOf(-1f, 0f, 1f).forEach { slot ->
-            val tipX = centreX + slot * width * 0.36f
-            val tipY = baseY - height * if (slot == 0f) 1f else 0.72f
-            val halfWidth = width * 0.17f
-            path.moveTo(centreX + slot * width * 0.30f - halfWidth, baseY)
-            path.quadTo(tipX - halfWidth * 0.6f, tipY, tipX, tipY)
-            path.quadTo(
-                tipX + halfWidth * 0.6f,
-                tipY,
-                centreX + slot * width * 0.30f + halfWidth,
-                baseY,
-            )
-            path.close()
-        }
-        canvas.drawPath(path, fillPaint)
-    }
 
     private companion object {
         const val DEFAULT_SIZE_DP = 34
         const val OUTLINE_DP = 1.6f
-        const val CALYX_WIDTH_FRACTION = 0.164f
         const val PAUSED_ALPHA = 115 // ~45%
         const val MIN_SIZE_PX = 24
         const val MAX_SIZE_PX = 256

@@ -78,7 +78,6 @@ class WidgetUpdater @Inject constructor(
                 slotType = state.slotType,
                 fillFraction = readout.fillFraction,
                 dimmed = readout.dimmed,
-                showCalyx = state.slotType.isBreak,
                 glyph = readout.glyph,
                 glyphLarge = readout.glyphLarge,
             ),

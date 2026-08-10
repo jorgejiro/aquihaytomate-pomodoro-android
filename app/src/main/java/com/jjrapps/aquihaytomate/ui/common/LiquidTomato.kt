@@ -88,8 +88,8 @@ fun rememberLiquidPhases(): LiquidPhases {
 }
 
 /**
- * The circle of liquid that drains: hollow, two waves, the highlight on the surface, the outline where
- * the liquid is gone, and the calyx during breaks.
+ * The circle of liquid that drains: hollow, two waves, the highlight on the surface, and the outline
+ * where the liquid is gone.
  *
  * Three performance decisions, in order of importance (docs/design-spec.md §6.2):
  *
@@ -105,7 +105,6 @@ fun rememberLiquidPhases(): LiquidPhases {
 fun LiquidTomato(
     fillFraction: Float,
     colors: PhaseColors,
-    showCalyx: Boolean,
     modifier: Modifier = Modifier,
     phases: LiquidPhases = rememberLiquidPhases(),
 ) {
@@ -113,7 +112,6 @@ fun LiquidTomato(
     val circlePath = remember { Path() }
     val frontPath = remember { Path() }
     val backPath = remember { Path() }
-    val calyxPath = remember { Path() }
 
     Spacer(
         modifier.drawBehind {
@@ -148,7 +146,6 @@ fun LiquidTomato(
                     style = Stroke(width = stroke),
                 )
             }
-            if (showCalyx) drawCalyx(calyxPath, colors.bright)
         },
     )
 }
@@ -229,34 +226,7 @@ private fun DrawScope.drawSurfaceLine(fillFraction: Float, phaseRad: Float) {
     }
 }
 
-/**
- * Three leaves tangent to the top of the circle. This is the non-chromatic redundancy for breaks: the
- * phase is never signalled by colour alone. See docs/design-spec.md §2.4.
- */
-private fun DrawScope.drawCalyx(path: Path, color: Color) {
-    val diameter = min(size.width, size.height)
-    val width = diameter * 0.164f // 44 dp at a 268 dp diameter
-    val height = width / 2f
-    val centreX = size.width / 2f
-    val baseY = (size.height - diameter) / 2f + height * 0.55f
 
-    path.rewind()
-    listOf(-1f, 0f, 1f).forEach { slot ->
-        val tipX = centreX + slot * width * 0.36f
-        val tipY = baseY - height * if (slot == 0f) 1f else 0.72f
-        val halfWidth = width * 0.17f
-        path.moveTo(centreX + slot * width * 0.30f - halfWidth, baseY)
-        path.quadraticTo(tipX - halfWidth * 0.6f, tipY, tipX, tipY)
-        path.quadraticTo(
-            tipX + halfWidth * 0.6f,
-            tipY,
-            centreX + slot * width * 0.30f + halfWidth,
-            baseY,
-        )
-        path.close()
-    }
-    drawPath(path, color)
-}
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
@@ -265,7 +235,6 @@ private fun LiquidTomatoFocusPreview() {
         LiquidTomato(
             fillFraction = 0.62f,
             colors = phaseColorsOf(SlotType.FOCUS),
-            showCalyx = false,
             modifier = Modifier.size(268.dp),
         )
     }
@@ -278,7 +247,6 @@ private fun LiquidTomatoBreakPreview() {
         LiquidTomato(
             fillFraction = 0.35f,
             colors = phaseColorsOf(SlotType.SHORT_BREAK),
-            showCalyx = true,
             modifier = Modifier.size(268.dp),
         )
     }
@@ -291,7 +259,6 @@ private fun LiquidTomatoFullPreview() {
         LiquidTomato(
             fillFraction = 1f,
             colors = phaseColorsOf(SlotType.FOCUS),
-            showCalyx = false,
             modifier = Modifier.size(268.dp),
         )
     }

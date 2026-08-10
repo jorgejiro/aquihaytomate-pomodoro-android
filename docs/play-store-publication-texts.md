@@ -219,7 +219,7 @@ El nombre se mantiene en español en ambos idiomas: es la marca.
 | # | Fichero | Qué muestra |
 |---|---|---|
 | 1 | `01-pomodoro-en-marcha.png` | Un pomodoro corriendo: tomate al 70 %, 17:30, los tres controles y «a continuación» |
-| 2 | `02-descanso.png` | El descanso: tomate ámbar con el cáliz, que es la señal no cromática de la fase |
+| 2 | `02-descanso.png` | El descanso: el mismo tomate en ámbar, con la fase escrita debajo |
 | 3 | `03-ajustes.png` | Configuración: duraciones, los dos auto-inicios, avisos y widget |
 | 4 | `04-historial.png` | Estadísticas con 45 días sembrados: hoy, la semana y el mapa del mes |
 | 5 | `05-fin-del-intervalo.png` | Fin de intervalo: el tomate vacío, «¡Tiempo!» y la invitación a seguir |

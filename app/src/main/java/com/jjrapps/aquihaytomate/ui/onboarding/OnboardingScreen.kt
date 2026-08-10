@@ -280,7 +280,6 @@ private fun WhatItIsPage() {
             // With reduced motion the loop is replaced by a still tomato, not by an empty gap.
             fillFraction = if (reduced) REDUCED_MOTION_FILL else animatedFill,
             colors = phaseColorsOf(SlotType.FOCUS),
-            showCalyx = false,
             modifier = Modifier.size(TOMATO_SIZE),
         )
         Spacer(Modifier.height(32.dp))
@@ -394,7 +393,6 @@ private fun WidgetAndPermissionsPage(
         LiquidTomato(
             fillFraction = 0.6f,
             colors = phaseColorsOf(SlotType.FOCUS),
-            showCalyx = false,
             modifier = Modifier.size(WIDGET_TOMATO_SIZE),
         )
         Spacer(Modifier.height(24.dp))

@@ -33,7 +33,6 @@ class TomatoBitmapRendererTest {
             slotType = SlotType.FOCUS,
             fillFraction = fillFraction,
             dimmed = false,
-            showCalyx = false,
             glyph = glyph,
             glyphLarge = large,
         )

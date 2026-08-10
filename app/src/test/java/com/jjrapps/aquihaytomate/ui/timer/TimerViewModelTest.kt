@@ -112,7 +112,6 @@ class TimerViewModelTest {
             assertEquals(1f, state.fillFraction, 0.0001f)
             assertEquals(PrimaryControl.START, state.primaryControl)
             assertFalse(state.showReset)
-            assertFalse(state.showCalyx)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -197,7 +196,6 @@ class TimerViewModelTest {
             assertEquals(SlotType.SHORT_BREAK, ringing.slotType)
             assertEquals(PrimaryControl.START_BREAK, ringing.primaryControl)
             assertEquals(0f, ringing.fillFraction, 0.0001f)
-            assertTrue(ringing.showCalyx)
 
             assertEquals(1, stats.recorded.size)
             assertEquals(1, alerts.playCount)

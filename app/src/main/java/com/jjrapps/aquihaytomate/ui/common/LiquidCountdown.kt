@@ -57,7 +57,6 @@ fun LiquidCountdown(
     timeText: String,
     fillFraction: Float,
     colors: PhaseColors,
-    showCalyx: Boolean,
     contentDescription: String,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
@@ -100,7 +99,6 @@ fun LiquidCountdown(
         LiquidTomato(
             fillFraction = fillFraction,
             colors = colors,
-            showCalyx = showCalyx,
             phases = phases,
             modifier = Modifier.fillMaxSize(),
         )
@@ -149,7 +147,6 @@ private fun LiquidCountdownPreview() {
             timeText = "18:42",
             fillFraction = 0.74f,
             colors = phaseColorsOf(SlotType.FOCUS),
-            showCalyx = false,
             contentDescription = "18 minutes and 42 seconds remaining",
             modifier = Modifier.size(268.dp),
         )
@@ -164,7 +161,6 @@ private fun LiquidCountdownBreakPreview() {
             timeText = "04:07",
             fillFraction = 0.82f,
             colors = phaseColorsOf(SlotType.SHORT_BREAK),
-            showCalyx = true,
             contentDescription = "4 minutes and 7 seconds remaining",
             modifier = Modifier.size(268.dp),
         )

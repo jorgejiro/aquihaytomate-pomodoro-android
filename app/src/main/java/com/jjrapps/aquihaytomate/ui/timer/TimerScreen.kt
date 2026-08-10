@@ -146,7 +146,6 @@ private fun TimerBlock(
             timeText = state.timeText,
             fillFraction = state.fillFraction,
             colors = colors,
-            showCalyx = state.showCalyx,
             contentDescription = tomatoContentDescription(state),
             // Tapping the tomato is the primary control: it is by far the biggest target on the screen.
             onClick = onPrimaryClick,

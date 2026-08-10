@@ -110,11 +110,12 @@ Reglas derivadas:
 
 ### 2.4 Redundancia no cromática
 
-La fase **nunca se distingue solo por color**:
+En la app, la fase **nunca se distingue solo por color**:
 
-- En descanso se dibuja un **cáliz de 3 hojas** de 44 × 22 dp tangente al borde superior del tomate, en el `bright` de la fase. En enfoque no se dibuja.
-- La etiqueta de fase (`ENFOQUE` / `DESCANSO` / `DESCANSO LARGO`) siempre está presente en la app.
-- En el widget de 40 dp, donde no cabe el texto, la distinción es color **más** el cáliz.
+- La etiqueta de fase (`ENFOQUE` / `DESCANSO` / `DESCANSO LARGO`) siempre está presente, en palabras, bajo el tomate. Es la redundancia que cuenta.
+- La línea `SIGUIENTE: …` nombra también la fase que viene.
+
+**El cáliz de 3 hojas se retiró.** Se dibujaba en descanso, tangente al borde superior del tomate, y en pantalla no se leía como hojas sino como un recorte pegado encima del círculo: las tres hojas se solapaban —semianchura `0,17·w` con las bases a `0,30·w`— y se fusionaban en un bloque de base recta que además cruzaba el contorno, porque se pintaba fuera del `clipPath`. En el widget de 40 dp queda por tanto **solo el color** para distinguir la fase, que es una merma asumida: la app es donde se lee el estado y ahí la fase está escrita.
 
 ---
 
@@ -568,7 +569,7 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
 │ ╰────╯ │      │ ╰────╯ │       │ ╰────╯ │       │ ╰────╯ │      │ ╰────╯ │    │ ╰────╯ │
 └────────┘      └────────┘       └────────┘       └────────┘      └────────┘    └────────┘
  TomateFill      TomateFill       TomateFill       AmbarFill       AmbarFill     el color y
- lleno           + ❚❚ pequeño     @45 % + ▶        + cáliz + ❚❚    @45 % + ▶     la duración
+ lleno           + ❚❚ pequeño     @45 % + ▶        + ❚❚           @45 % + ▶     la duración
  + ▶ grande                                                                       del slot que
                                                                                   viene
 ```
@@ -576,7 +577,6 @@ El descuento lo pinta un `Chronometer` de `RemoteViews` con `setChronometerCount
 **El glifo dice lo que hará el toque, no en qué estado está el temporizador.** Parado y pausado muestran `▶`, corriendo muestra `❚❚`. Es la misma regla que el control primario de la app, y es lo que convierte un cuadrado de 40 dp en un botón: la acción por defecto se ve sin pensar. El estado ya lo cuentan el nivel del líquido, el color de la fase y —en pausa— el líquido al 45 %, así que el glifo no tiene que repetirlo.
 
 - **En `IDLE` no hay cifra.** Un temporizador parado no tiene tiempo que informar y el `▶` se queda con todo el tomate. Es también el estado en el que queda el widget tras un doble toque o tras reiniciar el móvil, que es cuando más falta hace que se entienda que hay que tocarlo.
-- El cáliz de descanso es la redundancia no cromática, igual que en la app.
 - **En `RINGING` el widget muestra el slot que está a punto de empezar**: tomate lleno con el color de esa fase —rojo si viene enfoque, ámbar si viene descanso—, su duración como cifra y el `▶`. El estado ya apunta al slot siguiente, así que es literalmente lo que hará el toque.
 
   Antes dibujaba un tomate vacío con un `!`, y en un escritorio lleno de iconos eso se lee como «algo va mal», no como «tu descanso está listo». Se retiró con él el parpadeo del borde, que era **el único sitio donde el widget se refrescaba por tiempo** (dos `updateAppWidget()` alternos hasta 60 s): sin signo de alarma no hay nada que hacer parpadear, y el aviso de que el slot terminó lo dan el sonido, la vibración y la notificación.
@@ -712,7 +712,7 @@ Sin `windowSplashScreenIconBackgroundColor`: el tomate flota directamente sobre 
 
 | Componente | Descripción |
 |---|---|
-| `LiquidTomato` | El círculo que se drena: hueco, dos ondas, línea de superficie, contorno y cáliz opcional. El corazón visual de la app |
+| `LiquidTomato` | El círculo que se drena: hueco, dos ondas, línea de superficie y contorno. El corazón visual de la app |
 | `LiquidCountdown` | `LiquidTomato` más los dos `Text` superpuestos que producen los dígitos en negativo. Con `onClick`, el círculo entero es el control primario |
 | `PhaseLabel` | `ENFOQUE` / `DESCANSO` / `DESCANSO LARGO` / `¡TIEMPO!` con tracking amplio y color de fase |
 | `TextControl` | Control sin caja: glifo + etiqueta **siempre en mayúsculas**, alto táctil configurable (48 dp por defecto), ripple sin límites. Base de `INICIAR`/`PAUSAR`/`REINICIAR`. El glifo se dibuja al 72 % del `fontSize` del estilo, así que crece con él |

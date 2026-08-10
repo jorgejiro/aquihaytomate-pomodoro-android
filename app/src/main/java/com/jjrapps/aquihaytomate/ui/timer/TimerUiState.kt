@@ -46,8 +46,5 @@ sealed interface TimerUiState {
          * it would jump to a break earned by nothing.
          */
         val showSkip: Boolean get() = status != TimerStatus.IDLE || slotType.isBreak
-
-        /** Breaks carry the calyx, the redundancy that keeps the phase off colour alone. */
-        val showCalyx: Boolean get() = slotType.isBreak
     }
 }
