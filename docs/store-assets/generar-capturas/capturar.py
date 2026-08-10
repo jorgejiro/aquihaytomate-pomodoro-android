@@ -32,6 +32,12 @@ import tanda
 import ui
 
 PKG = "com.jjrapps.aquihaytomate"
+LAUNCHER = "com.google.android.apps.nexuslauncher"
+
+# La otra app del autor, que también trae widget. Si está instalada aparece en la bandeja junto a la
+# nuestra y el arrastre puede agarrar su vista previa: en un pase salió el widget de Bebe Agua en la
+# captura del teléfono. Se desinstala antes de colocar nada.
+PKG_RIVAL = "com.jjrapps.bebeagua"
 
 
 def adb(*args):
@@ -66,15 +72,34 @@ def preparar():
 
     tanda.abrir_app()
     for _ in range(6):                       # el onboarding, si aparece, son cuatro páginas
-        if ui.buscar("GET STARTED") or ui.buscar("EMPEZAR"):
-            ui.tocar("GET STARTED") if ui.buscar("GET STARTED") else ui.tocar("EMPEZAR")
+        # Exacto: «SIGUIENTE» es el botón del onboarding y también el arranque de la línea
+        # «SIGUIENTE: ENFOQUE · 25 MIN» del temporizador, que es lo que se ve si no hay onboarding.
+        if ui.buscar("GET STARTED", exacto=True) or ui.buscar("EMPEZAR", exacto=True):
+            ui.tocar("GET STARTED") if ui.buscar("GET STARTED", exacto=True) else ui.tocar("EMPEZAR")
             time.sleep(2)
             break
-        if ui.buscar("NEXT") or ui.buscar("SIGUIENTE"):
-            ui.tocar("NEXT") if ui.buscar("NEXT") else ui.tocar("SIGUIENTE")
+        if ui.buscar("NEXT", exacto=True) or ui.buscar("SIGUIENTE", exacto=True):
+            ui.tocar("NEXT") if ui.buscar("NEXT", exacto=True) else ui.tocar("SIGUIENTE")
             time.sleep(1)
         else:
             break
+
+
+def limpiar_escritorio():
+    """
+    Escritorio virgen antes de colocar el widget.
+
+    `pm clear` del launcher es la única forma de quitar lo que dejó un pase anterior: no hay orden de
+    `adb` que borre un widget, así que sin esto se acumulan —en la tablet grande salieron dos tomates en
+    la misma captura— y encima quedan los widgets que el launcher trae de fábrica, como el de Calendar
+    con su «Sign in», que no tienen nada que hacer en la ficha.
+    """
+    adb("shell", "pm", "uninstall", PKG_RIVAL)
+    adb("shell", "pm", "clear", LAUNCHER)
+    time.sleep(3)
+    adb("shell", "input", "keyevent", "KEYCODE_HOME")
+    time.sleep(5)
+    print("escritorio limpio")
 
 
 def colocar_widget():
@@ -88,6 +113,7 @@ def colocar_widget():
     ancho = ancho_pantalla()
     centro_x = ancho // 2
 
+    limpiar_escritorio()
     adb("shell", "input", "keyevent", "KEYCODE_HOME")
     time.sleep(2)
     # El long press tiene que caer en hueco libre del escritorio, y dónde está el hueco depende de lo que
@@ -130,12 +156,16 @@ def colocar_widget():
     x = etiqueta[0]["centro"][0]
     y = etiqueta[0]["caja"][1] - dp(70)
 
+    # Se suelta a un tercio de la altura y centrado, en fracciones de la pantalla y no en dp fijos: los
+    # dp anteriores caían dentro del escritorio en el teléfono pero pegados al borde superior en la
+    # tablet de 7", donde el widget salía cortado por la barra de estado.
+    destino_x, destino_y = centro_x, int(alto * 0.33)
     adb("shell", f"input motionevent DOWN {x} {y}; sleep 1.2; "
                  f"input motionevent MOVE {x + 2} {y - 2}; sleep 0.3; "
                  f"input motionevent MOVE {x} {y - dp(30)}; sleep 0.2; "
                  f"input motionevent MOVE {int(x * 0.8)} {y - dp(60)}; sleep 0.2; "
-                 f"input motionevent MOVE {dp(90)} {dp(260)}; sleep 0.5; "
-                 f"input motionevent UP {dp(90)} {dp(260)}")
+                 f"input motionevent MOVE {destino_x} {destino_y}; sleep 0.5; "
+                 f"input motionevent UP {destino_x} {destino_y}")
     time.sleep(3)
     adb("shell", "input", "tap", str(centro_x), str(dp(700)))     # soltar el marco de redimensión
     time.sleep(1)
@@ -155,11 +185,18 @@ def colocar_widget():
     print("widget colocado en la segunda página del escritorio")
 
 
-def capturar_widget(destino):
-    """El escritorio con el widget vivo. Hay que reabrir la app: `force-stop` deja el widget en blanco."""
+def capturar_widget(destino, idioma):
+    """
+    El escritorio con el widget vivo. Hay que reabrir la app: `force-stop` deja el widget en blanco.
+
+    Se espera el control primario **del idioma de esta tanda**. Antes se probaba `ui.buscar("PAUSAR")` y,
+    si no estaba, se esperaba `"PAUSE"`: esa comprobación corre nada más abrir la app, así que si la
+    pantalla todavía no había compuesto —una carrera que se pierde de vez en cuando— daba por hecho que
+    la app estaba en inglés y se quedaba esperando un texto que no iba a llegar nunca.
+    """
     estado.escribir("enfoque")
     tanda.abrir_app()
-    tanda.esperar("PAUSAR") if ui.buscar("PAUSAR") else tanda.esperar("PAUSE")
+    tanda.esperar(tanda.TEXTOS[idioma]["pausar"])
     adb("shell", "input", "keyevent", "KEYCODE_HOME")
     time.sleep(3)
 
@@ -190,4 +227,4 @@ if __name__ == "__main__":
         destino = os.path.join(raiz, idioma)
         print(f"── {idioma} ──")
         tanda.tanda(destino, idioma)
-        capturar_widget(destino)
+        capturar_widget(destino, idioma)

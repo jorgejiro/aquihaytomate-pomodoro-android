@@ -72,7 +72,15 @@ def nodos(xml):
     return fuera
 
 
-def buscar(aguja, xml=None):
+def buscar(aguja, xml=None, exacto=False):
+    """
+    El primer nodo cuyo texto o descripción coincida, prefiriendo la coincidencia exacta.
+
+    `exacto=True` descarta las parciales, y hace falta cuando la aguja es una palabra que también
+    aparece dentro de otro texto de la pantalla: «SIGUIENTE» es el botón del onboarding **y** el
+    comienzo de la línea «SIGUIENTE: ENFOQUE · 25 MIN» del temporizador, así que sin esto se toca la
+    línea de la pantalla equivocada y el bucle no avanza.
+    """
     xml = xml or arbol()
     aguja_b = aguja.lower()
     exactos, parciales = [], []
@@ -82,7 +90,7 @@ def buscar(aguja, xml=None):
                 continue
             if campo.lower() == aguja_b:
                 exactos.append(n)
-            elif aguja_b in campo.lower():
+            elif not exacto and aguja_b in campo.lower():
                 parciales.append(n)
     return (exactos + parciales)[:1]
 

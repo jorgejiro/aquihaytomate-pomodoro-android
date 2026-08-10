@@ -56,4 +56,9 @@ if __name__ == "__main__":
     raiz = sys.argv[1]
     centrar()
     for idioma in ("es", "en"):
-        capturar.capturar_widget(os.path.join(raiz, idioma))
+        # El idioma es un ajuste persistido de la app, no del sistema, y quien lo dejó puesto fue la
+        # última tanda que corrió aquí. Sin fijarlo, recolocar contra la carpeta «es» se queda esperando
+        # un «PAUSAR» que no va a aparecer porque la app sigue en inglés.
+        tanda.abrir_app()
+        tanda.poner_idioma(idioma)
+        capturar.capturar_widget(os.path.join(raiz, idioma), idioma)
