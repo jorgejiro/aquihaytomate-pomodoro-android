@@ -209,7 +209,32 @@ El nombre se mantiene en español en ambos idiomas: es la marca.
 
 ## 7. Novedades de esta versión
 
-**ES (1.2.0)** — 425 caracteres, el límite de Play son 500
+**ES (1.3.0)** — 442 caracteres, el límite de Play son 500
+> El icono es ahora un reloj que marca las cinco y cinco: las cinco son los 25 minutos de un pomodoro y
+> la una, los 5 del descanso.
+>
+> El sonido de fin se puede repetir hasta diez veces, con un ajuste aparte para el pomodoro y para el
+> descanso. Y la pantalla se mantiene encendida mientras el móvil carga.
+>
+> Corregido: el temporizador se salía de la pantalla con el móvil girado, y el icono aparecía dentro de un
+> círculo negro sobre fondos claros.
+
+**EN (1.3.0)**
+> The icon is a clock now, reading five past five: five o'clock is the 25 minutes of a pomodoro and one
+> o'clock the 5 of a break.
+>
+> The end sound can repeat up to ten times, with a separate setting for the pomodoro and for the break.
+> And the screen stays awake while your phone is charging.
+>
+> Fixed: the timer ran off the screen with the phone on its side, and the icon sat inside a black circle
+> on light wallpapers.
+
+> **Este texto suma la 1.3.0 y la 1.2.0 a propósito**, porque las dos llegan juntas al usuario. Es la
+> única excepción a la regla de abajo: dentro de la app las dos versiones se leen por separado, cada una
+> con su `string-array`, que es lo que corresponde a un historial. Un texto de Play no es un historial,
+> es lo que cambia respecto a lo último que el usuario tiene instalado.
+
+**ES (1.2.0)** — redactado en su día y **absorbido por el de la 1.3.0**, que es el que se envía
 > La pantalla se mantiene encendida mientras el móvil carga, así puedes ver la cuenta atrás sin tocar
 > nada. Se puede poner en «nunca» o «siempre» en Ajustes.
 >
@@ -217,15 +242,6 @@ El nombre se mantiene en español en ambos idiomas: es la marca.
 > El icono ya no aparece dentro de un círculo negro sobre fondos claros.
 >
 > Además: «Reiniciar» y «Saltar» se ven en blanco, y hay una opción nueva para escribirme por correo.
-
-**EN (1.2.0)**
-> The screen stays awake while your phone is charging, so you can watch the countdown without touching
-> anything. You can set it to never or always in Settings.
->
-> Fixed: the timer ran off the screen with the phone on its side and «Skip» was out of reach. The app
-> icon no longer sits inside a black circle on light wallpapers.
->
-> Also: «Reset» and «Skip» are white now, and there is a new entry to email me.
 
 **ES (1.0.0)**
 > Primera versión. Temporizador Pomodoro con widget de una sola casilla, estadísticas, avisos

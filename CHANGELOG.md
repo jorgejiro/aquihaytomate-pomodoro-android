@@ -15,6 +15,45 @@ reutilizar ni bajando la versión.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.3.0] — 2026-08-10 (versionCode 6)
+
+Sube el minor por las dos repeticiones de sonido, que son funcionalidad nueva, pero la versión la define
+el icono: la app llevaba un tomate que no decía en ningún momento que fuera un temporizador.
+
+**Las novedades que se envían a Play cubren también las de la 1.2.0**, porque van a llegar juntas al
+usuario.
+
+### Añadido
+
+- **El sonido de fin de slot se puede repetir de 1 a 10 veces seguidas**, con **dos ajustes
+  independientes**, uno para el pomodoro y otro para el descanso, y por defecto **una sola vez** —lo que
+  la app hacía antes—. Un aviso que suena una vez es fácil de perder si te has ido a la cocina, y cuántas
+  repeticiones hacen falta depende del sonido, de la casa y de la persona. Que sean dos y no uno es el
+  mismo argumento que ya tenían los dos sonidos: levantarse del escritorio y volver a él no cuestan lo
+  mismo. El selector suena al tocarlo, con el sonido de ese extremo, porque «3 veces» no significa nada
+  hasta oírlo. Ver el apéndice de `docs/decisions/012-*`.
+
+### Cambiado
+
+- **El icono lleva el dial de un reloj y marca las 5:05.** La aguja corta y gruesa señala las cinco, que
+  en la escala de minutos son los **25 de un bloque de enfoque**; la larga y fina señala la una, que son
+  los **5 del descanso corto**. Al quitar la placa negra en la 1.2.0 el icono se quedó además sin
+  contorno —la silueta la dibujaba el recorte del launcher, no el icono—, y dibujar el dial dentro
+  arregla las dos cosas sin volver a meter una placa que se lea como pegatina. **No hay marca a las 12**:
+  caería debajo del rabillo, que hace de doce. El monocromo pasa a llevar el reloj calado, todavía en un
+  solo path. Se renderizaron siete direcciones antes de elegir; están en `docs/propuestas-icono/` con su
+  generador. Ver `docs/decisions/014-*`.
+- **Los controles `PAUSAR` / `REINICIAR` / `SALTAR` van centrados** en el hueco que queda entre el tomate
+  y la línea de «siguiente», en vez de colgar de la etiqueta de fase con todo el aire acumulado debajo. El
+  tomate no se mueve: el peso que había bajo los controles se parte en dos iguales, uno a cada lado.
+
+### Interno
+
+- **Las actions de la CI suben a los majors que corren en Node 24** —`checkout` v7, `setup-java` v5,
+  `upload-artifact` v7 y `setup-gradle` v5—, porque GitHub tiene deprecado Node 20 y avisaba en cada
+  ejecución. `setup-gradle` se queda en la v5 a propósito: desde la v6 el cacheo lo hace un componente
+  cerrado cuyos términos de uso no son MIT.
+
 ## [1.2.0] — 2026-08-10 (versionCode 5)
 
 Sube el minor porque hay funcionalidad nueva —los tres modos de pantalla encendida y el correo al

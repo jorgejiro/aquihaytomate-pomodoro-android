@@ -208,6 +208,11 @@
     <string name="changelog_title">Novedades</string>
     <string name="changelog_current_badge">Actual</string>
 
+    <string-array name="changelog_1_3_0">
+        <item>El icono de la app es ahora un reloj, y marca las cinco y cinco: las cinco son los 25 minutos de un pomodoro y la una, los 5 de un descanso corto. El tomate era un círculo rojo que no decía nada de lo que hace la app.</item>
+        <item>El sonido de fin de slot se puede repetir hasta diez veces seguidas, con un ajuste aparte para el pomodoro y para el descanso. Un solo aviso es fácil de perder si te has ido a la cocina.</item>
+        <item>«Pausar», «Reiniciar» y «Saltar» quedan centrados en el hueco que hay bajo el tomate, en vez de apelotonados contra él.</item>
+    </string-array>
     <string-array name="changelog_1_2_0">
         <item>La pantalla se mantiene encendida mientras el móvil está cargando, para que puedas ver la cuenta atrás sin tocar nada. Se puede cambiar a «nunca» o «siempre» en Ajustes.</item>
         <item>El temporizador ya cabe con el móvil girado: antes, en horizontal, «Saltar» se quedaba fuera de la pantalla.</item>

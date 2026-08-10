@@ -211,6 +211,11 @@
     <string name="changelog_title">What\'s new</string>
     <string name="changelog_current_badge">Current</string>
 
+    <string-array name="changelog_1_3_0">
+        <item>The app icon is a clock now, reading five past five: five o’clock is the 25 minutes of a pomodoro and one o’clock the 5 of a short break. The tomato was a red circle that said nothing about what the app does.</item>
+        <item>The end-of-slot sound can repeat up to ten times in a row, with a separate setting for the pomodoro and for the break. One chime is easy to miss from the kitchen.</item>
+        <item>«Pause», «Reset» and «Skip» sit centred in the space below the tomato instead of crammed against it.</item>
+    </string-array>
     <string-array name="changelog_1_2_0">
         <item>The screen stays awake while the phone is charging, so you can watch the countdown without touching anything. You can set it to never or always in Settings.</item>
         <item>The timer now fits with the phone on its side: «Skip» used to end up off the bottom of the screen in landscape.</item>
