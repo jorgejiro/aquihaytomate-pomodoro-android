@@ -6,6 +6,7 @@ import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.TimerState
 import com.jjrapps.aquihaytomate.domain.model.TimerStatus
+import com.jjrapps.aquihaytomate.domain.repository.ChargingMonitor
 import com.jjrapps.aquihaytomate.domain.time.ElapsedRealtimeSource
 import com.jjrapps.aquihaytomate.domain.usecase.CompleteSlotUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.ObserveSettingsUseCase
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -37,6 +39,7 @@ import kotlinx.coroutines.launch
 class TimerViewModel @Inject constructor(
     observeTimerState: ObserveTimerStateUseCase,
     observeSettings: ObserveSettingsUseCase,
+    private val chargingMonitor: ChargingMonitor,
     private val toggleTimer: ToggleTimerUseCase,
     private val resetTimer: ResetTimerUseCase,
     private val skipSlot: SkipSlotUseCase,
@@ -50,6 +53,26 @@ class TimerViewModel @Inject constructor(
     private val settings: Flow<TimerSettings> = observeSettings()
 
     /**
+     * Whether the window should hold the display awake right now.
+     *
+     * The charger is only watched when the answer depends on it, so `NEVER` and `ALWAYS` never register a
+     * broadcast receiver. The subscription ends with the screen: this flow hangs off `uiState`, which
+     * stops collecting shortly after the Timer tab goes away.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val keepScreenOn: Flow<Boolean> = settings
+        .map { it.keepScreenOn }
+        .distinctUntilChanged()
+        .flatMapLatest { mode ->
+            if (mode.dependsOnCharging) {
+                chargingMonitor.isCharging.map(mode::shouldKeepScreenOn)
+            } else {
+                flowOf(mode.shouldKeepScreenOn(charging = false))
+            }
+        }
+        .distinctUntilChanged()
+
+    /**
      * The screen state.
      *
      * The clock only ticks while the timer is running: outside `RUNNING` the remaining time cannot
@@ -59,12 +82,12 @@ class TimerViewModel @Inject constructor(
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<TimerUiState> =
-        combine(timerState, settings) { state, currentSettings -> state to currentSettings }
-            .flatMapLatest { (state, currentSettings) ->
+        combine(timerState, settings, keepScreenOn, ::Triple)
+            .flatMapLatest { (state, currentSettings, awake) ->
                 if (state.status == TimerStatus.RUNNING) {
-                    secondTicker().map { render(state, currentSettings) }
+                    secondTicker().map { render(state, currentSettings, awake) }
                 } else {
-                    flowOf(render(state, currentSettings))
+                    flowOf(render(state, currentSettings, awake))
                 }
             }
             .stateIn(
@@ -120,7 +143,11 @@ class TimerViewModel @Inject constructor(
         }
     }
 
-    private fun render(state: TimerState, settings: TimerSettings): TimerUiState.Success {
+    private fun render(
+        state: TimerState,
+        settings: TimerSettings,
+        keepScreenOn: Boolean,
+    ): TimerUiState.Success {
         val durationMs = state.durationMsWith(settings)
         val remainingMs =
             TimerMath.remainingMs(state, clock.millis(), elapsedRealtime.millis(), settings)
@@ -141,7 +168,7 @@ class TimerViewModel @Inject constructor(
             completedInCycle = state.completedFocusInCycle,
             cyclePosition = state.cyclePosition,
             pomodorosPerCycle = state.pomodorosPerCycleWith(settings),
-            keepScreenOn = settings.keepScreenOn && state.status == TimerStatus.RUNNING,
+            keepScreenOn = keepScreenOn,
             nextSlot = nextSlotFor(state, settings),
         )
     }

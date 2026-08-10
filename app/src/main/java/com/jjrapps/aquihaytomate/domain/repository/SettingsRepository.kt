@@ -2,6 +2,7 @@ package com.jjrapps.aquihaytomate.domain.repository
 
 import com.jjrapps.aquihaytomate.domain.model.AlertSound
 import com.jjrapps.aquihaytomate.domain.model.AppLanguage
+import com.jjrapps.aquihaytomate.domain.model.KeepScreenOnMode
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.WidgetBackground
@@ -28,7 +29,7 @@ interface SettingsRepository {
 
     suspend fun setVibrationSeconds(seconds: Int)
 
-    suspend fun setKeepScreenOn(enabled: Boolean)
+    suspend fun setKeepScreenOn(mode: KeepScreenOnMode)
 
     suspend fun setDailyGoal(pomodoros: Int)
 

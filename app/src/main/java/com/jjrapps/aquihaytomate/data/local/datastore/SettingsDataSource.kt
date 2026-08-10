@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.jjrapps.aquihaytomate.domain.model.AlertSound
 import com.jjrapps.aquihaytomate.domain.model.AppLanguage
+import com.jjrapps.aquihaytomate.domain.model.KeepScreenOnMode
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.WidgetBackground
@@ -62,7 +63,7 @@ class SettingsDataSource @Inject constructor(
 
     suspend fun setAutoStartFocus(enabled: Boolean) = edit(Keys.AUTO_START_FOCUS) { enabled }
 
-    suspend fun setKeepScreenOn(enabled: Boolean) = edit(Keys.KEEP_SCREEN_ON) { enabled }
+    suspend fun setKeepScreenOn(mode: KeepScreenOnMode) = edit(Keys.KEEP_SCREEN_ON) { mode.id }
 
     suspend fun setLiquidAnimationEnabled(enabled: Boolean) =
         edit(Keys.LIQUID_ANIMATION) { enabled }
@@ -122,7 +123,11 @@ class SettingsDataSource @Inject constructor(
             ),
             vibrationSeconds = (this[Keys.VIBRATION_SECONDS] ?: defaults.vibrationSeconds)
                 .coerceIn(TimerSettings.VIBRATION_SECONDS_RANGE),
-            keepScreenOn = this[Keys.KEEP_SCREEN_ON] ?: defaults.keepScreenOn,
+            // El interruptor que fue este ajuste solo se lee cuando estaba encendido, y entonces vale
+            // ALWAYS: era literalmente lo que hacía. Apagado no se traduce a NEVER, porque respondía a
+            // otra pregunta —«no apagues nunca la pantalla»— y decir que no a esa no es decir que no a
+            // «mantenla mientras cargas», que es el nuevo valor por defecto para todo el mundo.
+            keepScreenOn = keepScreenOnMode(defaults.keepScreenOn),
             dailyGoal = (this[Keys.DAILY_GOAL] ?: defaults.dailyGoal)
                 .coerceIn(TimerSettings.DAILY_GOAL_RANGE),
             widgetBackground = WidgetBackground.fromId(this[Keys.WIDGET_BACKGROUND]),
@@ -130,6 +135,12 @@ class SettingsDataSource @Inject constructor(
             liquidAnimationEnabled = this[Keys.LIQUID_ANIMATION] ?: defaults.liquidAnimationEnabled,
             onboardingDone = this[Keys.ONBOARDING_DONE] ?: defaults.onboardingDone,
         )
+    }
+
+    private fun Preferences.keepScreenOnMode(default: KeepScreenOnMode): KeepScreenOnMode {
+        val stored = this[Keys.KEEP_SCREEN_ON]
+        if (stored != null) return KeepScreenOnMode.fromId(stored)
+        return if (this[Keys.RETIRED_KEEP_SCREEN_ON] == true) KeepScreenOnMode.ALWAYS else default
     }
 
     private fun Preferences.minutes(
@@ -161,7 +172,14 @@ class SettingsDataSource @Inject constructor(
          */
         val RETIRED_ALERT_SOUND = stringPreferencesKey("alert_sound")
         val VIBRATION_SECONDS = intPreferencesKey("vibration_seconds")
-        val KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
+        val KEEP_SCREEN_ON = stringPreferencesKey("keep_screen_on_mode")
+
+        /**
+         * El interruptor de sí/no que se convirtió en los tres modos de arriba. Ya no se escribe, solo se
+         * lee para que quien lo tuviera encendido siga con la pantalla siempre despierta. Lleva otro
+         * nombre de clave a propósito: leer un booleano guardado como texto revienta.
+         */
+        val RETIRED_KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
         val DAILY_GOAL = intPreferencesKey("daily_goal")
         val WIDGET_BACKGROUND = stringPreferencesKey("widget_background")
         val LANGUAGE = stringPreferencesKey("language")

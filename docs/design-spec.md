@@ -330,7 +330,8 @@ Fila estándar: **52 dp** de alto, padding horizontal 16 dp. Etiqueta `rowLabel`
 │ ┌──────────────────────────────────┐ │
 │ │ Auto-iniciar el descanso  [● ]   │ │  toggle 40×22, thumb 16
 │ │ Auto-iniciar el pomodoro  [ ○]   │ │  dos ajustes, no uno
-│ │ Mantener pantalla encendida[● ]  │ │
+│ │ Mantener pantalla encendida      │ │
+│ │ Solo en el temporizador  Carga › │ │  tres modos, no un toggle
 │ │ Objetivo diario              8 › │ │
 │ └──────────────────────────────────┘ │
 │  AVISOS                              │

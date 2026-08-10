@@ -27,7 +27,8 @@ data class TimerSettings(
     /** Sound when a break ends. Harder by default: this one has to get you back to work. */
     val breakAlertSound: AlertSound = AlertSound.DEFAULT_BREAK,
     val vibrationSeconds: Int = DEFAULT_VIBRATION_SECONDS,
-    val keepScreenOn: Boolean = false,
+    /** When the Timer screen holds the display awake. Plugged in by default; see [KeepScreenOnMode]. */
+    val keepScreenOn: KeepScreenOnMode = KeepScreenOnMode.DEFAULT,
     val dailyGoal: Int = DEFAULT_DAILY_GOAL,
     val widgetBackground: WidgetBackground = WidgetBackground.DEFAULT,
     val language: AppLanguage = AppLanguage.DEFAULT,

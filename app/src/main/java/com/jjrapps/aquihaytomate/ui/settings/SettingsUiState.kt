@@ -11,6 +11,7 @@ sealed interface SettingsSheet {
     data object FocusAlertSound : SettingsSheet
     data object BreakAlertSound : SettingsSheet
     data object VibrationSeconds : SettingsSheet
+    data object KeepScreenOn : SettingsSheet
     data object WidgetBackground : SettingsSheet
     data object Language : SettingsSheet
 }

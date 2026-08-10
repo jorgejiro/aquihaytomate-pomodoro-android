@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jjrapps.aquihaytomate.R
 import com.jjrapps.aquihaytomate.domain.model.AlertSound
 import com.jjrapps.aquihaytomate.domain.model.AppLanguage
+import com.jjrapps.aquihaytomate.domain.model.KeepScreenOnMode
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.WidgetBackground
@@ -78,7 +79,7 @@ fun SettingsScreen(
         onLanguageSelected = viewModel::onLanguageSelected,
         onAutoStartBreakChanged = viewModel::onAutoStartBreakChanged,
         onAutoStartFocusChanged = viewModel::onAutoStartFocusChanged,
-        onKeepScreenOnChanged = viewModel::onKeepScreenOnChanged,
+        onKeepScreenOnSelected = viewModel::onKeepScreenOnSelected,
         onLiquidAnimationChanged = viewModel::onLiquidAnimationChanged,
         onOpenNotificationSettings = {
             context.startActivity(
@@ -116,7 +117,7 @@ private fun SettingsContent(
     onLanguageSelected: (AppLanguage) -> Unit,
     onAutoStartBreakChanged: (Boolean) -> Unit,
     onAutoStartFocusChanged: (Boolean) -> Unit,
-    onKeepScreenOnChanged: (Boolean) -> Unit,
+    onKeepScreenOnSelected: (KeepScreenOnMode) -> Unit,
     onLiquidAnimationChanged: (Boolean) -> Unit,
     onOpenNotificationSettings: () -> Unit,
     onOpenExactAlarmSettings: () -> Unit,
@@ -137,7 +138,6 @@ private fun SettingsContent(
                     onSheetRequested,
                     onAutoStartBreakChanged,
                     onAutoStartFocusChanged,
-                    onKeepScreenOnChanged,
                 )
                 AlertsSection(state.settings, onSheetRequested)
                 WidgetSection(state.settings, onSheetRequested)
@@ -161,6 +161,7 @@ private fun SettingsContent(
                 onFocusAlertSoundSelected = onFocusAlertSoundSelected,
                 onBreakAlertSoundSelected = onBreakAlertSoundSelected,
                 onVibrationSecondsSelected = onVibrationSecondsSelected,
+                onKeepScreenOnSelected = onKeepScreenOnSelected,
                 onWidgetBackgroundSelected = onWidgetBackgroundSelected,
                 onLanguageSelected = onLanguageSelected,
             )
@@ -206,7 +207,6 @@ private fun BehaviourSection(
     onSheetRequested: (SettingsSheet) -> Unit,
     onAutoStartBreakChanged: (Boolean) -> Unit,
     onAutoStartFocusChanged: (Boolean) -> Unit,
-    onKeepScreenOnChanged: (Boolean) -> Unit,
 ) {
     Section(stringResource(R.string.settings_section_behaviour)) {
         // Two switches, one per direction of the chain. See TimerSettings.autoStartsInto for why they are
@@ -225,10 +225,11 @@ private fun BehaviourSection(
             onCheckedChange = onAutoStartFocusChanged,
         )
         Divider()
-        SettingsToggleRow(
+        SettingsRow(
             label = stringResource(R.string.settings_keep_screen_on),
-            checked = settings.keepScreenOn,
-            onCheckedChange = onKeepScreenOnChanged,
+            sublabel = stringResource(R.string.settings_keep_screen_on_sublabel),
+            value = stringResource(settings.keepScreenOn.labelRes),
+            onClick = { onSheetRequested(SettingsSheet.KeepScreenOn) },
         )
         Divider()
         SettingsRow(
@@ -376,6 +377,7 @@ private fun Sheets(
     onFocusAlertSoundSelected: (AlertSound) -> Unit,
     onBreakAlertSoundSelected: (AlertSound) -> Unit,
     onVibrationSecondsSelected: (Int) -> Unit,
+    onKeepScreenOnSelected: (KeepScreenOnMode) -> Unit,
     onWidgetBackgroundSelected: (WidgetBackground) -> Unit,
     onLanguageSelected: (AppLanguage) -> Unit,
 ) {
@@ -449,6 +451,17 @@ private fun Sheets(
             onDismiss = onDismiss,
         )
 
+        SettingsSheet.KeepScreenOn -> ValuePickerSheet(
+            title = stringResource(R.string.settings_keep_screen_on),
+            hint = stringResource(R.string.settings_keep_screen_on_hint),
+            options = KeepScreenOnMode.entries.map {
+                PickerOption(it, stringResource(it.labelRes))
+            },
+            selected = state.settings.keepScreenOn,
+            onSelect = onKeepScreenOnSelected,
+            onDismiss = onDismiss,
+        )
+
         SettingsSheet.WidgetBackground -> ValuePickerSheet(
             title = stringResource(R.string.settings_widget_background),
             options = WidgetBackground.entries.map { PickerOption(it, stringResource(it.labelRes)) },
@@ -516,7 +529,7 @@ private fun SettingsScreenPreview() {
             onLanguageSelected = {},
             onAutoStartBreakChanged = {},
             onAutoStartFocusChanged = {},
-            onKeepScreenOnChanged = {},
+            onKeepScreenOnSelected = {},
             onLiquidAnimationChanged = {},
             onOpenNotificationSettings = {},
             onOpenExactAlarmSettings = {},

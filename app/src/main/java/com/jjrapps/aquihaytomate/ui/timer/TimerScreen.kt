@@ -305,10 +305,11 @@ private fun remainingSpokenText(state: TimerUiState.Success): String {
 }
 
 /**
- * Honours the "keep the screen on" setting.
+ * Honours the "keep the screen on" setting, already resolved against the charger by the ViewModel.
  *
  * Set on the window through the view rather than with a wakelock: the flag is dropped automatically
- * when the window goes away, which a wakelock is not.
+ * when the window goes away, which a wakelock is not. `onDispose` clearing it is also what confines the
+ * whole thing to this screen — leave the Timer tab and the display goes back to its normal timeout.
  */
 @Composable
 private fun KeepScreenOn(enabled: Boolean) {

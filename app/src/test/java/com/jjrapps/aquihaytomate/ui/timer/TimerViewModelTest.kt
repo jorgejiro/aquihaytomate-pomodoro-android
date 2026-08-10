@@ -1,6 +1,7 @@
 package com.jjrapps.aquihaytomate.ui.timer
 
 import app.cash.turbine.test
+import com.jjrapps.aquihaytomate.domain.model.KeepScreenOnMode
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.TimerStatus
@@ -16,6 +17,7 @@ import com.jjrapps.aquihaytomate.domain.usecase.StartTimerUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.SyncTimerRuntimeUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.ToggleTimerUseCase
 import com.jjrapps.aquihaytomate.testing.FakeAlertPlayer
+import com.jjrapps.aquihaytomate.testing.FakeChargingMonitor
 import com.jjrapps.aquihaytomate.testing.FakeSettingsRepository
 import com.jjrapps.aquihaytomate.testing.FakeStatsRepository
 import com.jjrapps.aquihaytomate.testing.FakeTimerRuntime
@@ -54,6 +56,7 @@ class TimerViewModelTest {
     private val settings = FakeSettingsRepository()
     private val stats = FakeStatsRepository()
     private val alerts = FakeAlertPlayer()
+    private val charging = FakeChargingMonitor()
 
     @Before
     fun setUp() = Dispatchers.setMain(dispatcher)
@@ -72,6 +75,7 @@ class TimerViewModelTest {
         return TimerViewModel(
             observeTimerState = ObserveTimerStateUseCase(timerState),
             observeSettings = ObserveSettingsUseCase(settings),
+            chargingMonitor = charging,
             toggleTimer = ToggleTimerUseCase(timerState, start, pause),
             resetTimer = ResetTimerUseCase(
                 timerState,
@@ -372,15 +376,58 @@ class TimerViewModelTest {
         }
 
     @Test
-    fun `keep screen on only applies while the timer runs`() = runTest(dispatcher) {
-        settings.set(TimerSettings(keepScreenOn = true))
+    fun `keep screen on while charging follows the charger`() = runTest(dispatcher) {
+        settings.set(TimerSettings(keepScreenOn = KeepScreenOnMode.WHILE_CHARGING))
         val vm = viewModel()
         vm.uiState.test {
             skipItems(1)
             assertFalse((awaitItem() as TimerUiState.Success).keepScreenOn)
 
-            vm.onPrimaryControlClick()
+            charging.set(true)
             runCurrent()
+            assertTrue((awaitItem() as TimerUiState.Success).keepScreenOn)
+
+            charging.set(false)
+            runCurrent()
+            assertFalse((awaitItem() as TimerUiState.Success).keepScreenOn)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    /** The rule is about the screen being open, not about the timer running. Idle counts. */
+    @Test
+    fun `keep screen on while charging applies with the timer idle`() = runTest(dispatcher) {
+        settings.set(TimerSettings(keepScreenOn = KeepScreenOnMode.WHILE_CHARGING))
+        charging.set(true)
+        val vm = viewModel()
+        vm.uiState.test {
+            skipItems(1)
+            (awaitItem() as TimerUiState.Success).let { state ->
+                assertEquals(TimerStatus.IDLE, state.status)
+                assertTrue(state.keepScreenOn)
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `keep screen on never ignores the charger`() = runTest(dispatcher) {
+        settings.set(TimerSettings(keepScreenOn = KeepScreenOnMode.NEVER))
+        charging.set(true)
+        val vm = viewModel()
+        vm.uiState.test {
+            skipItems(1)
+            assertFalse((awaitItem() as TimerUiState.Success).keepScreenOn)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `keep screen on always applies without a charger`() = runTest(dispatcher) {
+        settings.set(TimerSettings(keepScreenOn = KeepScreenOnMode.ALWAYS))
+        val vm = viewModel()
+        vm.uiState.test {
+            skipItems(1)
             assertTrue((awaitItem() as TimerUiState.Success).keepScreenOn)
             cancelAndIgnoreRemainingEvents()
         }

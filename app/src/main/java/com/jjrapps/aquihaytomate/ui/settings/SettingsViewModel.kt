@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.jjrapps.aquihaytomate.BuildConfig
 import com.jjrapps.aquihaytomate.domain.model.AlertSound
 import com.jjrapps.aquihaytomate.domain.model.AppLanguage
+import com.jjrapps.aquihaytomate.domain.model.KeepScreenOnMode
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.WidgetBackground
 import com.jjrapps.aquihaytomate.domain.repository.AlertPlayer
@@ -126,8 +127,8 @@ class SettingsViewModel @Inject constructor(
         settingsRepository.setAutoStartFocus(enabled)
     }
 
-    fun onKeepScreenOnChanged(enabled: Boolean) = update {
-        settingsRepository.setKeepScreenOn(enabled)
+    fun onKeepScreenOnSelected(mode: KeepScreenOnMode) = update {
+        settingsRepository.setKeepScreenOn(mode)
     }
 
     fun onLiquidAnimationChanged(enabled: Boolean) = update {

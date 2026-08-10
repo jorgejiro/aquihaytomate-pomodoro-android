@@ -71,7 +71,7 @@ Todo dibujado con Compose `Canvas`. **Sin librería de gráficos** — ver `docs
 | **Sonido al terminar el pomodoro** | **Cuenco tibetano** | `silent`, `bell`, `bowl`, `digital`, `soft` |
 | **Sonido al terminar el descanso** | **Campana** | los mismos cinco |
 | **Duración de la vibración** | **5 s** | 0 (= desactivada) – 30 |
-| Mantener pantalla encendida | desactivado | — |
+| **Mantener pantalla encendida** (en la pantalla Temporizador) | **Mientras carga** | Nunca / Mientras carga / Siempre |
 | Objetivo diario de pomodoros | 8 | 1–24 |
 | Fondo del widget | Sólido | Sólido / Transparente |
 | Idioma | Auto | Auto / Español / English |
@@ -217,6 +217,8 @@ app/
         local/datastore/
           SettingsDataSource.kt        # Flows por campo + snapshot; coerceIn en los setters
           TimerStateDataSource.kt      # Flow<TimerState> + write() atómico
+        system/
+          ChargingMonitorImpl.kt       # sticky BATTERY_CHANGED + POWER_CONNECTED/DISCONNECTED
         repository/
           SettingsRepositoryImpl.kt
           StatsRepositoryImpl.kt
@@ -232,6 +234,7 @@ app/
           PeriodStats.kt
           StreakInfo.kt
           AlertSound.kt                # enum con id estable + @RawRes + @StringRes
+          KeepScreenOnMode.kt          # NEVER / WHILE_CHARGING / ALWAYS, con la regla pura
         repository/
           SettingsRepository.kt
           StatsRepository.kt
@@ -239,6 +242,7 @@ app/
           TimerAlarmScheduler.kt       # interfaz: arm(deadline) / cancel()
           TimerServiceController.kt    # interfaz: start() / stop()
           AlertPlayer.kt               # interfaz: play(sound, vibrationSeconds)
+          ChargingMonitor.kt           # interfaz: Flow<Boolean> de enchufado
         render/
           TomatoGeometry.kt            # PURO: superficie del líquido, compartido app ↔ widget
         usecase/

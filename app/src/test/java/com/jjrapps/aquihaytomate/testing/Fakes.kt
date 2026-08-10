@@ -4,11 +4,13 @@ import com.jjrapps.aquihaytomate.domain.model.AlertSound
 import com.jjrapps.aquihaytomate.domain.model.AppLanguage
 import com.jjrapps.aquihaytomate.domain.model.DayStats
 import com.jjrapps.aquihaytomate.domain.model.FocusSession
+import com.jjrapps.aquihaytomate.domain.model.KeepScreenOnMode
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.TimerState
 import com.jjrapps.aquihaytomate.domain.model.WidgetBackground
 import com.jjrapps.aquihaytomate.domain.repository.AlertPlayer
+import com.jjrapps.aquihaytomate.domain.repository.ChargingMonitor
 import com.jjrapps.aquihaytomate.domain.repository.SettingsRepository
 import com.jjrapps.aquihaytomate.domain.repository.StatsRepository
 import com.jjrapps.aquihaytomate.domain.repository.TimerAlarmScheduler
@@ -115,8 +117,8 @@ class FakeSettingsRepository(initial: TimerSettings = TimerSettings()) : Setting
         )
     }
 
-    override suspend fun setKeepScreenOn(enabled: Boolean) {
-        flow.value = flow.value.copy(keepScreenOn = enabled)
+    override suspend fun setKeepScreenOn(mode: KeepScreenOnMode) {
+        flow.value = flow.value.copy(keepScreenOn = mode)
     }
 
     override suspend fun setDailyGoal(pomodoros: Int) {
@@ -270,6 +272,18 @@ class FakeAlertPlayer : AlertPlayer {
 
     override fun stop() {
         stopCount++
+    }
+}
+
+/** The charger, plugged and unplugged by hand. */
+class FakeChargingMonitor(initial: Boolean = false) : ChargingMonitor {
+
+    private val flow = MutableStateFlow(initial)
+
+    override val isCharging: Flow<Boolean> = flow.asStateFlow()
+
+    fun set(charging: Boolean) {
+        flow.value = charging
     }
 }
 

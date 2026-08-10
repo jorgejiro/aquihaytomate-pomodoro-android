@@ -3,6 +3,7 @@ package com.jjrapps.aquihaytomate.data.repository
 import com.jjrapps.aquihaytomate.data.local.datastore.SettingsDataSource
 import com.jjrapps.aquihaytomate.domain.model.AlertSound
 import com.jjrapps.aquihaytomate.domain.model.AppLanguage
+import com.jjrapps.aquihaytomate.domain.model.KeepScreenOnMode
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.WidgetBackground
@@ -40,7 +41,7 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setVibrationSeconds(seconds: Int) =
         dataSource.setVibrationSeconds(seconds)
 
-    override suspend fun setKeepScreenOn(enabled: Boolean) = dataSource.setKeepScreenOn(enabled)
+    override suspend fun setKeepScreenOn(mode: KeepScreenOnMode) = dataSource.setKeepScreenOn(mode)
 
     override suspend fun setDailyGoal(pomodoros: Int) = dataSource.setDailyGoal(pomodoros)
 

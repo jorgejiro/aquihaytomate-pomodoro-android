@@ -94,6 +94,11 @@
     <string name="settings_auto_start_focus">Auto-iniciar el pomodoro</string>
     <string name="settings_auto_start_focus_sublabel">Al terminar un descanso</string>
     <string name="settings_keep_screen_on">Mantener pantalla encendida</string>
+    <string name="settings_keep_screen_on_sublabel">Solo en la pantalla del temporizador</string>
+    <string name="settings_keep_screen_on_hint">Con el móvil enchufado la pantalla no cuesta batería, y así la cuenta atrás se lee mientras trabajas.</string>
+    <string name="keep_screen_on_never">Nunca</string>
+    <string name="keep_screen_on_while_charging">Mientras carga</string>
+    <string name="keep_screen_on_always">Siempre</string>
     <string name="settings_daily_goal">Objetivo diario</string>
     <string name="settings_alert_sound_focus">Sonido al terminar el pomodoro</string>
     <string name="settings_alert_sound_focus_sublabel">Toca descansar</string>

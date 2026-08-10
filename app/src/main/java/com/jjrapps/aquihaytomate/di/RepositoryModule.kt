@@ -4,7 +4,9 @@ import com.jjrapps.aquihaytomate.alert.AlertPlayerImpl
 import com.jjrapps.aquihaytomate.data.repository.SettingsRepositoryImpl
 import com.jjrapps.aquihaytomate.data.repository.StatsRepositoryImpl
 import com.jjrapps.aquihaytomate.data.repository.TimerStateRepositoryImpl
+import com.jjrapps.aquihaytomate.data.system.ChargingMonitorImpl
 import com.jjrapps.aquihaytomate.domain.repository.AlertPlayer
+import com.jjrapps.aquihaytomate.domain.repository.ChargingMonitor
 import com.jjrapps.aquihaytomate.domain.repository.SettingsRepository
 import com.jjrapps.aquihaytomate.domain.repository.StatsRepository
 import com.jjrapps.aquihaytomate.domain.repository.TimerAlarmScheduler
@@ -27,6 +29,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindChargingMonitor(impl: ChargingMonitorImpl): ChargingMonitor
 
     @Binds
     @Singleton
