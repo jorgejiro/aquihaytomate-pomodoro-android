@@ -353,7 +353,7 @@ Fila estándar: **52 dp** de alto, padding horizontal 16 dp. Etiqueta `rowLabel`
 │ └──────────────────────────────────┘ │
 │  WIDGET                              │
 │ ┌──────────────────────────────────┐ │
-│ │ Fondo                  Sólido  › │ │
+│ │ Fondo             Transparente › │ │
 │ └──────────────────────────────────┘ │
 │  APARIENCIA                          │
 │ ┌──────────────────────────────────┐ │
@@ -545,7 +545,9 @@ Con `reduced = true`:
 
 ### 7.1 Placa
 
-Fondo con `@android:dimen/system_app_widget_background_radius` (el sistema decide el radio, así encaja con el resto del escritorio) y relleno negro opaco, **sin trazo**. Hubo un filete de 1 dp al 14 % de blanco para que la placa negra no se perdiera sobre un wallpaper oscuro; lo que hacía en realidad era rodear el widget de un contorno gris que se lee como suciedad en el escritorio y contradice el «cero tarjetas» del §1 de `CLAUDE.md`. Que la placa se funda con un fondo negro es lo deseable: lo que tiene que verse es el tomate, y el tomate está siempre. Variante transparente disponible en Ajustes.
+**Por defecto no hay placa: el widget va transparente y solo se ve el tomate.** El fondo sólido fue el valor por defecto hasta la 1.1.0 y parecía correcto por una razón que no vale para nadie más: el escritorio del autor tiene un fondo de pantalla negro, así que la placa era invisible. Sobre cualquier fondo más claro el widget se lee como una tarjeta negra con un tomate dentro, que es exactamente lo que descarta el «cero tarjetas, cero botones con relleno» del §1 de `CLAUDE.md`. El tomate es un círculo relleno y **opaco**, de modo que se recorta solo sobre lo que haya debajo sin necesidad de fondo.
+
+La variante sólida sigue en Ajustes → Widget para quien la quiera: relleno negro opaco con `@android:dimen/system_app_widget_background_radius` —el radio lo decide el sistema, así encaja con el resto del escritorio— y **sin trazo**. Hubo un filete de 1 dp al 14 % de blanco para que la placa negra no se perdiera sobre un wallpaper oscuro; lo que hacía en realidad era rodear el widget de un contorno gris que se lee como suciedad.
 
 ### 7.2 Contenido a 40 × 40 dp
 

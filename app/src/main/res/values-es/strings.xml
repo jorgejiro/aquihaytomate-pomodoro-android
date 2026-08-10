@@ -205,6 +205,7 @@
         <item>«Reiniciar» y «Saltar» se ven en blanco. En gris parecían desactivados.</item>
         <item>Nueva opción en Ajustes para escribir al autor por correo.</item>
         <item>El icono de la app ya no lleva un círculo negro alrededor sobre fondos de pantalla claros.</item>
+        <item>El widget del escritorio ya no lleva un recuadro negro detrás: se ve solo el tomate. La placa sigue disponible en Ajustes.</item>
         <item>El tomate del temporizador pierde las hojas que le salían en los descansos.</item>
     </string-array>
     <string-array name="changelog_1_1_0">

@@ -40,6 +40,12 @@ temporizador no cabía girado y el icono se leía como una pegatina negra.
   ahora el tamaño y el glifo del control primario.
 - **`A CONTINUACIÓN:` se queda en `SIGUIENTE:`.** A 10 sp y con tracking, esa etiqueta pesaba más que el
   dato que introduce.
+- **El widget sale sin placa negra por defecto.** El fondo sólido era el valor por defecto y solo parecía
+  correcto porque el escritorio del autor tiene un fondo de pantalla negro: sobre cualquier otro, el widget
+  se lee como una tarjeta negra con un tomate dentro, que es justo lo que descarta el «cero tarjetas, cero
+  botones con relleno» del proyecto. El tomate es un círculo relleno y opaco, así que se recorta solo sobre
+  cualquier fondo. Quien prefiera la placa la tiene en Ajustes → Widget, y a quien ya la hubiera elegido a
+  mano no se le cambia.
 - **El tomate pierde el cáliz.** Las tres hojas que se dibujaban en los descansos se solapaban entre ellas
   y se fundían en un bloque de base recta pintado por encima del contorno, así que parecían un recorte
   pegado al círculo y no parte de él. La fase la sigue diciendo la etiqueta escrita debajo.

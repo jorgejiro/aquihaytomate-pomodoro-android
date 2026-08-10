@@ -74,7 +74,7 @@ Todo dibujado con Compose `Canvas`. **Sin librería de gráficos** — ver `docs
 | **Duración de la vibración** | **5 s** | 0 (= desactivada) – 30 |
 | **Mantener pantalla encendida** (en la pantalla Temporizador) | **Mientras carga** | Nunca / Mientras carga / Siempre |
 | Objetivo diario de pomodoros | 8 | 1–24 |
-| Fondo del widget | Sólido | Sólido / Transparente |
+| Fondo del widget | **Transparente** | Sólido / Transparente |
 | Idioma | Auto | Auto / Español / English |
 
 Más: estado de los permisos (notificaciones y alarmas exactas) con botón a los ajustes del sistema, refrescado en `onResume`; y **Acerca de** con **Enviar comentarios** —correo al autor con el nombre y la versión en el asunto; la dirección **no se imprime en la pantalla**, se ve en la app de correo al abrirse—, la versión instalada y acceso a **Novedades**.

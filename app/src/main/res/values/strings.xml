@@ -209,6 +209,7 @@
         <item>«Reset» and «Skip» are white now. In grey they looked disabled.</item>
         <item>A new Settings entry to email the author.</item>
         <item>The app icon no longer sits inside a black circle on light wallpapers.</item>
+        <item>The home screen widget no longer sits on a black plate: you see just the tomato. The plate is still there in Settings.</item>
         <item>The timer tomato loses the leaves it grew during breaks.</item>
     </string-array>
     <string-array name="changelog_1_1_0">
