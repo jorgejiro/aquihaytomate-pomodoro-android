@@ -137,6 +137,22 @@ def manecilla(img, cx, cy, minuto, largo, ancho, color, cola=0.0):
     )
 
 
+def aguja_recta(img, cx, cy, minuto, r0, r1, grosor, color, redondo=True):
+    """
+    Aguja de grosor constante, del radio [r0] al [r1]. Es el trazo de un reloj de estación.
+
+    La otra forma de dibujar una aguja es el polígono que se estrecha hacia la punta (ver `manecilla`).
+    Esta es la lectura simple: una sola anchura y, si [redondo], las puntas redondeadas — que en PIL hay
+    que poner a mano con un disco en cada extremo, porque no tiene caps.
+    """
+    x0, y0 = punto_reloj(cx, cy, r0, minuto)
+    x1, y1 = punto_reloj(cx, cy, r1, minuto)
+    ImageDraw.Draw(img).line([u(x0), u(y0), u(x1), u(y1)], fill=color, width=int(round(u(grosor))))
+    if redondo:
+        for x, y in ((x0, y0), (x1, y1)):
+            disco(img, x, y, grosor / 2.0, color)
+
+
 def bezier2(p0, p1, p2, pasos=18):
     return [
         (
@@ -429,24 +445,50 @@ def pE_cocina():
     return Image.alpha_composite(img, capa)
 
 
+# Geometría definitiva del dial, la que está en res/drawable/ic_launcher_foreground.xml.
+AGUJA_MIN_LARGO, AGUJA_MIN_GROSOR = 25.5, 2.6
+AGUJA_HOR_LARGO, AGUJA_HOR_GROSOR = 18.5, 4.2
+REMACHE_R = 3.6
+
+
+def dial_de_f(capa):
+    """
+    El dial de F: marcas de cinco en cinco y **dos agujas**, a las 5:05.
+
+    Las dos horas no son decorativas: la gruesa marca las 5, que en la escala de minutos son los 25 del
+    enfoque, y la fina marca la 1, que son los 5 del descanso corto. El icono lleva escritos los dos
+    valores por defecto de la app en la única notación que un reloj sabe leer.
+
+    Las agujas son cápsulas de grosor constante con las puntas redondeadas, no polígonos que se
+    estrechan: el estrechamiento hacía nacer las dos anchas en el centro y, con el remache encima, el eje
+    quedaba abultado. El remache se queda, pero como una redonda limpia.
+
+    No hay marca a las 12 — caería debajo del tallo y sería tinta invisible. El tallo es el doce.
+    """
+    for m in range(5, 60, 5):
+        largo = 4.8 if m % 15 == 0 else 3.0
+        grosor = 2.2 if m % 15 == 0 else 1.5
+        marca(capa, C, C, m, 31.5, 31.5 - largo, grosor, HUESO + (255,))
+    # El contraste entre las dos tiene que ser grande: con largos y grosores parecidos, a las 5:05 los
+    # dos brazos forman una uve simétrica y el icono se lee como una flecha, no como un reloj. La
+    # proporción es la clásica de un reloj, la hora en torno al 0,72 del minutero.
+    aguja_recta(capa, C, C, 5, 0, AGUJA_MIN_LARGO, AGUJA_MIN_GROSOR, HUESO + (255,))
+    aguja_recta(capa, C, C, 25, 0, AGUJA_HOR_LARGO, AGUJA_HOR_GROSOR, HUESO + (255,))
+    disco(capa, C, C, REMACHE_R, HUESO + (255,))
+
+
 def pF_dial_desnudo():
     """
-    F · Dial desnudo. Lo mismo que A pero sin bisel: las marcas y la aguja van pintadas directamente
-    sobre la fruta, y el cáliz se queda donde le toca, arriba. Es la lectura más sobria de las seis y
+    F · Dial desnudo. Lo mismo que A pero sin bisel: las marcas y las agujas van pintadas directamente
+    sobre la fruta, y el cáliz se queda donde le toca, arriba. Es la lectura más sobria de las siete y
     la que mejor cumple la regla del design-spec de no añadir cajas: no hay aro, no hay disco interior,
-    no hay número. Solo la fruta y la aguja en el 25.
+    no hay número.
     """
     img = degradado_rojo()
     img = brillo(img, cx=30, cy=41)
     capa = lienzo_nuevo()
-
-    for m in range(0, 60, 5):
-        largo = 4.8 if m % 15 == 0 else 3.0
-        grosor = 2.2 if m % 15 == 0 else 1.5
-        marca(capa, C, C, m, 31.5, 31.5 - largo, grosor, HUESO + (255,))
-    manecilla(capa, C, C, 25, 21.5, 4.4, HUESO + (255,), cola=3.4)
-    disco(capa, C, C, 3.2, HUESO + (255,))
-    caliz_tres_hojas(capa, C, 25.6, 14.5, 7.6, VERDE, VERDE_OSCURO, alto_tallo=4.0)
+    dial_de_f(capa)
+    caliz_tres_hojas(capa, C, 26.4, 11.5, 6.0, VERDE, VERDE_OSCURO, alto_tallo=3.4)
     return Image.alpha_composite(img, capa)
 
 
@@ -480,6 +522,89 @@ def pG_placa_hueso():
     return Image.alpha_composite(img, capa)
 
 
+# ── Variantes de manecilla sobre F ──────────────────────────────────────────────────────────────────
+# El dial y el cáliz están fijados; lo único que cambia es cómo se dibujan las dos agujas y el remache.
+# El remache se queda —una redonda limpia, como en el reloj de la referencia—, pero deja de ser el
+# ensanchamiento de las propias agujas: antes las dos nacían anchas y encima llevaban un disco, y eso es
+# lo que engordaba el centro sin aportar nada.
+def fondo_y_marcas():
+    img = degradado_rojo()
+    img = brillo(img, cx=30, cy=41)
+    capa = lienzo_nuevo()
+    for m in range(5, 60, 5):     # sin marca a las 12: la tapa el tallo
+        largo = 4.8 if m % 15 == 0 else 3.0
+        grosor = 2.2 if m % 15 == 0 else 1.5
+        marca(capa, C, C, m, 31.5, 31.5 - largo, grosor, HUESO + (255,))
+    return img, capa
+
+
+def cierra_variante(img, capa):
+    caliz_tres_hojas(capa, C, 26.4, 11.5, 6.0, VERDE, VERDE_OSCURO, alto_tallo=3.4)
+    return Image.alpha_composite(img, capa)
+
+
+def v0_actual_estrechada():
+    """La que está ahora en el drawable: polígono que se estrecha, más remache. El punto de partida."""
+    img, capa = fondo_y_marcas()
+    manecilla(capa, C, C, 5, 25.5, 2.9, HUESO + (255,), cola=3.6)
+    manecilla(capa, C, C, 25, 14.5, 6.0, HUESO + (255,), cola=3.6)
+    disco(capa, C, C, 3.4, HUESO + (255,))
+    return cierra_variante(img, capa)
+
+
+def v1_capsulas():
+    """
+    V1 · Cápsulas. **La elegida.** Grosor constante y puntas redondeadas, la hora más gorda, remache
+    de 3,6. La hora se alargó de 15,5 a 18,5 tras verla en fila: a 15,5 se leía como un muñón.
+    """
+    img, capa = fondo_y_marcas()
+    dial_de_f(capa)
+    return cierra_variante(img, capa)
+
+
+def v2_capsulas_iguales():
+    """V2 · Cápsulas iguales. Las dos del mismo grosor: solo el largo las distingue. Lo más simple."""
+    img, capa = fondo_y_marcas()
+    aguja_recta(capa, C, C, 5, 0, 25.5, 3.2, HUESO + (255,))
+    aguja_recta(capa, C, C, 25, 0, 15.5, 3.2, HUESO + (255,))
+    disco(capa, C, C, 3.6, HUESO + (255,))
+    return cierra_variante(img, capa)
+
+
+def v3_puntas_planas():
+    """V3 · Puntas planas. El mismo trazo con los extremos cuadrados: cronómetro de laboratorio."""
+    img, capa = fondo_y_marcas()
+    aguja_recta(capa, C, C, 5, 0, 25.5, 2.6, HUESO + (255,), redondo=False)
+    aguja_recta(capa, C, C, 25, 0, 15.5, 4.2, HUESO + (255,), redondo=False)
+    disco(capa, C, C, 3.6, HUESO + (255,))
+    return cierra_variante(img, capa)
+
+
+def v4_remache_generoso():
+    """
+    V4 · Remache generoso. Las mismas cápsulas con la redonda del centro más grande, que es la
+    proporción del reloj de la referencia: allí el disco mide unas dos veces y media el grosor de la
+    aguja, y es lo que hace que el centro se lea como una pieza y no como un cruce de dos trazos.
+    """
+    img, capa = fondo_y_marcas()
+    aguja_recta(capa, C, C, 5, 0, 25.5, 2.6, HUESO + (255,))
+    aguja_recta(capa, C, C, 25, 0, 18.5, 4.2, HUESO + (255,))
+    disco(capa, C, C, 4.8, HUESO + (255,))
+    return cierra_variante(img, capa)
+
+
+VARIANTES_F = [
+    ("v0", "Actual · estrechada", v0_actual_estrechada),
+    ("v1", "V1 · Cápsulas  ← ELEGIDA", v1_capsulas),
+    ("v2", "V2 · Cápsulas iguales", v2_capsulas_iguales),
+    ("v3", "V3 · Puntas planas", v3_puntas_planas),
+    ("v4", "V4 · Remache generoso", v4_remache_generoso),
+]
+
+
+# **F es la elegida.** Se probó además una tanda con el estilo del temporizador de cocina mecánico
+# —cáliz granate, banda del dial en perspectiva con sus muescas y triángulo sobre el 25— y se descartó
+# en revisión: a 48 px la banda se convierte en una raya de puntos y los números en manchas.
 PROPUESTAS = [
     ("0-actual", "Actual (1.2.0)", p0_actual),
     ("1-anterior", "Anterior (1.1.0)", p1_anterior),
@@ -488,12 +613,11 @@ PROPUESTAS = [
     ("C-desde-arriba", "C · Visto desde arriba", pC_desde_arriba),
     ("D-se-vacia", "D · El tomate que se vacía", pD_se_vacia),
     ("E-cocina", "E · El 25 escrito", pE_cocina),
-    ("F-dial-desnudo", "F · Dial desnudo", pF_dial_desnudo),
+    ("F-dial-desnudo", "F · Dial desnudo  ← ELEGIDA", pF_dial_desnudo),
     ("G-placa-hueso", "G · Placa de hueso", pG_placa_hueso),
 ]
 
 
-# ── Máscaras del launcher y presentación ────────────────────────────────────────────────────────────
 def mascara_circulo(lado):
     m = Image.new("L", (lado * 4, lado * 4), 0)
     ImageDraw.Draw(m).ellipse([0, 0, lado * 4 - 1, lado * 4 - 1], fill=255)
@@ -609,6 +733,53 @@ def comparativa():
     return lamina.convert("RGB")
 
 
+def comparativa_manecillas():
+    """
+    Las variantes de aguja, en grande y a tamaño real. Va aparte de la comparativa de propuestas porque
+    aquí lo único que cambia son dos trazos: puestas en fila se ve en un segundo cuál aguanta los 48 px.
+    """
+    lado, medio, chico = 230, 96, 48
+    margen, hueco = 26, 22
+    cols = len(VARIANTES_F)
+    ancho = margen * 2 + cols * lado + (cols - 1) * hueco
+    alto = margen * 2 + 34 + lado + 18 + medio + 16 + chico + 26
+
+    lamina = Image.new("RGBA", (ancho, alto), (24, 22, 22, 255))
+    d = ImageDraw.Draw(lamina)
+    f_tit = ImageFont.truetype(os.path.join(FUENTES, "inter_variable.ttf"), 22)
+    f_pie = ImageFont.truetype(os.path.join(FUENTES, "inter_variable.ttf"), 14)
+    d.text((margen, margen - 8), "F · variantes de manecilla y de remache",
+           font=f_tit, fill=(245, 242, 239, 255))
+
+    negro = ((10, 10, 12), (22, 20, 24))
+    claro = ((236, 232, 226), (208, 214, 220))
+    for i, (_, titulo, fabrica) in enumerate(VARIANTES_F):
+        img108 = fabrica()
+        x = margen + i * (lado + hueco)
+        y = margen + 34
+        d.text((x, y - 20), titulo, font=f_pie, fill=(168, 160, 155, 255))
+
+        lamina.paste(tablero(negro, lado, lado), (x, y))
+        icono = recorta(img108, lado)
+        lamina.paste(icono, (x, y), icono)
+
+        # Intermedio y tamaño real, sobre claro: es donde se cae el detalle fino.
+        yb = y + lado + 18
+        lamina.paste(tablero(claro, lado, medio), (x, yb))
+        for k, (tam, squircle) in enumerate(((medio - 8, False), (medio - 8, True))):
+            ic = recorta(img108, tam, squircle=squircle)
+            lamina.paste(ic, (x + 14 + k * (tam + 26), yb + 4), ic)
+
+        yc = yb + medio + 16
+        lamina.paste(tablero(negro, lado, chico + 12), (x, yc))
+        for k in range(3):
+            ic = recorta(img108, chico, squircle=(k == 1))
+            lamina.paste(ic, (x + 20 + k * (chico + 24), yc + 6), ic)
+        d.text((x, yc + chico + 16), "48 px", font=f_pie, fill=(168, 160, 155, 255))
+
+    return lamina.convert("RGB")
+
+
 def main():
     for slug, titulo, fabrica in PROPUESTAS:
         ruta = os.path.join(SALIDA, f"{slug}.png")
@@ -616,6 +787,10 @@ def main():
         print(f"  {os.path.relpath(ruta, RAIZ)}")
     ruta = os.path.join(SALIDA, "comparativa.png")
     comparativa().save(ruta, "PNG")
+    print(f"  {os.path.relpath(ruta, RAIZ)}")
+
+    ruta = os.path.join(SALIDA, "F-variantes-manecilla.png")
+    comparativa_manecillas().save(ruta, "PNG")
     print(f"  {os.path.relpath(ruta, RAIZ)}")
 
 

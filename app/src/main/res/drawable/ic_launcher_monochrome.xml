@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Themed icon layer, required from Android 13. A single solid white silhouette: the system tints
-  it, so gradients and interior detail would be lost anyway.
+  Themed icon layer, required from Android 13. A single path, as the design spec asks: the system tints
+  it flat, so gradients and colour detail would be lost anyway.
+
+  Since 1.3 the silhouette carries the clock knocked out of it, which is the only way to keep the dial
+  when everything is one colour. It relies on the nonZero fill rule: subpaths wound the *same* way as the
+  body merge into it, and subpaths wound the *opposite* way punch holes. Order: body → calyx-with-stem,
+  both hands and the 3/6/9 marks as holes.
+
+  Three traps paid for while drawing it, all invisible until rendered:
+
+  · Calyx and stem are ONE contour, not two. As separate holes they overlap between y=26.4 and 28.4, and
+    two holes on top of each other sum to winding −2 — non-zero, so the overlap fills back in and the
+    calyx grows a wart. The stem is spliced into the calyx's top centre vertex instead.
+  · The hands start at radius 3.75, not at the centre, so they never cross each other — which would hit
+    the same −2 problem right in the middle. **The white left between them IS the pin**: there is no
+    separate pin subpath here, because it would have to be an island inside two overlapping holes.
+  · Winding direction is computed, not guessed: each contour's signed area is compared against the
+    body's. Reversing the *normal* of a capsule does not reverse its winding — it mirrors it, which is
+    how the hands first came out filled instead of hollow.
+
+  There is no mark at twelve o'clock: it would sit under the stem, so in the colour icon it is invisible
+  ink and here it would collide with the same hole. The stem is the twelve.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -12,5 +32,6 @@
 
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M52.5,25 L55.5,25 L55.5,31 L62,29 L69,32 L62.5,38.4 C72.6,41.9 80,51.6 80,63 C80,77.4 68.5,88 54,88 C39.5,88 28,77.4 28,63 C28,51.6 35.4,41.9 45.5,38.4 L39,32 L46,29 L52.5,31 Z" />
+        android:fillType="nonZero"
+        android:pathData="M54,22 C71.67,22 86,36.33 86,54 C86,71.67 71.67,86 54,86 C36.33,86 22,71.67 22,54 C22,36.33 36.33,22 54,22 Z M55.5,26.4 L55.5,23 L52.5,23 L52.5,26.4 L47.79,22.68 L42.5,26.4 L48.59,32.4 L54,33.24 L59.41,32.4 L65.5,26.4 L60.21,22.68 Z M57,51.4 L67.88,32.57 C68.23,31.94 68.02,31.15 67.4,30.79 C66.78,30.43 65.98,30.64 65.62,31.27 L54.75,50.1 C54.39,50.72 54.6,51.52 55.23,51.88 C55.85,52.24 56.64,52.02 57,51.4 Z M54.06,58.3 L61.43,71.07 C62.01,72.08 63.3,72.42 64.3,71.84 C65.3,71.26 65.65,69.98 65.07,68.97 L57.69,56.2 C57.11,55.19 55.83,54.85 54.83,55.43 C53.82,56.01 53.48,57.29 54.06,58.3 Z M85.2,52.65 L80.2,52.65 L80.2,55.35 L85.2,55.35 Z M55.35,85.2 L55.35,80.2 L52.65,80.2 L52.65,85.2 Z M22.8,55.35 L27.8,55.35 L27.8,52.65 L22.8,52.65 Z" />
 </vector>

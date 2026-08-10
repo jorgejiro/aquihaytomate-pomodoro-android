@@ -1,7 +1,25 @@
 # Propuestas de icono · 1.3
 
-Siete direcciones para el icono del launcher, renderizadas con las máscaras y los tamaños reales.
-Nada de esto está decidido: es material para elegir. Las genera
+> **Decidida: la F, «dial desnudo», con las agujas de la variante V1.** Ya está en
+> `res/drawable/ic_launcher_*.xml`. Este documento se conserva como registro de lo que se descartó y por
+> qué; el razonamiento cerrado está en
+> [`docs/decisions/014-el-icono-lleva-el-dial-de-un-reloj.md`](../decisions/014-el-icono-lleva-el-dial-de-un-reloj.md).
+>
+> Dos cosas que se decidieron después de la primera tanda y que están en
+> [`F-variantes-manecilla.png`](F-variantes-manecilla.png):
+>
+> - **Las agujas son cápsulas**, de grosor constante y puntas redondeadas, no polígonos que se estrechan.
+>   El estrechamiento hacía nacer las dos anchas en el eje y, con el remache encima, el centro salía
+>   abultado. El remache se queda, pero como una redonda limpia de radio 3,6.
+> - **La hora se alargó de 15,5 a 18,5** —en torno al 0,72 del minutero, la proporción de un reloj—,
+>   porque a 15,5 se leía como un muñón.
+>
+> También se dibujó y se descartó una tanda con el estilo del **temporizador de cocina mecánico** (cáliz
+> granate, la junta de la tapa en perspectiva con sus muescas, el triángulo sobre el 25): a 48 px la banda
+> de muescas se convierte en una raya de puntos y los números en manchas.
+
+Siete direcciones para el icono del launcher, renderizadas con las máscaras y los tamaños reales. Las
+genera
 [`generar-propuestas.py`](generar-propuestas.py) y se pueden volver a sacar con cualquier ajuste.
 
 ```

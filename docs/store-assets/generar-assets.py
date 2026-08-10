@@ -178,11 +178,56 @@ def mascara_liquido(tamano, fraccion, fase, periodos):
 # ── Icono de Play ───────────────────────────────────────────────────────────────────────────────────
 # Los `pathData` de res/drawable/ic_launcher_foreground.xml, literalmente. El cuerpo del tomate ya no
 # es un path: es el degradado de ic_launcher_background.xml, que llena el lienzo entero.
-BRILLO = "M36,45 C40.5,39 48,36 54,37.5 C48,40.5 42,45 39,52.5 C36.75,51.75 35.25,49 36,45 Z"
-SOMBRA_CALIZ = ("M54,32.6 L64.4,28.7 L73.5,32.6 L63.1,41.7 L54,43 L44.9,41.7 L34.5,32.6 "
-                "L43.6,28.7 Z")
-TALLO = "M52.3,24 L55.7,24 L55.7,36 L52.3,36 Z"
-CALIZ = "M54,31.4 L64.4,27.5 L73.5,31.4 L63.1,40.5 L54,41.8 L44.9,40.5 L34.5,31.4 L43.6,27.5 Z"
+#
+# Desde la 1.3 el primer plano es un dial: marcas de cinco en cinco y dos agujas a las 5:05 —las 5 son
+# los 25 min de enfoque, la 1 son los 5 del descanso—. Ver docs/decisions/014-*.
+BRILLO = "M30,41 C34.5,35 42,32 48,33.5 C42,36.5 36,41 33,48.5 C30.75,47.75 29.25,45 30,41 Z"
+SOMBRA_TALLO = "M52.5,24.2 L55.5,24.2 L55.5,29.6 L52.5,29.6 Z"
+SOMBRA_CALIZ = ("M54,27.6 L60.21,23.88 L65.5,27.6 L59.41,33.6 L54,34.44 L48.59,33.6 L42.5,27.6 "
+                "L47.79,23.88 Z")
+TALLO = "M52.5,23 L55.5,23 L55.5,28.4 L52.5,28.4 Z"
+CALIZ = "M54,26.4 L60.21,22.68 L65.5,26.4 L59.41,32.4 L54,33.24 L48.59,32.4 L42.5,26.4 L47.79,22.68 Z"
+
+# Las marcas y las agujas son trazos, no rellenos, así que aquí van con la fórmula en vez de con el
+# `pathData`: es la misma cuenta que generó los números del XML. **Sin marca a las 12** — la tapa el
+# tallo, así que allí sería tinta invisible.
+MARCAS_CARDINALES = (15, 30, 45)
+MARCAS_INTERMEDIAS = (5, 10, 20, 25, 35, 40, 50, 55)
+AGUJA_MINUTOS = (5, 25.5, 2.6)      # minuto del dial, largo, grosor  →  la 1 → 5 min de descanso
+AGUJA_HORAS = (25, 18.5, 4.2)       #                                 →  las 5 → 25 min de enfoque
+REMACHE_R = 3.6
+HUESO = (0xF5, 0xF2, 0xEF, 255)
+
+
+def punto_del_dial(radio, minuto, escala):
+    """Punto del dial de 60 minutos: el 0 arriba y sentido horario, con el centro en (54,54)."""
+    a = math.radians(minuto * 6.0)
+    return (54 + radio * math.sin(a)) * escala, (54 - radio * math.cos(a)) * escala
+
+
+def redonda(dibujo, cx, cy, r):
+    dibujo.ellipse([cx - r, cy - r, cx + r, cy + r], fill=HUESO)
+
+
+def dial(dibujo, escala):
+    """El dial del icono: marcas de cinco en cinco, las dos agujas en cápsula y el remache."""
+    for minutos, largo, grosor in ((MARCAS_CARDINALES, 4.8, 2.2), (MARCAS_INTERMEDIAS, 3.0, 1.5)):
+        for m in minutos:
+            dibujo.line(
+                [punto_del_dial(31.5, m, escala), punto_del_dial(31.5 - largo, m, escala)],
+                fill=HUESO,
+                width=max(1, int(round(grosor * escala))),
+            )
+
+    # Las agujas llevan cap redondeado en el XML (`strokeLineCap="round"`), y Pillow no tiene caps: el
+    # redondeo se pone a mano con una redonda en cada extremo.
+    centro = punto_del_dial(0, 0, escala)
+    for minuto, largo, grosor in (AGUJA_MINUTOS, AGUJA_HORAS):
+        punta = punto_del_dial(largo, minuto, escala)
+        dibujo.line([centro, punta], fill=HUESO, width=max(1, int(round(grosor * escala))))
+        redonda(dibujo, punta[0], punta[1], grosor / 2.0 * escala)
+
+    redonda(dibujo, centro[0], centro[1], REMACHE_R * escala)
 
 
 def icono_play(lado=512):
@@ -214,6 +259,8 @@ def icono_play(lado=512):
 
     capa = Image.new("RGBA", (lienzo, lienzo), (0, 0, 0, 0))
     dibujo = ImageDraw.Draw(capa)
+    dial(dibujo, escala)
+    dibujo.polygon(puntos_de_path(SOMBRA_TALLO, escala), fill=(0, 0, 0, 46))
     dibujo.polygon(puntos_de_path(SOMBRA_CALIZ, escala), fill=(0, 0, 0, 46))
     dibujo.polygon(puntos_de_path(TALLO, escala), fill=(0x37, 0x62, 0x2A, 255))
     dibujo.polygon(puntos_de_path(CALIZ, escala), fill=(0x57, 0x94, 0x3E, 255))
