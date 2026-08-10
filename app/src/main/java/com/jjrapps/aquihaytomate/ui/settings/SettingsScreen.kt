@@ -38,6 +38,14 @@ import com.jjrapps.aquihaytomate.ui.common.ValuePickerSheet
 import com.jjrapps.aquihaytomate.ui.theme.AlertAmber
 import com.jjrapps.aquihaytomate.ui.theme.AquiHayTomateTheme
 import com.jjrapps.aquihaytomate.ui.theme.TomateBright
+import timber.log.Timber
+
+/**
+ * Where feedback goes. A constant rather than a string resource: it is the author's address, the same in
+ * every language, and it has to be impossible for the row's subtitle and the actual recipient to drift
+ * apart.
+ */
+private const val FEEDBACK_EMAIL = "jjrmobileapps@gmail.com"
 
 private val SCREEN_PADDING = 20.dp
 private val SECTION_TOP = 20.dp
@@ -87,6 +95,14 @@ fun SettingsScreen(
                     .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName),
             )
         },
+        onSendFeedback = { subject ->
+            // ACTION_SENDTO with a mailto: URI, so only email apps answer and the address travels in the
+            // URI, which is the part every client honours. EXTRA_EMAIL alone gets dropped by some.
+            val intent = Intent(Intent.ACTION_SENDTO, "mailto:$FEEDBACK_EMAIL".toUri())
+                .putExtra(Intent.EXTRA_SUBJECT, subject)
+            runCatching { context.startActivity(intent) }
+                .onFailure { Timber.w(it, "No email app to send feedback with") }
+        },
         onOpenExactAlarmSettings = {
             // ACTION_REQUEST_SCHEDULE_EXACT_ALARM, never USE_EXACT_ALARM in the manifest. See §3.
             context.startActivity(
@@ -121,6 +137,7 @@ private fun SettingsContent(
     onLiquidAnimationChanged: (Boolean) -> Unit,
     onOpenNotificationSettings: () -> Unit,
     onOpenExactAlarmSettings: () -> Unit,
+    onSendFeedback: (subject: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (state) {
@@ -148,7 +165,7 @@ private fun SettingsContent(
                     onOpenNotificationSettings,
                     onOpenExactAlarmSettings,
                 )
-                AboutSection(state, onOpenChangelog, onOpenLicenses)
+                AboutSection(state, onOpenChangelog, onOpenLicenses, onSendFeedback)
                 Spacer(Modifier.height(SECTION_TOP * 2))
             }
 
@@ -343,8 +360,24 @@ private fun AboutSection(
     state: SettingsUiState.Success,
     onOpenChangelog: () -> Unit,
     onOpenLicenses: () -> Unit,
+    onSendFeedback: (subject: String) -> Unit,
 ) {
+    // The subject carries the version because a report without it is a report you cannot act on: the
+    // author needs to know whether the bug is in what is published or in what was fixed two builds ago.
+    val feedbackSubject = stringResource(
+        R.string.feedback_subject,
+        stringResource(R.string.app_name),
+        state.versionName,
+        state.versionCode,
+    )
+
     Section(stringResource(R.string.settings_section_about)) {
+        SettingsRow(
+            label = stringResource(R.string.settings_feedback),
+            sublabel = FEEDBACK_EMAIL,
+            onClick = { onSendFeedback(feedbackSubject) },
+        )
+        Divider()
         SettingsRow(
             label = stringResource(R.string.changelog_title),
             onClick = onOpenChangelog,
@@ -530,6 +563,7 @@ private fun SettingsScreenPreview() {
             onAutoStartBreakChanged = {},
             onAutoStartFocusChanged = {},
             onKeepScreenOnSelected = {},
+            onSendFeedback = {},
             onLiquidAnimationChanged = {},
             onOpenNotificationSettings = {},
             onOpenExactAlarmSettings = {},
