@@ -213,6 +213,7 @@
     <string name="changelog_current_badge">Current</string>
 
     <string-array name="changelog_1_3_1">
+        <item>The sound that tells you a pomodoro is over is «Digital» now: shorter and louder than the singing bowl, which was the one that came set and is still in the list. If you had already picked one, yours stays.</item>
         <item>The end-of-pomodoro sound plays again. When the break started on its own — which it does by default — the alert was lost on the way: the end of the break rang, the end of the pomodoro did not.</item>
         <item>The alert follows the alarm volume, as it was meant to. It was coming out of the media volume, so with media turned down you heard nothing however loud the alarm was.</item>
         <item>The cycle starts from zero each day. Leave the app halfway through and it used to greet you days later on pomodoro 3 of 4 of a run that no longer existed.</item>

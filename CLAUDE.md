@@ -69,7 +69,7 @@ Todo dibujado con Compose `Canvas`. **Sin librería de gráficos** — ver `docs
 | Pomodoros por ciclo | **4** | 2–12 |
 | **Auto-iniciar el descanso** (al terminar un pomodoro) | **activado** | — |
 | **Auto-iniciar el pomodoro** (al terminar un descanso) | desactivado | — |
-| **Sonido al terminar el pomodoro** | **Cuenco tibetano** | `silent`, `bell`, `bowl`, `digital`, `soft` |
+| **Sonido al terminar el pomodoro** | **Digital** | `silent`, `bell`, `bowl`, `digital`, `soft` |
 | **Repetir ese sonido** (al terminar el pomodoro) | **1 vez** | 1–10 |
 | **Sonido al terminar el descanso** | **Campana** | los mismos cinco |
 | **Repetir ese sonido** (al terminar el descanso) | **1 vez** | 1–10 |
@@ -105,7 +105,7 @@ En la tercera página los permisos son **filas con su estado escrito** (`Pendien
 
 ### 2.6 Alertas de fin de slot ✅ Implementadas
 
-- Sonido seleccionable de un catálogo de 4 más silencio, reproducido con `USAGE_ALARM` (usa el volumen de alarma, no el de multimedia). **Hay dos ajustes, uno por extremo del slot**: acabar un pomodoro suena suave —cuenco, el más grave y largo— y acabar el descanso suena más fuerte —campana, más brillante y sonando 2,6 s—, porque uno es una recompensa y el otro una orden. Lo decide el slot que **acaba**, en `TimerSettings.alertSoundFor`. El selector reproduce cada opción al tocarla y no se cierra, que es lo que hace el ajuste utilizable: los nombres no significan nada hasta oírlos. Ver `docs/decisions/012-*`. Los clips son **Opus mono en contenedor `.ogg`** —no Vorbis—, sintetizados para la app: mismo contenedor, soportado desde API 21 y comprime mejor en mono.
+- Sonido seleccionable de un catálogo de 4 más silencio, reproducido con `USAGE_ALARM` (usa el volumen de alarma, no el de multimedia). **Hay dos ajustes, uno por extremo del slot**, y lo que importa es que **los dos extremos no suenen igual**: acabar un pomodoro suena seco y corto —digital, el más fuerte de los cuatro y 0,72 s— y acabar el descanso suena largo y brillante —campana, 2,6 s—, que es el que tiene que llegarte desde otra habitación. El cuenco fue el valor por defecto del pomodoro hasta la 1.3.1, elegido por ser el más suave; sigue en el catálogo, a un toque. Lo decide el slot que **acaba**, en `TimerSettings.alertSoundFor`. El selector reproduce cada opción al tocarla y no se cierra, que es lo que hace el ajuste utilizable: los nombres no significan nada hasta oírlos. Ver `docs/decisions/012-*`. Los clips son **Opus mono en contenedor `.ogg`** —no Vorbis—, sintetizados para la app: mismo contenedor, soportado desde API 21 y comprime mejor en mono.
 - **El sonido se puede repetir de 1 a 10 veces seguidas**, con **un ajuste por cada extremo del slot** igual que el sonido —`TimerSettings.alertRepeatsFor`—, y por defecto **una sola vez**, que es lo que hacía la app antes. Encadenado sin hueco: una repetición tiene que leerse como una alerta más larga, no como dos. **La cadena se cuenta, nunca se usa `isLooping`**: un bucle es ilimitado y lo único que lo pararía —este proceso— es justo lo que el sistema puede matar a mitad de alerta, así que sería la versión sonora del bug de la vibración infinita.
 - **Vibración de duración configurable en segundos**, por defecto 5 s, en pulsos de 400 ms con huecos de 250 ms.
 - Respeta modo silencio y No molestar.

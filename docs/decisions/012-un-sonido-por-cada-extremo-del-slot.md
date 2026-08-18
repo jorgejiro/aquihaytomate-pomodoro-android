@@ -113,3 +113,24 @@ Tres decisiones de implementación que no se ven en la pantalla:
 El selector se comporta como los de sonido —se queda abierto y suena al tocar— y **reproduce las N veces
 con el sonido que ese extremo tenga configurado**, por la misma razón que allí: «3 veces» no significa
 nada hasta que se oye. El límite de 10 acota lo que eso puede durar; el botón de hecho lo corta.
+
+---
+
+## Añadido el 2026-08-18 · el pomodoro pasa a sonar `digital`
+
+El valor por defecto del **fin del pomodoro** cambia de `bowl` a `digital` en la 1.3.1, elegido por el
+autor por oído en su propio dispositivo.
+
+Lo que este ADR decide no se mueve: **los dos extremos del slot suenan distinto**, y sigue habiendo un
+ajuste para cada uno. Lo que cae es el argumento con el que se eligió el cuenco —que acabar un pomodoro
+es una recompensa y debía sonar suave—, porque suave y lento también es fácil de perderse, y eso es lo
+único que una alerta de fin de slot no puede permitirse. `digital` es el más fuerte de los cuatro
+(−7,2 dB RMS contra los −15,3 del cuenco) y el más corto (0,72 s): un pitido seco.
+
+El descanso **se queda con la campana**, y ahora por un motivo más nítido que antes: entre los dos
+sonidos, el que tiene que alcanzarte desde otra habitación es el que te devuelve al trabajo, y la campana
+suena 2,6 s contra 0,72. Si los dos extremos usaran `digital` se perdería justo lo que este ADR defiende.
+
+**Ojo con lo que esto significa al actualizar:** el valor por defecto no está persistido, así que quien
+nunca haya tocado el ajuste pasará a oír `digital` al instalar la 1.3.1. Quien lo eligiera a mano
+conserva el suyo. El cuenco sigue en el catálogo.

@@ -17,36 +17,34 @@ release: *Producción → Crear nueva versión → Notas de la versión*, una pe
 
 ## 1.3.1 (versionCode 7) — 2026-08-18
 
-Una release de correcciones, así que las viñetas nombran **el síntoma que el usuario vio**, no la causa:
+Casi todo son correcciones, así que las viñetas nombran **el síntoma que el usuario vio**, no la causa:
 nadie de fuera sabe qué es una corrutina cancelada, pero sí se acuerda de que el pomodoro acabó en
-silencio. El fallo del sonido va primero porque es el que rompía la promesa de la app —un temporizador
-que no avisa no es un temporizador— y lleva pegado el detalle del volumen de alarma, que es lo que
-explica por qué alguien podía no oír nada teniendo la alarma alta.
+silencio. El sonido va primero porque es el que rompía la promesa de la app —un temporizador que no avisa
+no es un temporizador— y arrastra dos cosas más en la misma viñeta: el volumen de alarma, que explica por
+qué alguien podía no oír nada teniéndola alta, y el cambio de sonido por defecto, que es lo que va a notar
+de entrada quien nunca haya tocado ese ajuste. De ahí la frase sobre el cuenco: lo primero que se pregunta
+quien echa de menos el de antes es si sigue estando.
 
-### es-ES (442 caracteres)
+### es-ES (457 caracteres)
 
 ```text
 Novedades de la versión 1.3.1
 
-Tres correcciones vistas usando la app:
-
-• El aviso del final del pomodoro vuelve a sonar, y lo hace con el volumen de alarma, como debía.
-• El ciclo empieza de cero cada día: ya no te recibe en el pomodoro 3 de 4 de una tanda de otro día.
+• El aviso del final del pomodoro vuelve a sonar, y lo hace con el volumen de alarma. Ahora es «Digital»: más seco y más fuerte. El cuenco tibetano sigue en la lista.
+• El ciclo empieza de cero cada día: ya no te recibe en el pomodoro 3 de 4 de otro día.
 • Reiniciar desde la notificación ya no la hace desaparecer: se queda con el tiempo completo y el botón de empezar.
 
 Sin cuentas, sin nube, sin anuncios y sin seguimiento.
 ```
 
-### en-US (404 caracteres)
+### en-US (422 caracteres)
 
 ```text
 What's new in 1.3.1
 
-Three fixes found by using the app:
-
-• The end-of-pomodoro alert sounds again, and it follows the alarm volume, as it should.
-• The cycle starts from zero each day: no more opening the app on pomodoro 3 of 4 from another day.
-• Resetting from the notification no longer makes it vanish: it stays, showing the full time and a start button.
+• The end-of-pomodoro alert sounds again, and it follows the alarm volume. It is «Digital» now: shorter and louder. The singing bowl is still in the list.
+• The cycle starts from zero each day: no more opening on pomodoro 3 of 4 from another day.
+• Resetting from the notification no longer makes it vanish: it stays, with the full time and a start button.
 
 No accounts, no cloud, no ads, no tracking.
 ```
@@ -57,10 +55,8 @@ No accounts, no cloud, no ads, no tracking.
 <es-ES>
 Novedades de la versión 1.3.1
 
-Tres correcciones vistas usando la app:
-
-• El aviso del final del pomodoro vuelve a sonar, y lo hace con el volumen de alarma, como debía.
-• El ciclo empieza de cero cada día: ya no te recibe en el pomodoro 3 de 4 de una tanda de otro día.
+• El aviso del final del pomodoro vuelve a sonar, y lo hace con el volumen de alarma. Ahora es «Digital»: más seco y más fuerte. El cuenco tibetano sigue en la lista.
+• El ciclo empieza de cero cada día: ya no te recibe en el pomodoro 3 de 4 de otro día.
 • Reiniciar desde la notificación ya no la hace desaparecer: se queda con el tiempo completo y el botón de empezar.
 
 Sin cuentas, sin nube, sin anuncios y sin seguimiento.
@@ -68,11 +64,9 @@ Sin cuentas, sin nube, sin anuncios y sin seguimiento.
 <en-US>
 What's new in 1.3.1
 
-Three fixes found by using the app:
-
-• The end-of-pomodoro alert sounds again, and it follows the alarm volume, as it should.
-• The cycle starts from zero each day: no more opening the app on pomodoro 3 of 4 from another day.
-• Resetting from the notification no longer makes it vanish: it stays, showing the full time and a start button.
+• The end-of-pomodoro alert sounds again, and it follows the alarm volume. It is «Digital» now: shorter and louder. The singing bowl is still in the list.
+• The cycle starts from zero each day: no more opening on pomodoro 3 of 4 from another day.
+• Resetting from the notification no longer makes it vanish: it stays, with the full time and a start button.
 
 No accounts, no cloud, no ads, no tracking.
 </en-US>

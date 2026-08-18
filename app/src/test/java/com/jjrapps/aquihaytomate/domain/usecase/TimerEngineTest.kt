@@ -809,7 +809,7 @@ class TimerEngineTest {
         runtime.onServiceStart = null
 
         assertEquals("El pomodoro tiene que sonar aunque el descanso arranque solo", 1, alerts.playCount)
-        assertEquals(AlertSound.BOWL, alerts.lastSound)
+        assertEquals("Y con el sonido del pomodoro", AlertSound.DEFAULT_FOCUS, alerts.lastSound)
         assertEquals(1, runtime.chainedNotificationCount)
         assertEquals(1, stats.recorded.size)
     }

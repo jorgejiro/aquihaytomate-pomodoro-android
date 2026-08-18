@@ -25,10 +25,17 @@ enum class AlertSound(val id: String, @param:StringRes val labelRes: Int) {
         /**
          * The sound a finished pomodoro gets by default.
          *
-         * The singing bowl, measured as the gravest and longest of the four — spectral centroid 506 Hz,
-         * 2.9 s — so it lands as a reward rather than as an order. Ending a pomodoro is good news.
+         * **`digital`, chosen by ear on the author's own device in 1.3.1.** It measures as the loudest of
+         * the four — −7.2 dB RMS against the bowl's −15.3, and the most total energy — and at 0.72 s it is
+         * also the shortest: a short, dry beep rather than a chime that fades.
+         *
+         * It replaced the singing bowl, which was picked for being the gravest and longest — spectral
+         * centroid 506 Hz, 2.9 s — on the theory that ending a pomodoro is good news and should land as a
+         * reward. The theory held up worse than the sound did: soft and slow is also easy to miss, which
+         * is the one thing an end-of-slot alert cannot be. Both are still in the catalogue, and the bowl
+         * is one tap away. See docs/decisions/012-*.
          */
-        val DEFAULT_FOCUS = BOWL
+        val DEFAULT_FOCUS = DIGITAL
 
         /**
          * The sound the end of a break gets by default.
@@ -37,11 +44,10 @@ enum class AlertSound(val id: String, @param:StringRes val labelRes: Int) {
          * 2 kHz — and it rings for 2.6 s. This one has to cut through whatever you drifted into and get
          * you back to work.
          *
-         * `digital` measures louder on paper (−7.2 dB RMS against −15.3, and the most total energy of the
-         * four) and was the first choice for that reason, but it lasts 0.72 s: a blip that is over before
-         * it registers if you are not looking at the phone. Chosen by ear on the author's own device, on
-         * the grounds that standing out is a matter of insisting, not of peak level. See
-         * docs/decisions/012-*.
+         * Still the bell and not `digital`, even though `digital` is now what a finished pomodoro plays:
+         * the point of this ADR is that the two ends of a slot must not sound alike, and the bell rings
+         * for 2.6 s against 0.72 — the longer of the two is the one that has to reach you from another
+         * room. See docs/decisions/012-*.
          */
         val DEFAULT_BREAK = BELL
 

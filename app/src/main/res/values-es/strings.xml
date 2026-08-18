@@ -210,6 +210,7 @@
     <string name="changelog_current_badge">Actual</string>
 
     <string-array name="changelog_1_3_1">
+        <item>El sonido que avisa del final del pomodoro es ahora «Digital»: más seco y más fuerte que el cuenco tibetano, que era el que venía puesto y sigue estando en la lista. Si ya habías elegido uno, se queda el tuyo.</item>
         <item>El sonido del final del pomodoro vuelve a sonar. Si el descanso empezaba solo —que es lo normal—, el aviso se perdía por el camino: sonaba el final del descanso, pero no el del pomodoro.</item>
         <item>El aviso usa el volumen de alarma, como debía. Salía por el de multimedia, así que con los medios bajados no se oía aunque la alarma estuviera alta.</item>
         <item>El ciclo empieza de cero cada día. Si dejabas la app a medias, al volver días después te recibía en el pomodoro 3 de 4 de una tanda que ya no existía.</item>

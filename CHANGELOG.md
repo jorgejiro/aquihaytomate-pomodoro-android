@@ -25,6 +25,13 @@ del slot que más importa.
 
 ### Cambiado
 
+- **El sonido por defecto al terminar el pomodoro pasa a ser Digital**, elegido por oído en dispositivo. El
+  cuenco tibetano se había escogido por ser el más suave —acabar un pomodoro es una recompensa—, y suave y
+  lento también es fácil de perderse, que es lo único que una alerta de fin de slot no puede permitirse:
+  `digital` es el más fuerte de los cuatro y el más corto. El descanso se queda con la campana, que sigue
+  siendo la que tiene que llegar desde otra habitación. **Quien nunca haya tocado el ajuste oirá el sonido
+  nuevo al actualizar**; quien lo eligiera a mano conserva el suyo, y el cuenco sigue en el catálogo. Ver
+  la adenda de `docs/decisions/012-un-sonido-por-cada-extremo-del-slot.md`.
 - **Reiniciar desde la notificación ya no deja la persiana vacía.** El temporizador parado mantiene su
   notificación, con el slot pendiente a su duración completa —25:00 en un pomodoro, 5:00 en un descanso— y
   un ▸ para arrancarlo sin abrir la app. Lleva los mismos controles que la pantalla en ese estado: sin

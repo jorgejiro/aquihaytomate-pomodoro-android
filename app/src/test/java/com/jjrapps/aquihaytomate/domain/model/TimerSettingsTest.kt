@@ -30,7 +30,7 @@ class TimerSettingsTest {
 
         assertTrue(
             "Acabar un pomodoro es una buena noticia: cuenco, el más grave y largo de los cuatro",
-            defaults.focusAlertSound == AlertSound.BOWL,
+            defaults.focusAlertSound == AlertSound.DIGITAL,
         )
         assertTrue(
             "Acabar el descanso es una orden: campana, más brillante que el cuenco y sonando 2,6 s",
