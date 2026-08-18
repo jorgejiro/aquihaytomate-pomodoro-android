@@ -12,6 +12,10 @@ import javax.inject.Inject
  * looking when a slot ran out. Called when the app opens, when the widget is tapped and from
  * `BootReceiver`.
  *
+ * It is also where the day turns: a stopped timer left over from an earlier day is swept by
+ * [StartFreshDayUseCase] before anything else, so the app never opens in the middle of yesterday's
+ * cycle.
+ *
  * **It never simulates more than one expired slot**, even with auto-start on. If the phone spent eight
  * hours off, the slot that expired is recorded, the timer stops there, and that is that — the rule that
  * stops opening the app in the morning from inserting sixteen pomodoros nobody worked. See CLAUDE.md §6
@@ -20,6 +24,7 @@ import javax.inject.Inject
 class ReconcileTimerUseCase @Inject constructor(
     private val timerStateRepository: TimerStateRepository,
     private val completeSlot: CompleteSlotUseCase,
+    private val startFreshDay: StartFreshDayUseCase,
     private val syncTimerRuntime: SyncTimerRuntimeUseCase,
     private val clock: Clock,
     private val elapsedRealtime: ElapsedRealtimeSource,
@@ -27,8 +32,12 @@ class ReconcileTimerUseCase @Inject constructor(
 
     /** @return true when something had to be repaired. */
     suspend operator fun invoke(): Boolean {
+        // First, because a slot that expired while the timer was running still has to be recorded on the
+        // day it happened, and the sweep declines to touch anything that is running.
+        val sweptStaleDay = startFreshDay()
+
         val state = timerStateRepository.current()
-        if (state.status != TimerStatus.RUNNING) return false
+        if (state.status != TimerStatus.RUNNING) return sweptStaleDay
 
         val nowEpochMs = clock.millis()
         val nowElapsedRealtimeMs = elapsedRealtime.millis()
@@ -44,7 +53,14 @@ class ReconcileTimerUseCase @Inject constructor(
         val overdueMs = overdueMs(state, nowEpochMs, nowElapsedRealtimeMs)
         val worthAlerting = overdueMs <= STALE_EXPIRY_MS
 
-        return completeSlot(alertUser = worthAlerting, allowAutoStart = false)
+        val closed = completeSlot(alertUser = worthAlerting, allowAutoStart = false)
+
+        // The slot is recorded on the day it ran out, but the cycle it left behind belongs to that day
+        // too: a pomodoro that expired on Tuesday must not open Friday's app on `3/4`.
+        if (closed && DayRollover.isEarlierDay(state.endAtEpochMs, nowEpochMs, clock.zone)) {
+            startFreshDay(force = true)
+        }
+        return closed || sweptStaleDay
     }
 
     private fun overdueMs(

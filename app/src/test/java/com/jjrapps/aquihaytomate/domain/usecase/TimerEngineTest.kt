@@ -13,6 +13,7 @@ import com.jjrapps.aquihaytomate.testing.FakeTimerStateRepository
 import com.jjrapps.aquihaytomate.testing.MutableClock
 import com.jjrapps.aquihaytomate.testing.MutableElapsedRealtime
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -53,7 +54,10 @@ class TimerEngineTest {
     private val skip = SkipSlotUseCase(timerState, settings, recordFocusSlot, sync, clock, elapsed)
     private val complete =
         CompleteSlotUseCase(timerState, settings, recordFocusSlot, alerts, runtime, sync, clock, elapsed)
-    private val reconcile = ReconcileTimerUseCase(timerState, complete, sync, clock, elapsed)
+    private val freshDay =
+        StartFreshDayUseCase(timerState, settings, recordFocusSlot, sync, runtime, clock)
+    private val reconcile =
+        ReconcileTimerUseCase(timerState, complete, freshDay, sync, clock, elapsed)
     private val restoreNotification =
         RestoreOngoingNotificationUseCase(timerState, runtime, clock, elapsed)
 
@@ -780,6 +784,143 @@ class TimerEngineTest {
         assertFalse(reconcile())
         assertEquals(TimerStatus.RUNNING, state().status)
         assertEquals(focusMs - 60_000L, remaining())
+    }
+
+    // ─── El día siguiente ───────────────────────────────────────────────────
+
+    private val oneDayMs = 24 * 60 * 60_000L
+
+    @Test
+    fun `a cycle left from another day starts again at zero`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
+        start()
+        advance(focusMs)
+        complete()
+        assertEquals(1, state().completedFocusInCycle)
+
+        advance(oneDayMs)
+        assertTrue(reconcile())
+
+        val state = state()
+        assertEquals(TimerStatus.IDLE, state.status)
+        assertEquals("El día empieza con un pomodoro, no con el descanso de ayer", SlotType.FOCUS, state.slotType)
+        assertEquals(0, state.completedFocusInCycle)
+        assertEquals("La tanda de ayer queda cerrada", 0L, state.sessionId)
+    }
+
+    @Test
+    fun `the cycle survives the same day`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
+        start()
+        advance(focusMs)
+        complete()
+
+        advance(6 * 60 * 60_000L)
+        assertFalse(reconcile())
+
+        assertEquals(1, state().completedFocusInCycle)
+        assertEquals(SlotType.SHORT_BREAK, state().slotType)
+    }
+
+    @Test
+    fun `a slot that expired days ago leaves no cycle behind`() = runTest {
+        start()
+        advance(3 * oneDayMs)
+
+        assertTrue(reconcile())
+
+        assertEquals("El pomodoro vencido se registra igual", 1, stats.recorded.size)
+        assertEquals(0, alerts.playCount)
+        assertEquals(TimerStatus.IDLE, state().status)
+        assertEquals(SlotType.FOCUS, state().slotType)
+        assertEquals(0, state().completedFocusInCycle)
+    }
+
+    /** El pomodoro vencido se apunta en el día en que se hizo, no en el que se abre la app. */
+    @Test
+    fun `a slot that expired days ago is recorded on its own day`() = runTest {
+        start()
+        val startedDay = LocalDate.ofInstant(clock.instant(), clock.zone)
+        advance(3 * oneDayMs)
+
+        reconcile()
+
+        assertEquals(startedDay, stats.recorded.single().localDate)
+    }
+
+    @Test
+    fun `a pomodoro left paused overnight is recorded and swept`() = runTest {
+        start()
+        advance(10 * 60_000L)
+        pause()
+
+        advance(oneDayMs)
+        assertTrue(reconcile())
+
+        val recorded = stats.recorded.single()
+        assertFalse("Abandonado, no completado", recorded.completed)
+        assertEquals(10 * 60_000L, recorded.actualFocusMs)
+        assertEquals(TimerStatus.IDLE, state().status)
+        assertEquals(SlotType.FOCUS, state().slotType)
+        assertEquals(0, state().completedFocusInCycle)
+    }
+
+    @Test
+    fun `a pause of seconds left overnight records nothing`() = runTest {
+        start()
+        advance(30_000L)
+        pause()
+
+        advance(oneDayMs)
+        assertTrue(reconcile())
+
+        assertTrue(stats.recorded.isEmpty())
+        assertEquals(TimerStatus.IDLE, state().status)
+    }
+
+    @Test
+    fun `a timer paused this morning is not swept`() = runTest {
+        start()
+        advance(10 * 60_000L)
+        pause()
+
+        advance(60 * 60_000L)
+        assertFalse(reconcile())
+
+        assertEquals(TimerStatus.PAUSED, state().status)
+        assertTrue(stats.recorded.isEmpty())
+    }
+
+    @Test
+    fun `a timer running across midnight is left alone`() = runTest {
+        // Empieza a las 23:50 y sigue corriendo pasada la medianoche: el pomodoro es de quien lo
+        // empezó, y el barrido no toca nada que esté en marcha.
+        val midnight = LocalDate.ofInstant(clock.instant(), clock.zone)
+            .plusDays(1)
+            .atStartOfDay(clock.zone)
+            .toInstant()
+            .toEpochMilli()
+        advance(midnight - 10 * 60_000L - clock.millis())
+
+        start()
+        advance(15 * 60_000L)
+
+        assertFalse(reconcile())
+
+        assertEquals(TimerStatus.RUNNING, state().status)
+        assertEquals(focusMs - 15 * 60_000L, remaining())
+    }
+
+    @Test
+    fun `sweeping an idle timer twice changes nothing the second time`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
+        start()
+        advance(focusMs)
+        complete()
+
+        advance(oneDayMs)
+        assertTrue(reconcile())
+        assertFalse(reconcile())
     }
 
     // ─── Settings interaction ───────────────────────────────────────────────

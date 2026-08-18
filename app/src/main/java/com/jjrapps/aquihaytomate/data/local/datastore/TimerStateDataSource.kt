@@ -79,6 +79,7 @@ class TimerStateDataSource @Inject constructor(
                 ?: defaults.endAtElapsedRealtimeMs,
             bootEpochMs = this[Keys.BOOT_EPOCH_MS] ?: defaults.bootEpochMs,
             remainingAtPauseMs = this[Keys.REMAINING_AT_PAUSE_MS] ?: defaults.remainingAtPauseMs,
+            lastActivityEpochMs = this[Keys.LAST_ACTIVITY_EPOCH_MS] ?: defaults.lastActivityEpochMs,
         )
     }
 
@@ -95,6 +96,7 @@ class TimerStateDataSource @Inject constructor(
         this[Keys.END_AT_ELAPSED_REALTIME_MS] = state.endAtElapsedRealtimeMs
         this[Keys.BOOT_EPOCH_MS] = state.bootEpochMs
         this[Keys.REMAINING_AT_PAUSE_MS] = state.remainingAtPauseMs
+        this[Keys.LAST_ACTIVITY_EPOCH_MS] = state.lastActivityEpochMs
     }
 
     /** Preference keys are a storage contract shared with the widget and the service. */
@@ -111,5 +113,6 @@ class TimerStateDataSource @Inject constructor(
         val END_AT_ELAPSED_REALTIME_MS = longPreferencesKey("end_at_elapsed_realtime_ms")
         val BOOT_EPOCH_MS = longPreferencesKey("boot_epoch_ms")
         val REMAINING_AT_PAUSE_MS = longPreferencesKey("remaining_at_pause_ms")
+        val LAST_ACTIVITY_EPOCH_MS = longPreferencesKey("last_activity_epoch_ms")
     }
 }

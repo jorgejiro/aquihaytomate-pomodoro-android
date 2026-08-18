@@ -28,6 +28,7 @@ class ResetTimerUseCase @Inject constructor(
         if (state.status == TimerStatus.IDLE) return false
 
         val settings = settingsRepository.current()
+        val nowEpochMs = clock.millis()
 
         // Only a slot with a clock behind it can have produced focus time. In RINGING the slot that
         // finished has already been recorded, and the state now describes the *next* one, so reading
@@ -35,7 +36,7 @@ class ResetTimerUseCase @Inject constructor(
         val recorded = if (state.status.isActive) {
             val remainingMs = TimerMath.remainingMs(
                 state,
-                clock.millis(),
+                nowEpochMs,
                 elapsedRealtime.millis(),
                 settings,
             )
@@ -56,7 +57,7 @@ class ResetTimerUseCase @Inject constructor(
             if (current.status == TimerStatus.IDLE) {
                 null
             } else {
-                TimerTransitions.resetSlot(current, settings, nextSlotIndex)
+                TimerTransitions.resetSlot(current, settings, nextSlotIndex, nowEpochMs)
             }
         }
         if (changed) syncTimerRuntime()

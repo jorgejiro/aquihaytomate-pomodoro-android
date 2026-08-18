@@ -16,6 +16,10 @@ import com.jjrapps.aquihaytomate.domain.model.TimerStatus
  * ended, and vice versa. That keeps `RINGING` a hair away from `IDLE` (start it and it runs) instead
  * of a special case every consumer has to unpack, and it stops the cycle counter from being advanced
  * twice by re-planning the same transition.
+ *
+ * **Every move stamps `lastActivityEpochMs`**, which is why the ones that had no use for the wall clock
+ * now take it too. That stamp is what lets a stopped timer know it belongs to a day that is already
+ * over; see [DayRollover].
  */
 object TimerTransitions {
 
@@ -39,13 +43,15 @@ object TimerTransitions {
             slotDurationMs = durationMs,
             slotStartedAtEpochMs = nowEpochMs,
             remainingAtPauseMs = 0L,
+            lastActivityEpochMs = nowEpochMs,
         ).armed(durationMs, nowEpochMs, nowElapsedRealtimeMs)
     }
 
     /** Freezes the clock. The remaining time is stored so it survives the process dying. */
-    fun pause(state: TimerState, remainingMs: Long): TimerState = state.copy(
+    fun pause(state: TimerState, remainingMs: Long, nowEpochMs: Long): TimerState = state.copy(
         status = TimerStatus.PAUSED,
         remainingAtPauseMs = remainingMs.coerceIn(0L, state.slotDurationMs),
+        lastActivityEpochMs = nowEpochMs,
     )
 
     /**
@@ -56,7 +62,7 @@ object TimerTransitions {
      * separate accumulator. See docs/decisions/006-el-tiempo-activo-se-deriva-del-restante.md.
      */
     fun resume(state: TimerState, nowEpochMs: Long, nowElapsedRealtimeMs: Long): TimerState =
-        state.copy(status = TimerStatus.RUNNING)
+        state.copy(status = TimerStatus.RUNNING, lastActivityEpochMs = nowEpochMs)
             .armed(state.remainingAtPauseMs, nowEpochMs, nowElapsedRealtimeMs)
 
     /**
@@ -85,6 +91,7 @@ object TimerTransitions {
             endAtEpochMs = 0L,
             endAtElapsedRealtimeMs = 0L,
             bootEpochMs = 0L,
+            lastActivityEpochMs = nowEpochMs,
         )
         return if (status == TimerStatus.RUNNING) {
             next.armed(planned.durationMs, nowEpochMs, nowElapsedRealtimeMs)
@@ -100,7 +107,12 @@ object TimerTransitions {
      *   caller passes the next index: `UNIQUE(session_id, slot_index)` would otherwise swallow the
      *   row for the retried slot, and a pomodoro the user did complete would go unrecorded.
      */
-    fun resetSlot(state: TimerState, settings: TimerSettings, slotIndex: Int): TimerState =
+    fun resetSlot(
+        state: TimerState,
+        settings: TimerSettings,
+        slotIndex: Int,
+        nowEpochMs: Long,
+    ): TimerState =
         state.copy(
             status = TimerStatus.IDLE,
             slotIndex = slotIndex,
@@ -111,6 +123,7 @@ object TimerTransitions {
             endAtElapsedRealtimeMs = 0L,
             bootEpochMs = 0L,
             remainingAtPauseMs = 0L,
+            lastActivityEpochMs = nowEpochMs,
         )
 
     /** Writes the two deadlines and the boot marker for a slot with [remainingMs] left to run. */

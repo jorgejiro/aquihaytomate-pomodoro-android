@@ -15,6 +15,20 @@ reutilizar ni bajando la versión.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
+## [No publicado]
+
+### Corregido
+
+- **El ciclo de pomodoros se reinicia al cambiar de día.** Un móvil que se coge de vez en cuando abría la
+  app diciendo `3/4` con un descanso esperando, días después del último pomodoro: el ciclo vive en el
+  estado persistido y nada lo envejecía. Ahora, al abrir la app, tocar el widget o arrancar el
+  dispositivo, un temporizador **parado** que quedó de un día anterior se barre —ciclo a cero, siguiente
+  slot de enfoque y tanda cerrada—; un pomodoro que se quedó pausado se da por abandonado y su tiempo
+  enfocado se apunta como parcial en el día en que se hizo; y un slot que venció mientras corría se
+  registra como siempre, pero sin dejar su ciclo atrás. **Un temporizador en marcha no se toca nunca**, y
+  atrasar el reloj del sistema no borra el ciclo en curso. Ver
+  `docs/decisions/015-el-ciclo-se-reinicia-al-cambiar-de-dia.md`.
+
 ## [1.3.0] — 2026-08-10 (versionCode 6)
 
 Sube el minor por las dos repeticiones de sonido, que son funcionalidad nueva, pero la versión la define

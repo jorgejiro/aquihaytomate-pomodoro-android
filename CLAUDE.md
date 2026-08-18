@@ -252,6 +252,7 @@ app/
         usecase/
           TimerMath.kt                 # PURO: tiempo restante, progreso, resistencia a cambios de reloj
           SlotPlanner.kt               # PURO: planNextSlot, ciclo de N pomodoros
+          DayRollover.kt               # PURO: si un temporizador parado es de un día ya cerrado
           AlertPolicy.kt               # PURO: decide sonido/vibración según ringer + DND
           VibrationPatterns.kt         # PURO: waveform finito de N segundos
           StatsAggregation.kt          # PURO: días → semanas/meses con WeekFields
@@ -260,6 +261,7 @@ app/
           SkipSlotUseCase.kt · ResetTimerUseCase.kt · ToggleTimerUseCase.kt
           CompleteSlotUseCase.kt       # registra + alerta + planifica; IDEMPOTENTE
           ReconcileTimerUseCase.kt     # repara el estado tras muerte del proceso o reinicio
+          StartFreshDayUseCase.kt      # barre el ciclo que quedó de un día anterior
           ObserveTimerStateUseCase.kt · ObserveSettingsUseCase.kt
           GetTodayStatsUseCase.kt · GetPeriodStatsUseCase.kt · GetStreakUseCase.kt
       timer/
@@ -380,6 +382,11 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 - **`START_NOT_STICKY`.** Un `START_STICKY` reviviría el servicio con `intent == null` y sin contexto; preferimos reconciliar.
 - **Todo `startForegroundService` va en `try/catch (ForegroundServiceStartNotAllowedException)`** con degradación a «solo estado + alarma». Las exenciones legítimas que sí tenemos: desde la Activity, desde una acción de notificación, desde el toque en el widget y desde una alarma exacta.
 - **Al pausar se detiene el servicio.** No tiene sentido quemar wakelock y notificación foreground con el reloj parado; se publica una notificación normal con «Reanudar».
+- **El ciclo pertenece a la jornada: al cambiar de día se reinicia.** Un temporizador **parado** que
+  quedó de un día anterior se barre en `reconcile()` —ciclo a cero, siguiente slot de enfoque, tanda
+  cerrada—, y un pomodoro que se quedó pausado se da por abandonado registrando su parcial. **Un
+  temporizador corriendo no se toca nunca**, y la comparación de días solo rueda hacia adelante, para
+  que atrasar el reloj del sistema no borre el ciclo en curso. Ver `docs/decisions/015-*`.
 - **`reconcile()` nunca simula más de un slot vencido**, aunque el auto-inicio esté activo. Si el móvil estuvo apagado 8 horas, se registra el slot que venció, se pasa a `IDLE` y ya. Sin esta regla, abrir la app por la mañana insertaría 16 pomodoros falsos.
 - **La notificación ongoing vuelve si el usuario la descarta**, mientras el temporizador esté corriendo o pausado: desde Android 13 `setOngoing` no impide el swipe, y quedarse sin notificación es quedarse sin cifra y sin controles. En `RINGING` e `IDLE` no vuelve. Ver `docs/decisions/010-*`.
 - **La notificación ongoing no se repinta cada segundo.** Se publica una vez por transición (~4 `notify()` por pomodoro) y el descuento lo tickea un `Chronometer` dentro de **nuestro propio cuerpo de notificación** (`DecoratedCustomViewStyle`), en el proceso de SystemUI. Nada de `setProgress()` ni de minutos en el título, que obligaría a republicar cada minuto. Ver `docs/decisions/009-*`.

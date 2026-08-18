@@ -13,6 +13,7 @@ import com.jjrapps.aquihaytomate.domain.usecase.ReconcileTimerUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.RecordFocusSlotUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.ResetTimerUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.SkipSlotUseCase
+import com.jjrapps.aquihaytomate.domain.usecase.StartFreshDayUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.StartTimerUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.SyncTimerRuntimeUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.ToggleTimerUseCase
@@ -87,7 +88,14 @@ class TimerViewModelTest {
             ),
             skipSlot = SkipSlotUseCase(timerState, settings, recordFocusSlot, sync, clock, elapsed),
             completeSlot = complete,
-            reconcileTimer = ReconcileTimerUseCase(timerState, complete, sync, clock, elapsed),
+            reconcileTimer = ReconcileTimerUseCase(
+                timerState,
+                complete,
+                StartFreshDayUseCase(timerState, settings, recordFocusSlot, sync, runtime, clock),
+                sync,
+                clock,
+                elapsed,
+            ),
             clock = clock,
             elapsedRealtime = elapsed,
         )

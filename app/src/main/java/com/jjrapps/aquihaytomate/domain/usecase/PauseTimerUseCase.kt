@@ -30,6 +30,7 @@ class PauseTimerUseCase @Inject constructor(
                 TimerTransitions.pause(
                     state,
                     TimerMath.remainingMs(state, nowEpochMs, nowElapsedRealtimeMs),
+                    nowEpochMs,
                 )
             }
         }

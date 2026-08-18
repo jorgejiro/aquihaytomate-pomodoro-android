@@ -24,6 +24,10 @@ package com.jjrapps.aquihaytomate.domain.model
  * @param bootEpochMs `epochNow - elapsedRealtimeNow` at write time. Comparing it against the same
  *   difference computed later is how a reboot or a manual clock change is spotted.
  * @param remainingAtPauseMs what was left when the user paused. Meaningful in [TimerStatus.PAUSED].
+ * @param lastActivityEpochMs wall-clock time of the last move of the state machine. It is the only
+ *   field that survives across batches, and it exists so a stopped timer can tell whether it belongs
+ *   to the day the user is living: see
+ *   [com.jjrapps.aquihaytomate.domain.usecase.DayRollover].
  */
 data class TimerState(
     val status: TimerStatus = TimerStatus.IDLE,
@@ -38,6 +42,7 @@ data class TimerState(
     val endAtElapsedRealtimeMs: Long = 0L,
     val bootEpochMs: Long = 0L,
     val remainingAtPauseMs: Long = 0L,
+    val lastActivityEpochMs: Long = 0L,
 ) {
 
     /**
@@ -60,6 +65,21 @@ data class TimerState(
         get() = when {
             slotType.isBreak -> completedFocusInCycle.coerceIn(1, pomodorosPerCycle)
             else -> (completedFocusInCycle + 1).coerceIn(1, pomodorosPerCycle)
+        }
+
+    /**
+     * When the timer was last moved, falling back to the older markers.
+     *
+     * [lastActivityEpochMs] arrived after 1.3.0, so a state written by an earlier version does not
+     * carry it. The fallbacks cover that: [slotStartedAtEpochMs] is set in every state a slot can be
+     * paused or waiting in, and [sessionId] is the epoch millis the batch began. Zero means there is
+     * no marker at all, and callers must read that as "no idea", never as "the epoch".
+     */
+    val lastTouchedEpochMs: Long
+        get() = when {
+            lastActivityEpochMs > 0L -> lastActivityEpochMs
+            slotStartedAtEpochMs > 0L -> slotStartedAtEpochMs
+            else -> sessionId
         }
 
     companion object {
