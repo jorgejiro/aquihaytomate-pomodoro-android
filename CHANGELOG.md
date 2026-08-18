@@ -15,7 +15,13 @@ reutilizar ni bajando la versión.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
-## [No publicado]
+## [1.3.1] — 2026-08-18 (versionCode 7)
+
+Tres fallos vistos usando la app, dos de ellos en un móvil que se coge de tarde en tarde. El del sonido
+es el serio: la alerta que separa un temporizador usable de un juguete llevaba sin sonar en el extremo
+del slot que más importa.
+
+**Aún sin subir a Play.**
 
 ### Cambiado
 
@@ -37,7 +43,6 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
   `USAGE_ALARM` se aplicaban después de `MediaPlayer.create`, que ya ha llamado a `prepare()`, y ahí el
   framework ya no reencamina nada. Con los medios bajados el aviso era inaudible aunque el volumen de
   alarma estuviera alto, que es lo que la app comprobaba para decidir si sonar.
-
 - **El ciclo de pomodoros se reinicia al cambiar de día.** Un móvil que se coge de vez en cuando abría la
   app diciendo `3/4` con un descanso esperando, días después del último pomodoro: el ciclo vive en el
   estado persistido y nada lo envejecía. Ahora, al abrir la app, tocar el widget o arrancar el

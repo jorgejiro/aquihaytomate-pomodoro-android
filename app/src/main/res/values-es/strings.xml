@@ -209,6 +209,12 @@
     <string name="changelog_title">Novedades</string>
     <string name="changelog_current_badge">Actual</string>
 
+    <string-array name="changelog_1_3_1">
+        <item>El sonido del final del pomodoro vuelve a sonar. Si el descanso empezaba solo —que es lo normal—, el aviso se perdía por el camino: sonaba el final del descanso, pero no el del pomodoro.</item>
+        <item>El aviso usa el volumen de alarma, como debía. Salía por el de multimedia, así que con los medios bajados no se oía aunque la alarma estuviera alta.</item>
+        <item>El ciclo empieza de cero cada día. Si dejabas la app a medias, al volver días después te recibía en el pomodoro 3 de 4 de una tanda que ya no existía.</item>
+        <item>Reiniciar desde la notificación ya no te deja sin ella: se queda con el tiempo completo y el botón de empezar.</item>
+    </string-array>
     <string-array name="changelog_1_3_0">
         <item>El icono de la app es ahora un reloj, y marca las cinco y cinco: las cinco son los 25 minutos de un pomodoro y la una, los 5 de un descanso corto. El tomate era un círculo rojo que no decía nada de lo que hace la app.</item>
         <item>El sonido de fin de slot se puede repetir hasta diez veces seguidas, con un ajuste aparte para el pomodoro y para el descanso. Un solo aviso es fácil de perder si te has ido a la cocina.</item>
