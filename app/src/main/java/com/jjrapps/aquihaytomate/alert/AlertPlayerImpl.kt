@@ -19,6 +19,7 @@ import com.jjrapps.aquihaytomate.domain.usecase.InterruptionFilter
 import com.jjrapps.aquihaytomate.domain.usecase.RingerMode
 import com.jjrapps.aquihaytomate.domain.usecase.VibrationPatterns
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.sync.Mutex
@@ -32,7 +33,10 @@ import timber.log.Timber
  *
  * - **`USAGE_ALARM`, not `USAGE_NOTIFICATION`.** It makes the clip follow the *alarm* volume, which is
  *   what a user expects of a timer, and it gets through Do Not Disturb configurations where alarms are
- *   allowed. A pomodoro the user started on purpose behaves like an alarm.
+ *   allowed. A pomodoro the user started on purpose behaves like an alarm. **The attributes go into the
+ *   factory call, never into a setter afterwards**: `MediaPlayer.create` calls `prepare()` internally,
+ *   and the framework only routes by attributes set before that — a later `setAudioAttributes` is
+ *   accepted, changes no state and does nothing, which had the clip coming out of the *media* volume.
  * - **The waveform is always finite.** A repeating `VibrationEffect` whose `cancel()` is lost because
  *   the process died leaves the phone buzzing until reboot. There are apps on Play that have shipped
  *   that bug.
@@ -55,11 +59,13 @@ class AlertPlayerImpl @Inject constructor(
     private var focusRequest: AudioFocusRequest? = null
 
     /**
-     * Plays still owed by the chain, counting the one currently sounding. Only touched from the main
-     * thread — `play` under the mutex, and the completion callback, which `MediaPlayer` posts to the
-     * thread that created it.
+     * Plays still owed by the chain, counting the one currently sounding.
+     *
+     * Atomic because two threads reach it: `play` runs on whatever dispatcher closed the slot — the
+     * service uses `Default` — while the completion callback is posted to the main looper, since the
+     * thread that built the `MediaPlayer` has no looper of its own.
      */
-    private var playsLeft: Int = 0
+    private val playsLeft = AtomicInteger(0)
 
     override suspend fun play(sound: AlertSound, vibrationSeconds: Int, repeats: Int) {
         val decision = AlertPolicy.decide(
@@ -77,7 +83,7 @@ class AlertPlayerImpl @Inject constructor(
         if (decision.vibrate) vibrate(vibrationSeconds)
         if (decision.playSound) {
             mutex.withLock {
-                playsLeft = repeats.coerceIn(TimerSettings.ALERT_REPEATS_RANGE)
+                playsLeft.set(repeats.coerceIn(TimerSettings.ALERT_REPEATS_RANGE))
                 startSound(sound)
             }
         }
@@ -86,7 +92,7 @@ class AlertPlayerImpl @Inject constructor(
     override fun stop() {
         // Zero first: releasing the player fires no completion callback, but a chain already queued on
         // the main thread would otherwise start the next play over the top of a stop the user asked for.
-        playsLeft = 0
+        playsLeft.set(0)
         releasePlayer()
         vibrator()?.cancel()
     }
@@ -106,22 +112,29 @@ class AlertPlayerImpl @Inject constructor(
         requestAudioFocus(attributes)
 
         try {
-            player = MediaPlayer.create(context, rawRes)?.apply {
-                setAudioAttributes(attributes)
+            player = MediaPlayer.create(context, rawRes, attributes, audioSessionId())?.apply {
                 setOnCompletionListener { finished -> onClipFinished(finished) }
                 setOnErrorListener { _, what, extra ->
                     Timber.w("MediaPlayer error %d/%d", what, extra)
-                    playsLeft = 0
+                    playsLeft.set(0)
                     releasePlayer()
                     true
                 }
                 start()
             }
-            if (player != null) playsLeft--
+            if (player == null) {
+                // `create` swallows its own exceptions and answers null. Without this line a clip that
+                // cannot be decoded is indistinguishable from an alert the policy chose to silence.
+                Timber.w("Could not open the alert clip %s", sound.id)
+                playsLeft.set(0)
+                releasePlayer()
+            } else {
+                playsLeft.decrementAndGet()
+            }
         } catch (e: Exception) {
             // A missing or corrupt clip must never take the timer down with it.
             Timber.e(e, "Could not play the alert sound %s", sound.id)
-            playsLeft = 0
+            playsLeft.set(0)
             releasePlayer()
         }
     }
@@ -134,20 +147,29 @@ class AlertPlayerImpl @Inject constructor(
      * Back to back with no gap on purpose — a repeat is meant to read as one longer alert, not as two.
      */
     private fun onClipFinished(finished: MediaPlayer) {
-        if (playsLeft <= 0) {
+        val owed = playsLeft.getAndUpdate { left -> if (left > 0) left - 1 else 0 }
+        if (owed <= 0) {
             releasePlayer()
             return
         }
-        playsLeft--
         val restarted = runCatching {
             finished.seekTo(0)
             finished.start()
         }.isSuccess
         if (!restarted) {
-            playsLeft = 0
+            playsLeft.set(0)
             releasePlayer()
         }
     }
+
+    /**
+     * A session of our own, so the clip is not mixed into whatever session the framework hands out by
+     * default. `generateAudioSessionId` answers [AudioManager.ERROR] when it cannot, and zero means
+     * "allocate one for me", which is the same thing `create` would have done.
+     */
+    private fun audioSessionId(): Int =
+        audioManager?.generateAudioSessionId()?.takeIf { it != AudioManager.ERROR }
+            ?: AudioManager.AUDIO_SESSION_ID_GENERATE
 
     private fun requestAudioFocus(attributes: AudioAttributes) {
         val manager = audioManager ?: return

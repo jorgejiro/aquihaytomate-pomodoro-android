@@ -15,6 +15,9 @@ import com.jjrapps.aquihaytomate.testing.MutableElapsedRealtime
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -784,6 +787,31 @@ class TimerEngineTest {
         assertFalse(reconcile())
         assertEquals(TimerStatus.RUNNING, state().status)
         assertEquals(focusMs - 60_000L, remaining())
+    }
+
+    /**
+     * El servicio cierra el slot dentro de su propio `countdownJob`, y al encadenar el descanso arranca
+     * el servicio otra vez: `onStartCommand` cancela ese job. La alerta iba después, así que el fin del
+     * pomodoro se quedaba mudo mientras el del descanso —que no encadena— sonaba.
+     */
+    @Test
+    fun `the alert sounds even when starting the next slot cancels the caller`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = true))
+        start()
+        advance(focusMs)
+
+        val closing = launch {
+            val self = currentCoroutineContext()[Job]!!
+            runtime.onServiceStart = { self.cancel() }
+            complete()
+        }
+        closing.join()
+        runtime.onServiceStart = null
+
+        assertEquals("El pomodoro tiene que sonar aunque el descanso arranque solo", 1, alerts.playCount)
+        assertEquals(AlertSound.BOWL, alerts.lastSound)
+        assertEquals(1, runtime.chainedNotificationCount)
+        assertEquals(1, stats.recorded.size)
     }
 
     // ─── El día siguiente ───────────────────────────────────────────────────

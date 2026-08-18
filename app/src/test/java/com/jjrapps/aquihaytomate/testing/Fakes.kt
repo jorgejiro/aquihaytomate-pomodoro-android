@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.yield
 import kotlinx.coroutines.sync.withLock
 
 /**
@@ -46,7 +47,15 @@ class FakeTimerStateRepository(initial: TimerState = TimerState.EMPTY) : TimerSt
 
     override val state: Flow<TimerState> = flow.asStateFlow()
 
-    override suspend fun current(): TimerState = flow.value
+    /**
+     * `yield()` on purpose: DataStore reads from disk, so `current()` is a real suspension point where
+     * a cancelled caller stops. Answering straight from memory would hide exactly that — it is what let
+     * the muted end-of-pomodoro alert through the suite unnoticed.
+     */
+    override suspend fun current(): TimerState {
+        yield()
+        return flow.value
+    }
 
     override suspend fun write(state: TimerState) {
         mutex.withLock {
@@ -221,6 +230,12 @@ class FakeTimerRuntime : TimerAlarmScheduler, TimerServiceController, TimerNotif
     /** Set to false to simulate `ForegroundServiceStartNotAllowedException`. */
     var serviceStartAllowed: Boolean = true
 
+    /**
+     * Run when the service is asked to start. Stands in for `onStartCommand`, which cancels the very
+     * countdown coroutine that was closing the slot when auto-start chains into the next one.
+     */
+    var onServiceStart: (() -> Unit)? = null
+
     /** Set to false to simulate `SCHEDULE_EXACT_ALARM` denied. */
     var exactAlarmsAllowed: Boolean = true
 
@@ -240,6 +255,7 @@ class FakeTimerRuntime : TimerAlarmScheduler, TimerServiceController, TimerNotif
     override fun start(): Boolean {
         startCount++
         serviceRunning = serviceStartAllowed
+        onServiceStart?.invoke()
         return serviceStartAllowed
     }
 

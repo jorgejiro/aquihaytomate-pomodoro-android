@@ -19,6 +19,17 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ### Corregido
 
+- **El sonido de fin de pomodoro no sonaba.** Con el auto-inicio del descanso activado —que es el valor
+  por defecto—, quien cierra el slot es la corrutina del servicio, y arrancar el servicio del descanso
+  siguiente cancelaba esa misma corrutina antes de llegar a la alerta. El fin del **descanso** sí sonaba
+  porque no encadena con nada, y de ahí que pareciera cosa del sonido elegido. Se llevaba por delante
+  también la notificación de fin del caso encadenado, la que va al reloj emparejado. Ver
+  `docs/decisions/016-la-alerta-no-depende-del-job-que-la-dispara.md`.
+- **La alerta sonaba con el volumen de multimedia en vez de con el de alarma.** Los `AudioAttributes` con
+  `USAGE_ALARM` se aplicaban después de `MediaPlayer.create`, que ya ha llamado a `prepare()`, y ahí el
+  framework ya no reencamina nada. Con los medios bajados el aviso era inaudible aunque el volumen de
+  alarma estuviera alto, que es lo que la app comprobaba para decidir si sonar.
+
 - **El ciclo de pomodoros se reinicia al cambiar de día.** Un móvil que se coge de vez en cuando abría la
   app diciendo `3/4` con un descanso esperando, días después del último pomodoro: el ciclo vive en el
   estado persistido y nada lo envejecía. Ahora, al abrir la app, tocar el widget o arrancar el

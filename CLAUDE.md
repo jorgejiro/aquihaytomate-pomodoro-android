@@ -390,6 +390,15 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 - **`reconcile()` nunca simula más de un slot vencido**, aunque el auto-inicio esté activo. Si el móvil estuvo apagado 8 horas, se registra el slot que venció, se pasa a `IDLE` y ya. Sin esta regla, abrir la app por la mañana insertaría 16 pomodoros falsos.
 - **La notificación ongoing vuelve si el usuario la descarta**, mientras el temporizador esté corriendo o pausado: desde Android 13 `setOngoing` no impide el swipe, y quedarse sin notificación es quedarse sin cifra y sin controles. En `RINGING` e `IDLE` no vuelve. Ver `docs/decisions/010-*`.
 - **La notificación ongoing no se repinta cada segundo.** Se publica una vez por transición (~4 `notify()` por pomodoro) y el descuento lo tickea un `Chronometer` dentro de **nuestro propio cuerpo de notificación** (`DecoratedCustomViewStyle`), en el proceso de SystemUI. Nada de `setProgress()` ni de minutos en el título, que obligaría a republicar cada minuto. Ver `docs/decisions/009-*`.
+- **Lo que va después de cerrar un slot se ejecuta en `NonCancellable`.** Quien cierra el slot suele ser
+  la corrutina del propio servicio, y al encadenar el descanso el `onStartCommand` del servicio nuevo
+  cancela esa misma corrutina: sin `NonCancellable`, el fin del pomodoro se quedaba mudo mientras el del
+  descanso sonaba. Una vez avanzado el estado, la alerta y la notificación son una deuda con el usuario.
+  Ver `docs/decisions/016-*`.
+- **Los `AudioAttributes` de la alerta van en la factoría del `MediaPlayer`, nunca en un setter
+  posterior.** `MediaPlayer.create` llama a `prepare()` por dentro y a partir de ahí `setAudioAttributes`
+  no reencamina nada: el clip sale por el volumen de multimedia en vez de por el de alarma. Ver
+  `docs/decisions/004-*`.
 - **El widget se refresca desde un solo sitio**: un colector con scope de aplicación observa `TimerStateRepository.state` con `distinctUntilChangedBy { Triple(status, slotType, endAtEpochMs) }` + `debounce(250)`. **Nunca por segundo** — de eso se encarga el `Chronometer` del widget.
 
 ### Máquina de estados

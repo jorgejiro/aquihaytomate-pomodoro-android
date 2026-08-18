@@ -8,6 +8,8 @@ import com.jjrapps.aquihaytomate.domain.repository.TimerStateRepository
 import com.jjrapps.aquihaytomate.domain.time.ElapsedRealtimeSource
 import java.time.Clock
 import javax.inject.Inject
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 
 /**
  * Closes a slot that has run out: records it, moves the state on and fires the alert.
@@ -24,6 +26,12 @@ import javax.inject.Inject
  *    `RUNNING` state matching the slot it means to close; the rest get null back and do nothing.
  * 3. **Only the caller that won the compare-and-set alerts.** That is why the alert comes last and is
  *    gated on the return value of the update, rather than on having written the row.
+ * 4. **Everything after the transition runs `NonCancellable`.** The usual caller is the service's own
+ *    countdown coroutine, and with auto-start on, `syncTimerRuntime` starts the service for the next
+ *    slot — whose `onStartCommand` cancels that very coroutine. Without this the job died at the next
+ *    suspension point and the alert never played: the end of a pomodoro was silent while the end of a
+ *    break, which chains into nothing, rang normally. Once the state has moved on, the alert and the
+ *    notification are owed to the user and cannot be dropped halfway.
  *
  * See CLAUDE.md §6 and docs/decisions/002-motor-del-temporizador-hibrido.md.
  */
@@ -101,7 +109,7 @@ class CompleteSlotUseCase @Inject constructor(
             }
         }
 
-        if (closedByUs) {
+        if (closedByUs) withContext(NonCancellable) {
             // Rearm or tear down before alerting: the alert can take seconds of vibration, and the
             // next slot's alarm should already be armed by then.
             syncTimerRuntime()

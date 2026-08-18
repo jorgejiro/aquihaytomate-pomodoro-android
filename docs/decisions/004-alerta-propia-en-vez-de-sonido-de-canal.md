@@ -53,7 +53,15 @@ canales huérfanos. Y aun así la vibración quedaría limitada a un patrón fij
    ```
 
    `USAGE_ALARM` hace que use el **volumen de alarma**, que es el que el usuario espera de un
-   temporizador, y no el de multimedia. Se pide `requestAudioFocus(GAIN_TRANSIENT_MAY_DUCK)` antes y
+   temporizador, y no el de multimedia.
+
+   > **Corregido el 2026-08-18.** La implementación pasaba estos atributos en un `setAudioAttributes`
+   > *posterior* a `MediaPlayer.create(context, resid)`, que llama a `prepare()` por dentro. La doc del
+   > framework es explícita: «In order for the target audio attributes type to become effective, this
+   > method must be called before `prepare()`». El setter se aceptaba, no cambiaba de estado y no hacía
+   > nada, así que **el clip salía por el volumen de multimedia** — justo lo que este punto quería
+   > evitar. Los atributos van ahora en la factoría,
+   > `MediaPlayer.create(context, resid, attributes, sessionId)`. Se pide `requestAudioFocus(GAIN_TRANSIENT_MAY_DUCK)` antes y
    se abandona en `onCompletion`, para bajar la música del usuario en vez de pisarla. Watchdog de
    10 s que libera el `MediaPlayer` pase lo que pase.
 
