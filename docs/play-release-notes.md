@@ -15,6 +15,71 @@ release: *Producción → Crear nueva versión → Notas de la versión*, una pe
 
 ---
 
+## 1.3.1 (versionCode 7) — 2026-08-18
+
+Una release de correcciones, así que las viñetas nombran **el síntoma que el usuario vio**, no la causa:
+nadie de fuera sabe qué es una corrutina cancelada, pero sí se acuerda de que el pomodoro acabó en
+silencio. El fallo del sonido va primero porque es el que rompía la promesa de la app —un temporizador
+que no avisa no es un temporizador— y lleva pegado el detalle del volumen de alarma, que es lo que
+explica por qué alguien podía no oír nada teniendo la alarma alta.
+
+### es-ES (442 caracteres)
+
+```text
+Novedades de la versión 1.3.1
+
+Tres correcciones vistas usando la app:
+
+• El aviso del final del pomodoro vuelve a sonar, y lo hace con el volumen de alarma, como debía.
+• El ciclo empieza de cero cada día: ya no te recibe en el pomodoro 3 de 4 de una tanda de otro día.
+• Reiniciar desde la notificación ya no la hace desaparecer: se queda con el tiempo completo y el botón de empezar.
+
+Sin cuentas, sin nube, sin anuncios y sin seguimiento.
+```
+
+### en-US (404 caracteres)
+
+```text
+What's new in 1.3.1
+
+Three fixes found by using the app:
+
+• The end-of-pomodoro alert sounds again, and it follows the alarm volume, as it should.
+• The cycle starts from zero each day: no more opening the app on pomodoro 3 of 4 from another day.
+• Resetting from the notification no longer makes it vanish: it stays, showing the full time and a start button.
+
+No accounts, no cloud, no ads, no tracking.
+```
+
+### Formato con etiquetas de idioma
+
+```xml
+<es-ES>
+Novedades de la versión 1.3.1
+
+Tres correcciones vistas usando la app:
+
+• El aviso del final del pomodoro vuelve a sonar, y lo hace con el volumen de alarma, como debía.
+• El ciclo empieza de cero cada día: ya no te recibe en el pomodoro 3 de 4 de una tanda de otro día.
+• Reiniciar desde la notificación ya no la hace desaparecer: se queda con el tiempo completo y el botón de empezar.
+
+Sin cuentas, sin nube, sin anuncios y sin seguimiento.
+</es-ES>
+<en-US>
+What's new in 1.3.1
+
+Three fixes found by using the app:
+
+• The end-of-pomodoro alert sounds again, and it follows the alarm volume, as it should.
+• The cycle starts from zero each day: no more opening the app on pomodoro 3 of 4 from another day.
+• Resetting from the notification no longer makes it vanish: it stays, showing the full time and a start button.
+
+No accounts, no cloud, no ads, no tracking.
+</en-US>
+```
+
+---
+
 ## 1.3.0 (versionCode 6) — 2026-08-10
 
 **Este bloque suma la 1.3.0 y la 1.2.0**, porque las dos llegan juntas al usuario: la 1.2.0 no se
