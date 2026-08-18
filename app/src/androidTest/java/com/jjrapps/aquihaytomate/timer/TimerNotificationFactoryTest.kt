@@ -281,6 +281,70 @@ class TimerNotificationFactoryTest {
         assertEquals("Nothing to expire: it is waiting for the user", 0L, waiting.timeoutAfter)
     }
 
+    // ─── The stopped slot ───────────────────────────────────────────────────
+
+    private val idleFocus = running.copy(
+        status = TimerStatus.IDLE,
+        sessionId = 1_800_000_000_000L,
+        endAtElapsedRealtimeMs = 0L,
+        endAtEpochMs = 0L,
+    )
+
+    /**
+     * Resetting from the shade left the shade empty: the timer was still there, back at its start, with no
+     * way to run it again short of opening the app. It now keeps a notification with the whole slot and a ▸.
+     */
+    @Test
+    fun theIdleNotificationCarriesItsOwnBodyAndBothLayouts() {
+        val notification = factory.ongoingIdle(idleFocus, durationMs = 25 * 60_000L)
+
+        assertEquals(R.layout.notification_timer_collapsed, notification.contentView.layoutId)
+        assertEquals(R.layout.notification_timer, notification.bigContentView.layoutId)
+        assertNotNull(notification.contentView.apply { apply(context, null) })
+        assertNotNull(notification.bigContentView.apply { apply(context, null) })
+    }
+
+    /**
+     * Dismissable, and it stays dismissed.
+     *
+     * With the clock stopped there is no countdown running unseen, so a swipe is a legitimate "not now" —
+     * the opposite of the running form, which comes back precisely because something is still ticking.
+     */
+    @Test
+    fun theIdleNotificationIsDismissableAndDoesNotComeBack() {
+        val notification = factory.ongoingIdle(idleFocus, durationMs = 25 * 60_000L)
+
+        assertEquals(0, notification.flags and android.app.Notification.FLAG_ONGOING_EVENT)
+        assertNull("Restoring an idle timer would be the notification that will not die", notification.deleteIntent)
+    }
+
+    /** A pomodoro waiting has one thing to offer; a break waiting can also be skipped, as on the screen. */
+    @Test
+    fun theIdleNotificationOffersStartingAndSkipsOnlyBreaks() {
+        val focus = factory.ongoingIdle(idleFocus, durationMs = 25 * 60_000L)
+        val breakWaiting = factory.ongoingIdle(
+            idleFocus.copy(slotType = SlotType.SHORT_BREAK),
+            durationMs = 5 * 60_000L,
+        )
+
+        assertEquals(1, focus.actions.size)
+        assertEquals(context.getString(R.string.control_start), focus.actions[0].title.toString())
+
+        assertEquals(2, breakWaiting.actions.size)
+        assertEquals(
+            context.getString(R.string.notification_action_skip),
+            breakWaiting.actions[1].title.toString(),
+        )
+    }
+
+    @Test
+    fun theIdleNotificationIsSilentAndPhoneOnly() {
+        val notification = factory.ongoingIdle(idleFocus, durationMs = 25 * 60_000L)
+
+        assertNull(notification.sound)
+        assertTrue(notification.flags and NotificationCompat.FLAG_LOCAL_ONLY != 0)
+    }
+
     @Test
     fun theRunningNotificationIsOngoingAndSilent() {
         val notification = factory.ongoingRunning(running)

@@ -24,6 +24,13 @@ interface TimerNotifier {
     fun showPaused(state: TimerState, remainingMs: Long)
 
     /**
+     * Publishes the notification of a stopped slot waiting to be started, with a Start action.
+     *
+     * @param durationMs the full length of the pending slot, which is what the figure shows.
+     */
+    fun showIdle(state: TimerState, durationMs: Long)
+
+    /**
      * Publishes the end-of-slot alert. [state] already describes the slot coming up.
      *
      * @param chained true when that slot started by itself. It still gets an alert: auto-starting means not

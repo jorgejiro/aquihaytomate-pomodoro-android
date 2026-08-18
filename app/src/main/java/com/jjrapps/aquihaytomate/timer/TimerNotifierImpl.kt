@@ -41,6 +41,12 @@ class TimerNotifierImpl @Inject constructor(
         ) { factory.ongoingPaused(state, remainingMs) }
     }
 
+    override fun showIdle(state: TimerState, durationMs: Long) {
+        notify(
+            TimerNotificationFactory.NOTIFICATION_ID_ONGOING,
+        ) { factory.ongoingIdle(state, durationMs) }
+    }
+
     override fun showSlotFinished(state: TimerState, chained: Boolean) {
         notify(TimerNotificationFactory.NOTIFICATION_ID_ALERT) {
             factory.slotFinished(state, chained)

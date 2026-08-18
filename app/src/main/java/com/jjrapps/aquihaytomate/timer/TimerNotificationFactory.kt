@@ -17,6 +17,7 @@ import com.jjrapps.aquihaytomate.R
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.TimerState
+import com.jjrapps.aquihaytomate.domain.model.TimerStatus
 import com.jjrapps.aquihaytomate.domain.time.ElapsedRealtimeSource
 import com.jjrapps.aquihaytomate.domain.usecase.TimerMath
 import com.jjrapps.aquihaytomate.ui.common.phaseNameRes
@@ -73,7 +74,31 @@ class TimerNotificationFactory @Inject constructor(
             .build()
 
     /**
-     * Silent and phone-only, which is what the two ongoing forms have in common.
+     * A stopped slot waiting to be started: the full length of what comes next and a single ▸.
+     *
+     * It exists because resetting from the shade used to leave the shade empty — the timer was still
+     * there, at zero progress, with no way to start it again without opening the app. The figure is
+     * frozen like the paused one, for the same reason: nothing is ticking.
+     *
+     * **Not `setOngoing`, and no restore on dismissal.** With the clock stopped, swiping it away is a
+     * legitimate "I am done for now", and `RestoreOngoingNotificationUseCase` deliberately ignores
+     * `IDLE`. Reset only ever hides it, never resurrects it.
+     *
+     * @param durationMs the whole length of the pending slot, read from the live settings by the caller.
+     */
+    fun ongoingIdle(state: TimerState, durationMs: Long): Notification =
+        base(AquiHayTomateApplication.CHANNEL_TIMER_RUNNING)
+            .setContentTitle(titleFor(state))
+            .setSubText(expandedPhaseText(state, R.string.notification_ready_label))
+            .asPhoneOnly()
+            .withBody(state, TimerActionReceiver.ACTION_START, R.string.notification_ready_label) {
+                frozenFigureOf(state, durationMs)
+            }
+            .withIdleActions(state)
+            .build()
+
+    /**
+     * Silent and phone-only, which is what the three ongoing forms have in common.
      *
      * **Silent** because they are republished on every transition and must never make a sound of their own —
      * the alert is `AlertPlayer`'s job, see ADR 004.
@@ -111,7 +136,7 @@ class TimerNotificationFactory @Inject constructor(
      */
     private fun NotificationCompat.Builder.withBody(
         state: TimerState,
-        pauseOrResume: String,
+        primaryAction: String,
         @StringRes suffixRes: Int? = null,
         applyFigure: RemoteViews.() -> Unit,
     ): NotificationCompat.Builder = setStyle(NotificationCompat.DecoratedCustomViewStyle())
@@ -125,7 +150,7 @@ class TimerNotificationFactory @Inject constructor(
                 layout = R.layout.notification_timer_collapsed,
                 phase = "",
                 applyFigure = applyFigure,
-            ).apply { applyIconActions(pauseOrResume, state.slotType) },
+            ).apply { applyIconActions(state, primaryAction) },
         )
         .setCustomBigContentView(
             body(
@@ -177,25 +202,32 @@ class TimerNotificationFactory @Inject constructor(
      * a tap to reach Pause. `contentDescription` carries the label a screen reader would have read off that
      * row.
      */
-    private fun RemoteViews.applyIconActions(pauseOrResume: String, slotType: SlotType) {
-        val tint = figureColour(slotType)
+    private fun RemoteViews.applyIconActions(state: TimerState, primaryAction: String) {
+        val tint = figureColour(state.slotType)
         listOf(
             R.id.notification_action_primary,
             R.id.notification_action_reset,
             R.id.notification_action_skip,
         ).forEach { setInt(it, "setColorFilter", tint) }
 
-        val resuming = pauseOrResume == TimerActionReceiver.ACTION_RESUME
+        val playing = primaryAction == TimerActionReceiver.ACTION_RESUME ||
+            primaryAction == TimerActionReceiver.ACTION_START
         setImageViewResource(
             R.id.notification_action_primary,
-            if (resuming) R.drawable.ic_notif_play else R.drawable.ic_notif_pause,
+            if (playing) R.drawable.ic_notif_play else R.drawable.ic_notif_pause,
         )
         setContentDescription(
             R.id.notification_action_primary,
-            context.getString(labelFor(pauseOrResume)),
+            context.getString(labelFor(primaryAction)),
         )
-        setOnClickPendingIntent(R.id.notification_action_primary, actionIntent(pauseOrResume))
+        setOnClickPendingIntent(R.id.notification_action_primary, actionIntent(primaryAction))
 
+        // The same two rules the Timer screen applies, straight off the state: nothing to throw away
+        // when the slot has not started, and no skipping a first pomodoro that has not run.
+        setViewVisibility(
+            R.id.notification_action_reset,
+            if (state.status == TimerStatus.IDLE) View.GONE else View.VISIBLE,
+        )
         setContentDescription(
             R.id.notification_action_reset,
             context.getString(R.string.notification_action_reset),
@@ -205,6 +237,10 @@ class TimerNotificationFactory @Inject constructor(
             actionIntent(TimerActionReceiver.ACTION_RESET),
         )
 
+        setViewVisibility(
+            R.id.notification_action_skip,
+            if (state.offersSkip) View.VISIBLE else View.GONE,
+        )
         setContentDescription(
             R.id.notification_action_skip,
             context.getString(R.string.notification_action_skip),
@@ -267,10 +303,34 @@ class TimerNotificationFactory @Inject constructor(
             actionIntent(TimerActionReceiver.ACTION_SKIP),
         )
 
-    private fun labelFor(action: String) = if (action == TimerActionReceiver.ACTION_RESUME) {
-        R.string.notification_action_resume
-    } else {
-        R.string.notification_action_pause
+    /**
+     * The expanded row of a stopped slot: start it, and skip it when what waits is a break.
+     *
+     * Reset is left out on purpose — the slot is already at its start — and so is a skip of a pomodoro
+     * that has not run, which would hand out a break earned by nothing.
+     */
+    private fun NotificationCompat.Builder.withIdleActions(
+        state: TimerState,
+    ): NotificationCompat.Builder = this
+        .addAction(
+            0,
+            context.getString(R.string.control_start),
+            actionIntent(TimerActionReceiver.ACTION_START),
+        )
+        .apply {
+            if (state.offersSkip) {
+                addAction(
+                    0,
+                    context.getString(R.string.notification_action_skip),
+                    actionIntent(TimerActionReceiver.ACTION_SKIP),
+                )
+            }
+        }
+
+    private fun labelFor(action: String) = when (action) {
+        TimerActionReceiver.ACTION_RESUME -> R.string.notification_action_resume
+        TimerActionReceiver.ACTION_START -> R.string.control_start
+        else -> R.string.notification_action_pause
     }
 
     /**

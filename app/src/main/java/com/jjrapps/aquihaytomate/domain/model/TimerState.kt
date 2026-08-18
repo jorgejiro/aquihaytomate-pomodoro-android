@@ -68,6 +68,25 @@ data class TimerState(
         }
 
     /**
+     * Whether SKIP is worth offering.
+     *
+     * Always with a slot under way; when stopped, only if what waits is a break — skipping a pomodoro
+     * that has not started is just not starting it. Lives here rather than in `TimerUiState` because the
+     * notification offers the same control and the two must not drift.
+     */
+    val offersSkip: Boolean
+        get() = offersSkip(status, slotType)
+
+    /**
+     * Whether a stopped timer still has a batch behind it, and therefore something to show.
+     *
+     * Zero means nothing has been started since the last fresh day, and a notification offering to start
+     * a pomodoro nobody asked for is clutter.
+     */
+    val hasBatchUnderWay: Boolean
+        get() = sessionId != 0L
+
+    /**
      * When the timer was last moved, falling back to the older markers.
      *
      * [lastActivityEpochMs] arrived after 1.3.0, so a state written by an earlier version does not
@@ -83,6 +102,10 @@ data class TimerState(
         }
 
     companion object {
+        /** The rule behind [offersSkip], callable from a screen state that holds no [TimerState]. */
+        fun offersSkip(status: TimerStatus, slotType: SlotType): Boolean =
+            status != TimerStatus.IDLE || slotType.isBreak
+
         /** Nothing has ever run. Used as the DataStore default. */
         val EMPTY = TimerState()
 

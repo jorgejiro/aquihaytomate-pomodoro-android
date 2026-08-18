@@ -1,6 +1,7 @@
 package com.jjrapps.aquihaytomate.ui.timer
 
 import com.jjrapps.aquihaytomate.domain.model.SlotType
+import com.jjrapps.aquihaytomate.domain.model.TimerState
 import com.jjrapps.aquihaytomate.domain.model.TimerStatus
 
 /** What the primary control does right now. The label follows from it. */
@@ -45,6 +46,6 @@ sealed interface TimerUiState {
          * so it is offered while idle too. Skipping the very first focus slot before starting it is not:
          * it would jump to a break earned by nothing.
          */
-        val showSkip: Boolean get() = status != TimerStatus.IDLE || slotType.isBreak
+        val showSkip: Boolean get() = TimerState.offersSkip(status, slotType)
     }
 }

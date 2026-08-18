@@ -58,3 +58,24 @@ decisión es la misma la reciba quien la reciba.
 - Queda un caso que solo se ve en dispositivo real: si el usuario descarta la notificación **con la pantalla
   bloqueada** en algún OEM que la degrade a la plantilla estándar. El mecanismo es el mismo, pero conviene
   mirarlo cuando se pase la checklist §10.
+
+---
+
+## Añadido el 2026-08-18 · el temporizador parado también tiene notificación
+
+Reiniciar desde la persiana dejaba la persiana **vacía**: `IDLE` limpiaba la notificación, y el
+temporizador seguía ahí —en su slot, a cero de progreso— sin ninguna forma de volver a arrancarlo que no
+fuera abrir la app. Ahora `IDLE` publica una tercera forma: el slot pendiente con su **duración completa**
+y un ▸.
+
+Lo que este ADR decide sigue en pie y es justo lo que la distingue de las otras dos:
+
+- **No es `ongoing` y no vuelve al descartarla.** Con el reloj parado no hay ninguna cuenta corriendo a
+  espaldas del usuario, así que un swipe es un «ahora no» legítimo. Las formas corriendo y pausada
+  vuelven porque hay algo que sigue pasando; esta no.
+- **Solo si hay una tanda empezada** (`sessionId != 0`). Una app recién instalada, o el día siguiente
+  después del barrido del ADR 015, no saca de la nada una notificación ofreciendo un pomodoro que nadie
+  ha pedido.
+- **Los controles son los de la pantalla en ese estado**: ▸ INICIAR siempre, SALTAR solo si lo que espera
+  es un descanso, y REINICIAR nunca — el slot ya está en su inicio. La regla vive en
+  `TimerState.offersSkip`, que usan la pantalla y la notificación, para que no puedan divergir.

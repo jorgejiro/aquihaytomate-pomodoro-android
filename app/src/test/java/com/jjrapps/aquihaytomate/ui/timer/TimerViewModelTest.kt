@@ -68,7 +68,7 @@ class TimerViewModelTest {
     private fun viewModel(): TimerViewModel {
         val runtime = FakeTimerRuntime()
         val recordFocusSlot = RecordFocusSlotUseCase(stats, clock)
-        val sync = SyncTimerRuntimeUseCase(timerState, runtime, runtime, runtime, clock, elapsed)
+        val sync = SyncTimerRuntimeUseCase(timerState, settings, runtime, runtime, runtime, clock, elapsed)
         val start = StartTimerUseCase(timerState, settings, sync, clock, elapsed)
         val pause = PauseTimerUseCase(timerState, sync, clock, elapsed)
         val complete =

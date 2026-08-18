@@ -388,6 +388,11 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
   temporizador corriendo no se toca nunca**, y la comparación de días solo rueda hacia adelante, para
   que atrasar el reloj del sistema no borre el ciclo en curso. Ver `docs/decisions/015-*`.
 - **`reconcile()` nunca simula más de un slot vencido**, aunque el auto-inicio esté activo. Si el móvil estuvo apagado 8 horas, se registra el slot que venció, se pasa a `IDLE` y ya. Sin esta regla, abrir la app por la mañana insertaría 16 pomodoros falsos.
+- **El temporizador parado también tiene notificación**, siempre que haya una tanda empezada: el slot
+  pendiente con su duración completa y un ▸ INICIAR. Reiniciar desde la persiana dejaba la persiana vacía.
+  No es `ongoing`, no vuelve si se descarta, y sus controles son los mismos que muestra la pantalla en ese
+  estado —sin REINICIAR, y con SALTAR solo si lo que espera es un descanso, por `TimerState.offersSkip`—.
+  Ver `docs/decisions/010-*`.
 - **La notificación ongoing vuelve si el usuario la descarta**, mientras el temporizador esté corriendo o pausado: desde Android 13 `setOngoing` no impide el swipe, y quedarse sin notificación es quedarse sin cifra y sin controles. En `RINGING` e `IDLE` no vuelve. Ver `docs/decisions/010-*`.
 - **La notificación ongoing no se repinta cada segundo.** Se publica una vez por transición (~4 `notify()` por pomodoro) y el descuento lo tickea un `Chronometer` dentro de **nuestro propio cuerpo de notificación** (`DecoratedCustomViewStyle`), en el proceso de SystemUI. Nada de `setProgress()` ni de minutos en el título, que obligaría a republicar cada minuto. Ver `docs/decisions/009-*`.
 - **Lo que va después de cerrar un slot se ejecuta en `NonCancellable`.** Quien cierra el slot suele ser

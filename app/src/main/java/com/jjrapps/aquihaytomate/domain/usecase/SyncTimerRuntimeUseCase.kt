@@ -1,6 +1,7 @@
 package com.jjrapps.aquihaytomate.domain.usecase
 
 import com.jjrapps.aquihaytomate.domain.model.TimerStatus
+import com.jjrapps.aquihaytomate.domain.repository.SettingsRepository
 import com.jjrapps.aquihaytomate.domain.repository.TimerAlarmScheduler
 import com.jjrapps.aquihaytomate.domain.repository.TimerNotifier
 import com.jjrapps.aquihaytomate.domain.repository.TimerServiceController
@@ -25,6 +26,7 @@ import javax.inject.Inject
  */
 class SyncTimerRuntimeUseCase @Inject constructor(
     private val timerStateRepository: TimerStateRepository,
+    private val settingsRepository: SettingsRepository,
     private val alarmScheduler: TimerAlarmScheduler,
     private val serviceController: TimerServiceController,
     private val notifier: TimerNotifier,
@@ -65,7 +67,15 @@ class SyncTimerRuntimeUseCase @Inject constructor(
             TimerStatus.IDLE -> {
                 alarmScheduler.cancel()
                 serviceController.stop()
-                notifier.clearOngoing()
+                // A stopped timer with a batch behind it still has something to offer: the pending slot
+                // at its full length, with a ▸. Resetting from the shade used to clear the shade — the
+                // timer was still there and the only way back to it was opening the app. With no batch
+                // under way there is nothing to report, and a notification would be clutter.
+                if (state.hasBatchUnderWay) {
+                    notifier.showIdle(state, state.durationMsWith(settingsRepository.current()))
+                } else {
+                    notifier.clearOngoing()
+                }
             }
         }
     }

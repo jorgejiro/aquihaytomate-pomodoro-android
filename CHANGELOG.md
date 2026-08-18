@@ -17,6 +17,14 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 ## [No publicado]
 
+### Cambiado
+
+- **Reiniciar desde la notificación ya no deja la persiana vacía.** El temporizador parado mantiene su
+  notificación, con el slot pendiente a su duración completa —25:00 en un pomodoro, 5:00 en un descanso— y
+  un ▸ para arrancarlo sin abrir la app. Lleva los mismos controles que la pantalla en ese estado: sin
+  reiniciar, y con saltar solo si lo que espera es un descanso. Se puede descartar y no vuelve, y no
+  aparece si no hay ninguna tanda empezada.
+
 ### Corregido
 
 - **El sonido de fin de pomodoro no sonaba.** Con el auto-inicio del descanso activado —que es el valor

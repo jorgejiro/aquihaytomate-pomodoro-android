@@ -186,6 +186,7 @@
 
     <!-- Notifications -->
     <string name="notification_title_focus">Enfoque · %1$d/%2$d</string>
+    <string name="notification_ready_label">Listo</string>
     <string name="notification_paused_label">Pausado</string>
     <!-- Phase line of the ongoing notification: phase, then a state such as Paused. -->
     <string name="notification_phase_suffix">%1$s · %2$s</string>

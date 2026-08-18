@@ -220,6 +220,16 @@ class FakeTimerRuntime : TimerAlarmScheduler, TimerServiceController, TimerNotif
         private set
     var pausedNotificationCount: Int = 0
         private set
+    var idleNotificationCount: Int = 0
+        private set
+
+    /** The figure the idle notification was published with, to check it shows the whole slot. */
+    var lastIdleDurationMs: Long? = null
+        private set
+
+    /** True while an ongoing notification is on screen, idle or otherwise. */
+    var ongoingVisible: Boolean = false
+        private set
     var finishedNotificationCount: Int = 0
         private set
 
@@ -265,10 +275,18 @@ class FakeTimerRuntime : TimerAlarmScheduler, TimerServiceController, TimerNotif
 
     override fun showRunning(state: TimerState) {
         runningNotificationCount++
+        ongoingVisible = true
     }
 
     override fun showPaused(state: TimerState, remainingMs: Long) {
         pausedNotificationCount++
+        ongoingVisible = true
+    }
+
+    override fun showIdle(state: TimerState, durationMs: Long) {
+        idleNotificationCount++
+        lastIdleDurationMs = durationMs
+        ongoingVisible = true
     }
 
     override fun showSlotFinished(state: TimerState, chained: Boolean) {
@@ -276,7 +294,9 @@ class FakeTimerRuntime : TimerAlarmScheduler, TimerServiceController, TimerNotif
         if (chained) chainedNotificationCount++
     }
 
-    override fun clearOngoing() = Unit
+    override fun clearOngoing() {
+        ongoingVisible = false
+    }
 
     override fun clearAlert() = Unit
 }

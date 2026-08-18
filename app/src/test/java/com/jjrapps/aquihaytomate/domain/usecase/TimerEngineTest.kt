@@ -47,7 +47,7 @@ class TimerEngineTest {
 
     private val recordFocusSlot = RecordFocusSlotUseCase(stats, clock)
     private val sync =
-        SyncTimerRuntimeUseCase(timerState, runtime, runtime, runtime, clock, elapsed)
+        SyncTimerRuntimeUseCase(timerState, settings, runtime, runtime, runtime, clock, elapsed)
     private val start = StartTimerUseCase(timerState, settings, sync, clock, elapsed)
     private val pause = PauseTimerUseCase(timerState, sync, clock, elapsed)
     private val resume = ResumeTimerUseCase(timerState, sync, clock, elapsed)
@@ -812,6 +812,73 @@ class TimerEngineTest {
         assertEquals(AlertSound.BOWL, alerts.lastSound)
         assertEquals(1, runtime.chainedNotificationCount)
         assertEquals(1, stats.recorded.size)
+    }
+
+    // ─── La notificación del temporizador parado ────────────────────────────
+
+    @Test
+    fun `resetting from the shade leaves the pending slot on screen`() = runTest {
+        start()
+        advance(10 * 60_000L)
+
+        reset()
+
+        assertEquals("Reiniciar no puede dejar la persiana vacía", 1, runtime.idleNotificationCount)
+        assertTrue(runtime.ongoingVisible)
+        assertEquals("La cifra es el slot entero", focusMs, runtime.lastIdleDurationMs)
+    }
+
+    @Test
+    fun `the idle notification shows the whole break when the break is what waits`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
+        start()
+        advance(focusMs)
+        complete()          // RINGING con el descanso listo
+        start()             // el descanso, corriendo
+        advance(60_000L)
+
+        reset()
+
+        assertEquals(shortBreakMs, runtime.lastIdleDurationMs)
+        assertEquals(SlotType.SHORT_BREAK, state().slotType)
+    }
+
+    /** La duración sale de los ajustes vivos, no del snapshot congelado del slot que se reinició. */
+    @Test
+    fun `the idle notification follows a duration changed in settings`() = runTest {
+        start()
+        advance(60_000L)
+        settings.set(TimerSettings(focusMinutes = 40))
+
+        reset()
+
+        assertEquals(40 * 60_000L, runtime.lastIdleDurationMs)
+    }
+
+    @Test
+    fun `a timer with no batch behind it publishes nothing`() = runTest {
+        // Sin haber empezado nunca: sincronizar no puede sacar una notificación de la nada.
+        sync()
+
+        assertEquals(0, runtime.idleNotificationCount)
+        assertFalse(runtime.ongoingVisible)
+    }
+
+    @Test
+    fun `the day rollover takes the idle notification with it`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = false))
+        start()
+        advance(focusMs)
+        complete()
+        start()
+        advance(60_000L)
+        reset()
+        assertTrue(runtime.ongoingVisible)
+
+        advance(24 * 60 * 60_000L)
+        assertTrue(reconcile())
+
+        assertFalse("El día nuevo no hereda la notificación de ayer", runtime.ongoingVisible)
     }
 
     // ─── El día siguiente ───────────────────────────────────────────────────

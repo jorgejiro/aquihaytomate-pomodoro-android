@@ -55,6 +55,8 @@ class TimerActionReceiver : BroadcastReceiver() {
                     ACTION_RESUME -> resumeTimer()
                     ACTION_SKIP -> skipSlot()
                     ACTION_RESET -> resetTimer()
+                    // The ▸ of a stopped slot. Same thing the Timer screen's primary control does.
+                    ACTION_START -> startTimer()
                     ACTION_START_NEXT -> {
                         // Whatever is still sounding has been acknowledged by the tap itself.
                         alertPlayer.stop()
@@ -85,6 +87,7 @@ class TimerActionReceiver : BroadcastReceiver() {
         const val ACTION_RESUME = "com.jjrapps.aquihaytomate.RESUME"
         const val ACTION_SKIP = "com.jjrapps.aquihaytomate.SKIP"
         const val ACTION_RESET = "com.jjrapps.aquihaytomate.RESET"
+        const val ACTION_START = "com.jjrapps.aquihaytomate.START"
         const val ACTION_START_NEXT = "com.jjrapps.aquihaytomate.START_NEXT"
         const val ACTION_DISMISS = "com.jjrapps.aquihaytomate.DISMISS"
         const val ACTION_ONGOING_DISMISSED = "com.jjrapps.aquihaytomate.ONGOING_DISMISSED"
