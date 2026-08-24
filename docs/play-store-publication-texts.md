@@ -47,7 +47,7 @@
    |---|---|
    | Icono de la aplicación | `docs/store-assets/icono-play-512.png` (§9) |
    | Gráfico de funciones | `docs/store-assets/grafico-de-funciones-1024x500.png` (§9) |
-   | Capturas de teléfono y de tablet | los seis juegos de `docs/store-assets/capturas/` (§8): teléfono, tablet de 7" y de 10", en ES y EN |
+   | Capturas de teléfono y de tablet | `docs/store-assets/capturas/<idioma>/<formato>/` (§8): teléfono, tablet de 7" y de 10", dentro de `es` y de `en` |
    | Nombre, descripción corta y completa | §2, §3 y §4, en ES y EN |
    | Política de privacidad | la URL de `docs/web/aqui-hay-tomate.html` una vez subida (§11) |
    | Data safety | §10 |
@@ -229,13 +229,15 @@ versiones distintas del mismo texto. Misma separación que en Bebe Agua.
 | 5 | `05-fin-del-intervalo.png` | Fin de intervalo: el tomate vacío, «¡Tiempo!» y la invitación a seguir |
 | 6 | `06-widget-en-el-escritorio.png` | El widget de 1×1 en un escritorio limpio, junto al dock para que se aprecie el tamaño |
 
-Están en `docs/store-assets/capturas/`, en **tres formatos por dos idiomas**:
+Están en `docs/store-assets/capturas/`, **agrupadas por idioma y dentro por formato** —`<idioma>/<formato>/`—,
+que es el orden en el que Play pide los recursos: la ficha se rellena idioma a idioma, así que lo que hay
+que tener junto son los tres formatos de un mismo idioma.
 
 | Carpeta | Resolución | Aspecto | Requisito de Play |
 |---|---|---|---|
-| `telefono/{es,en}` | 1080 × 2400 | 9:20 | lados de 320 a 3840 px |
-| `tablet-7-pulgadas/{es,en}` | 1080 × 1920 | **9:16** | 9:16 o 16:9, lados de 320 a 3840 px |
-| `tablet-10-pulgadas/{es,en}` | 1440 × 2560 | **9:16** | 9:16 o 16:9, lados de 1080 a 7680 px |
+| `{es,en}/telefono` | 1080 × 2400 | 9:20 | lados de 320 a 3840 px |
+| `{es,en}/tablet-7-pulgadas` | 1080 × 1920 | **9:16** | 9:16 o 16:9, lados de 320 a 3840 px |
+| `{es,en}/tablet-10-pulgadas` | 1440 × 2560 | **9:16** | 9:16 o 16:9, lados de 1080 a 7680 px |
 
 Las de tablet cumplen el 9:16 exacto que Play valida. Las de teléfono van en la resolución nativa de un
 móvil actual, que es 9:20: **si la consola pusiera problemas con esa proporción**, se regeneran en 9:16

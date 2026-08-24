@@ -2,7 +2,12 @@
 """
 Juego completo de capturas para la ficha de Play, en el dispositivo conectado.
 
-    python3 capturar.py <directorio-destino> [--sin-widget]
+    python3 capturar.py <formato> [--sin-widget]
+
+`<formato>` es una de las claves de `PANTALLAS` —`telefono`, `tablet-7-pulgadas`, `tablet-10-pulgadas`—.
+Las capturas van a `capturas/<idioma>/<formato>/`, **el idioma primero**, que es como Play pide los
+recursos: la ficha se rellena idioma a idioma, así que lo que interesa tener junto en una carpeta son los
+tres formatos de un mismo idioma.
 
 Seis escenas por idioma, en el orden que pidió Jorge —el pomodoro primero, luego el descanso, la
 configuración, el historial y el widget— en español y en inglés:
@@ -30,6 +35,10 @@ import time
 import estado
 import tanda
 import ui
+
+# Las capturas se agrupan por idioma y dentro por formato, no al revés: subir la ficha de Play es
+# rellenar un idioma cada vez.
+CAPTURAS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "capturas")
 
 PKG = "com.jjrapps.aquihaytomate"
 LAUNCHER = "com.google.android.apps.nexuslauncher"
@@ -60,7 +69,7 @@ def alto_pantalla():
     return int(adb("shell", "wm", "size").strip().split(":")[-1].split("x")[1])
 
 
-# Resolución y densidad que Play exige de cada formato, por carpeta de destino. **No salen del AVD**:
+# Resolución y densidad que Play exige de cada formato. **No salen del AVD**:
 # los tres `config.ini` dicen 2560×1600 @ 320, y los valores de verdad se fijan con `wm size` y
 # `wm density`, que persisten en el emulador… pero no siempre los dos. En un pase la tablet de 7" había
 # conservado la resolución y perdido la densidad, y a 320 dpi se queda en 540 dp de ancho en vez de 600,
@@ -73,9 +82,13 @@ PANTALLAS = {
 }
 
 
-def fijar_pantalla(raiz):
-    """Aplica la resolución y la densidad del formato que toca, deducidas del directorio de destino."""
-    formato = os.path.basename(os.path.normpath(raiz))
+def destino_de(idioma, formato):
+    """`capturas/<idioma>/<formato>`: el idioma primero, como los recursos de la ficha de Play."""
+    return os.path.join(CAPTURAS, idioma, formato)
+
+
+def fijar_pantalla(formato):
+    """Aplica la resolución y la densidad que Play exige del formato que toca."""
     medidas = PANTALLAS.get(formato)
     if not medidas:
         print(f"aviso: '{formato}' no está en PANTALLAS, se deja la pantalla como esté")
@@ -286,14 +299,16 @@ def capturar_widget(destino, idioma):
 
 
 if __name__ == "__main__":
-    raiz = sys.argv[1]
-    fijar_pantalla(raiz)
+    # Se admite tanto el nombre del formato como una ruta que acabe en él, para no tener que recordar
+    # cuál de los dos espera el script.
+    formato = os.path.basename(os.path.normpath(sys.argv[1]))
+    fijar_pantalla(formato)
     preparar()
     if "--sin-widget" not in sys.argv:
         colocar_widget()
 
     for idioma in ("es", "en"):
-        destino = os.path.join(raiz, idioma)
+        destino = destino_de(idioma, formato)
         print(f"── {idioma} ──")
         tanda.tanda(destino, idioma)
         capturar_widget(destino, idioma)

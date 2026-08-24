@@ -2,7 +2,9 @@
 """
 Deja el widget en un sitio presentable del escritorio y vuelve a capturar la escena.
 
-    python3 recolocar.py <directorio-raiz>
+    python3 recolocar.py <formato>
+
+`<formato>` es el mismo que espera `capturar.py`: la captura se rehace en `capturas/<idioma>/<formato>/`.
 
 La posición en la que cae al arrastrarlo depende del launcher y de la rejilla, y en una tablet quedaba
 pegado al borde superior. La captura del widget es la que más importa de todo el juego —«el widget es el
@@ -53,7 +55,7 @@ def centrar():
 
 
 if __name__ == "__main__":
-    raiz = sys.argv[1]
+    formato = os.path.basename(os.path.normpath(sys.argv[1]))
     centrar()
     for idioma in ("es", "en"):
         # El idioma es un ajuste persistido de la app, no del sistema, y quien lo dejó puesto fue la
@@ -61,4 +63,4 @@ if __name__ == "__main__":
         # un «PAUSAR» que no va a aparecer porque la app sigue en inglés.
         tanda.abrir_app()
         tanda.poner_idioma(idioma)
-        capturar.capturar_widget(os.path.join(raiz, idioma), idioma)
+        capturar.capturar_widget(capturar.destino_de(idioma, formato), idioma)

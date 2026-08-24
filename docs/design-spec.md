@@ -705,7 +705,7 @@ El copy se escribe **para una pantalla de reloj**, que muestra título y cuerpo 
 | Licencias | `raw/licenses_ofl.txt` | Texto de la OFL de ambas familias |
 | Feature graphic | PNG sin alfa | **1024 × 500**, ver abajo. `docs/store-assets/grafico-de-funciones-1024x500.png` |
 | Icono de Play | PNG 32 bits, alfa opaco | 512 × 512, render del adaptativo recortado a la ventana visible de 72 dp. `docs/store-assets/icono-play-512.png` |
-| Capturas | PNG | Seis escenas por idioma en tres formatos: teléfono 1080 × 2400, tablet de 7" 1080 × 1920 y tablet de 10" 1440 × 2560 —las dos de tablet en 9:16 exacto, que es lo que Play valida—. **El pomodoro primero y el widget tras el historial.** Las genera `docs/store-assets/generar-capturas/` |
+| Capturas | PNG | Seis escenas por idioma en tres formatos: teléfono 1080 × 2400, tablet de 7" 1080 × 1920 y tablet de 10" 1440 × 2560 —las dos de tablet en 9:16 exacto, que es lo que Play valida—. **El pomodoro primero y el widget tras el historial.** En `docs/store-assets/capturas/<idioma>/<formato>/`, el idioma primero porque Play pide los recursos idioma a idioma. Las genera `docs/store-assets/generar-capturas/` |
 
 **Splash** con `androidx.core.splashscreen`:
 

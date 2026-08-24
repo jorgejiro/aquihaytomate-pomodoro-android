@@ -21,6 +21,9 @@ Comprueba cuatro cosas:
    de la otra, esa está incompleta. Un umbral fijo no sirve, porque en tablet el contenido ocupa
    proporcionalmente menos y una pantalla correcta baja del 2 % de tinta sin que le pase nada.
 4. **Las seis escenas, en los dos idiomas y los tres formatos**: 36 ficheros, ni uno menos.
+
+El juego vive en `capturas/<idioma>/<formato>/`, con el idioma primero: la ficha de Play se rellena idioma
+a idioma, así que interesa tener juntos los tres formatos de un mismo idioma.
 """
 import glob
 import hashlib
@@ -57,7 +60,7 @@ def revisar(raiz):
         print(f"\n{formato}  {tam[0]}×{tam[1]}  ({aspecto})")
 
         nombres = sorted(
-            os.path.basename(p) for p in glob.glob(os.path.join(raiz, formato, "es", "*.png"))
+            os.path.basename(p) for p in glob.glob(os.path.join(raiz, "es", formato, "*.png"))
         )
         if len(nombres) != ESCENAS:
             fallos.append(f"{formato}: {len(nombres)} escenas, se esperaban {ESCENAS}")
@@ -65,7 +68,7 @@ def revisar(raiz):
         for escena in nombres:
             medidas, firmas = {}, {}
             for idioma in IDIOMAS:
-                ruta = os.path.join(raiz, formato, idioma, escena)
+                ruta = os.path.join(raiz, idioma, formato, escena)
                 if not os.path.exists(ruta):
                     fallos.append(f"{ruta}: no existe")
                     continue

@@ -1,7 +1,10 @@
 # Generar las capturas de la ficha de Play
 
 Automatiza el juego completo de capturas: **seis escenas × dos idiomas × tres formatos = 36 imágenes**,
-en `docs/store-assets/capturas/`.
+en `docs/store-assets/capturas/<idioma>/<formato>/`.
+
+**El idioma va primero, y el formato dentro**, porque Play pide los recursos de la ficha idioma a idioma:
+al actualizar las capturas de un idioma interesa tener sus tres formatos juntos en una carpeta.
 
 Está aquí versionado porque estas capturas hay que rehacerlas cada vez que cambie una pantalla, y hacerlas
 a mano son 36 secuencias de navegación con el riesgo de que se cuele una en el idioma equivocado —que es
@@ -13,14 +16,18 @@ Con un emulador arrancado y la app instalada:
 
 ```bash
 python3 sembrar_historial.py siembra          # una vez: la base de datos con historial
-python3 capturar.py <destino>                 # las doce capturas del dispositivo conectado
-python3 recolocar.py <destino>                # opcional: centra el widget y rehace su captura
+python3 capturar.py telefono                  # las doce capturas del dispositivo conectado
+python3 recolocar.py telefono                 # opcional: centra el widget y rehace su captura
 python3 revisar.py                            # al final: control de las 36 antes de subirlas
 ```
 
 **Pasa siempre `revisar.py` antes de subir.** Comprueba las dimensiones exactas, que `es` y `en` no sean
 idénticas —un idioma colado—, que ninguna escena esté a medio pintar y que estén las 36. Devuelve código
 de salida 1 si algo falla, así que sirve tal cual en un script.
+
+El argumento es el **formato** —`telefono`, `tablet-7-pulgadas` o `tablet-10-pulgadas`—, que es a la vez
+la resolución que se le fija al emulador y la carpeta de destino dentro de cada idioma. Un pase deja los
+dos idiomas de ese formato: `capturas/es/<formato>/` y `capturas/en/<formato>/`.
 
 `capturar.py --sin-widget` salta la colocación del widget, para cuando ya está puesto en el escritorio.
 
