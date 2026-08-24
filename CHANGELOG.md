@@ -24,6 +24,9 @@ los dos extremos del slot.
 **Las novedades que se envían a Play cubren también las de la 1.2.0, la 1.3.0 y la 1.3.1**, porque van a
 llegar juntas al usuario: ninguna de las tres llegó a subirse.
 
+**Enviada a Google Play el 2026-08-24.** Es la primera subida desde la 1.1.0 (`versionCode` 4), así que
+los `versionCode` 5, 6 y 7 quedan sin usar en la consola.
+
 ### Añadido
 
 - **El onboarding pregunta cuántas veces quieres que suene cada aviso**, en una página nueva —la cuarta,
@@ -50,7 +53,7 @@ Tres fallos vistos usando la app, dos de ellos en un móvil que se coge de tarde
 es el serio: la alerta que separa un temporizador usable de un juguete llevaba sin sonar en el extremo
 del slot que más importa.
 
-**Aún sin subir a Play.**
+**Nunca se subió por separado: llega a Play dentro de la 1.4.0.**
 
 ### Cambiado
 
