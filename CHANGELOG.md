@@ -15,6 +15,35 @@ reutilizar ni bajando la versión.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.4.0] — 2026-08-24 (versionCode 8)
+
+Sube el minor por la página nueva del onboarding, pero lo que se va a notar de entrada son los avisos:
+los cuatro valores de fábrica de las alertas cambian, y la app pasa a avisar dos veces en vez de una en
+los dos extremos del slot.
+
+**Las novedades que se envían a Play cubren también las de la 1.2.0, la 1.3.0 y la 1.3.1**, porque van a
+llegar juntas al usuario: ninguna de las tres llegó a subirse.
+
+### Añadido
+
+- **El onboarding pregunta cuántas veces quieres que suene cada aviso**, en una página nueva —la cuarta,
+  justo antes de la de los permisos— con un control para el final del pomodoro y otro para el del
+  descanso, de una a cuatro veces. Perderse el final de una fase es el fallo que nadie atribuye a un
+  ajuste: se atribuye a que el temporizador no sonó, y por eso la pregunta no puede vivir solo en
+  Ajustes, donde nadie la va a buscar. El rango completo, hasta diez, sigue allí.
+
+### Cambiado
+
+- **Los dos sonidos por defecto cambian, y ahora los dos suenan dos veces.** Al terminar el pomodoro suena
+  la **campana** y al terminar el descanso el **cuenco tibetano**, elegidos por oído en dispositivo: el
+  cuenco se había puesto en el pomodoro por ser el más suave —acabar uno es una recompensa— y `digital` lo
+  sustituyó en la 1.3.1 por ser el más fuerte, pero suave y lento se pierde y 0,72 s de pitido se acaban
+  antes de que lo registres. Lo que el ADR 012 defiende no se mueve: los dos extremos del slot no suenan
+  igual. Y la **repetición por defecto pasa de una vez a dos**, encadenadas sin hueco, que es lo que las
+  lleva a la habitación de al lado. **Quien nunca haya tocado los ajustes oirá lo nuevo al actualizar**;
+  quien los eligiera a mano conserva lo suyo, y los cinco sonidos siguen en el catálogo. Ver la adenda de
+  `docs/decisions/012-un-sonido-por-cada-extremo-del-slot.md`.
+
 ## [1.3.1] — 2026-08-18 (versionCode 7)
 
 Tres fallos vistos usando la app, dos de ellos en un móvil que se coge de tarde en tarde. El del sonido
@@ -25,20 +54,13 @@ del slot que más importa.
 
 ### Cambiado
 
-- **Los dos sonidos por defecto cambian, y ahora los dos suenan dos veces.** Al terminar el pomodoro suena
-  la **campana** y al terminar el descanso el **cuenco tibetano**, elegidos por oído en dispositivo: el
-  cuenco se había puesto en el pomodoro por ser el más suave —acabar uno es una recompensa— y `digital` lo
-  sustituyó por ser el más fuerte, pero suave y lento se pierde y 0,72 s de pitido se acaban antes de que
-  lo registres. Lo que este ADR defiende no se mueve: los dos extremos del slot no suenan igual. Y la
-  **repetición por defecto pasa de una vez a dos**, encadenadas sin hueco, que es lo que las lleva a la
-  habitación de al lado. **Quien nunca haya tocado los ajustes oirá lo nuevo al actualizar**; quien los
-  eligiera a mano conserva lo suyo, y los cinco sonidos siguen en el catálogo. Ver la adenda de
-  `docs/decisions/012-un-sonido-por-cada-extremo-del-slot.md`.
-- **El onboarding gana una quinta página, la última: cuántas veces suena el aviso.** Con un control para el
-  fin del pomodoro y otro para el fin del descanso, de una a cuatro veces, porque perderse el final de una
-  fase es el fallo que nadie atribuye a un ajuste. Los dos permisos siguen exigiéndose donde se piden, y
-  `CONTINUAR SIN ELLOS` ahora pasa a la página siguiente en vez de terminar. Ver
-  `docs/decisions/008-el-onboarding-exige-los-dos-permisos.md`.
+- **El sonido por defecto al terminar el pomodoro pasa a ser Digital**, elegido por oído en dispositivo. El
+  cuenco tibetano se había escogido por ser el más suave —acabar un pomodoro es una recompensa—, y suave y
+  lento también es fácil de perderse, que es lo único que una alerta de fin de slot no puede permitirse:
+  `digital` es el más fuerte de los cuatro y el más corto. El descanso se queda con la campana, que sigue
+  siendo la que tiene que llegar desde otra habitación. **Quien nunca haya tocado el ajuste oirá el sonido
+  nuevo al actualizar**; quien lo eligiera a mano conserva el suyo, y el cuenco sigue en el catálogo. Ver
+  la adenda de `docs/decisions/012-un-sonido-por-cada-extremo-del-slot.md`.
 - **Reiniciar desde la notificación ya no deja la persiana vacía.** El temporizador parado mantiene su
   notificación, con el slot pendiente a su duración completa —25:00 en un pomodoro, 5:00 en un descanso— y
   un ▸ para arrancarlo sin abrir la app. Lleva los mismos controles que la pantalla en ese estado: sin

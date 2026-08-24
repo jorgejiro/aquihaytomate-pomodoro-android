@@ -26,6 +26,12 @@ object ChangelogCatalog {
 
     val releases: List<ChangelogRelease> = listOf(
         ChangelogRelease(
+            versionName = "1.4.0",
+            versionCode = 8,
+            releaseDate = LocalDate.of(2026, 8, 24),
+            highlightsRes = R.array.changelog_1_4_0,
+        ),
+        ChangelogRelease(
             versionName = "1.3.1",
             versionCode = 7,
             releaseDate = LocalDate.of(2026, 8, 18),

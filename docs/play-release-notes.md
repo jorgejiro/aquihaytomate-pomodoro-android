@@ -15,6 +15,71 @@ release: *Producción → Crear nueva versión → Notas de la versión*, una pe
 
 ---
 
+## 1.4.0 (versionCode 8) — 2026-08-24
+
+**Este bloque suma la 1.4.0, la 1.3.1, la 1.3.0 y la 1.2.0**: ninguna de las tres anteriores llegó a
+subirse, así que quien viene de la 1.1.0 —la última que hay en Play— las recibe todas de golpe. Dentro de
+la app cada una conserva su entrada en Novedades; esto es el resumen de lo que va a notar, no el historial.
+
+Las dos primeras viñetas son lo nuevo de verdad y van delante: los avisos son lo que el usuario oye sin
+buscarlo. La tercera es la corrección que rompía la promesa de la app —un temporizador que no avisa no es
+un temporizador— y las dos últimas se agrupan porque vienen de versiones que nunca vio. **Ya no se nombra
+«Digital»**: fue el valor por defecto de una versión que no se publicó, así que anunciarlo y corregirlo en
+la misma actualización solo confunde.
+
+### es-ES (488 caracteres)
+
+```text
+Novedades de la versión 1.4.0
+
+• Los avisos de fin suenan ahora dos veces: campana al acabar el pomodoro y cuenco tibetano al acabar el descanso. Si ya elegiste los tuyos, se quedan.
+• La primera puesta en marcha pregunta cuántas veces quieres que suene cada aviso.
+• El aviso del final del pomodoro vuelve a sonar, y con el volumen de alarma.
+• El ciclo empieza de cero cada día, y el icono es un reloj que marca las cinco y cinco.
+
+Sin cuentas, sin nube, sin anuncios y sin seguimiento.
+```
+
+### en-US (434 caracteres)
+
+```text
+What's new in 1.4.0
+
+• End-of-slot alerts play twice now: a bell when the pomodoro is over, a singing bowl when the break is. If you had picked your own, yours stay.
+• First-run setup asks how many times each alert should play.
+• The end-of-pomodoro alert sounds again, and it follows the alarm volume.
+• The cycle starts from zero each day, and the icon is a clock reading five past five.
+
+No accounts, no cloud, no ads, no tracking.
+```
+
+### Formato con etiquetas de idioma
+
+```xml
+<es-ES>
+Novedades de la versión 1.4.0
+
+• Los avisos de fin suenan ahora dos veces: campana al acabar el pomodoro y cuenco tibetano al acabar el descanso. Si ya elegiste los tuyos, se quedan.
+• La primera puesta en marcha pregunta cuántas veces quieres que suene cada aviso.
+• El aviso del final del pomodoro vuelve a sonar, y con el volumen de alarma.
+• El ciclo empieza de cero cada día, y el icono es un reloj que marca las cinco y cinco.
+
+Sin cuentas, sin nube, sin anuncios y sin seguimiento.
+</es-ES>
+<en-US>
+What's new in 1.4.0
+
+• End-of-slot alerts play twice now: a bell when the pomodoro is over, a singing bowl when the break is. If you had picked your own, yours stay.
+• First-run setup asks how many times each alert should play.
+• The end-of-pomodoro alert sounds again, and it follows the alarm volume.
+• The cycle starts from zero each day, and the icon is a clock reading five past five.
+
+No accounts, no cloud, no ads, no tracking.
+</en-US>
+```
+
+---
+
 ## 1.3.1 (versionCode 7) — 2026-08-18
 
 Casi todo son correcciones, así que las viñetas nombran **el síntoma que el usuario vio**, no la causa:
