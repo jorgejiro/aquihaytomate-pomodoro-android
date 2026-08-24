@@ -77,7 +77,17 @@ import com.jjrapps.aquihaytomate.ui.theme.TomateBright
 import com.jjrapps.aquihaytomate.ui.theme.phaseColorsOf
 import kotlinx.coroutines.launch
 
-private const val PAGE_COUNT = 4
+private const val PAGE_COUNT = 5
+
+/**
+ * The page the two permissions live on, and the only one the forward control is gated on.
+ *
+ * It is no longer the last page — the alert repeats page is — so the gate cannot ride on `EMPEZAR` any
+ * more: greying out the finish control on a page that says nothing about permissions would read as broken.
+ * The pressure is the same, applied where it is legible. See docs/decisions/008-*.
+ */
+private const val PERMISSIONS_PAGE = 3
+
 private const val DRAIN_LOOP_MS = 6000
 private const val REDUCED_MOTION_FILL = 0.55f
 
@@ -87,10 +97,10 @@ private val WIDGET_TOMATO_SIZE = 48.dp
 private val BODY_MAX_WIDTH = 260.dp
 private val FOOTER_PADDING = 24.dp
 
-/** Reserved on every page so the pager does not shift when the escape hatch appears on page 3. */
+/** Reserved on every page so the pager does not shift when the escape hatch appears on the permissions page. */
 private val ESCAPE_SLOT_HEIGHT = 40.dp
 
-/** The permission rows own page 3, so they get more room than the 52 dp of a Settings row. */
+/** The permission rows own their page, so they get more room than the 52 dp of a Settings row. */
 private val PERMISSION_ROW_HEIGHT = 64.dp
 private val PERMISSIONS_LABEL_GAP = 14.dp
 
@@ -98,6 +108,9 @@ private val FOCUS_CHOICES = listOf(20, 25, 30, 45)
 private val BREAK_CHOICES = listOf(3, 5, 10, 15)
 private val CYCLE_CHOICES = listOf(2, 3, 4, 6)
 private val LONG_BREAK_CHOICES = listOf(10, 15, 20, 30)
+
+/** A subset of the 1..10 Settings offers: enough to make the idea land, few enough to fit one row. */
+private val REPEAT_CHOICES = listOf(1, 2, 3, 4)
 
 @Composable
 fun OnboardingScreen(
@@ -130,6 +143,8 @@ fun OnboardingScreen(
         onLongBreakMinutesSelected = viewModel::onLongBreakMinutesSelected,
         onAutoStartBreakChanged = viewModel::onAutoStartBreakChanged,
         onAutoStartFocusChanged = viewModel::onAutoStartFocusChanged,
+        onFocusAlertRepeatsSelected = viewModel::onFocusAlertRepeatsSelected,
+        onBreakAlertRepeatsSelected = viewModel::onBreakAlertRepeatsSelected,
         onRequestNotifications = {
             val canAsk = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                 !notificationDialogShown
@@ -155,6 +170,8 @@ private fun OnboardingContent(
     onLongBreakMinutesSelected: (Int) -> Unit,
     onAutoStartBreakChanged: (Boolean) -> Unit,
     onAutoStartFocusChanged: (Boolean) -> Unit,
+    onFocusAlertRepeatsSelected: (Int) -> Unit,
+    onBreakAlertRepeatsSelected: (Int) -> Unit,
     onRequestNotifications: () -> Unit,
     onRequestExactAlarms: () -> Unit,
     onFinished: () -> Unit,
@@ -167,6 +184,11 @@ private fun OnboardingContent(
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.weight(1f),
+            // The gate would be decorative without this: greying out the forward control means nothing if
+            // the page after it is one swipe away. The gesture comes back the moment both permissions are
+            // in, and `CONTINUAR SIN ELLOS` is there in the meantime — that escape hatch is what makes
+            // holding the pager here acceptable rather than a trap. See docs/decisions/008-*.
+            userScrollEnabled = !isGated(pagerState.currentPage, state.permissionsGranted),
         ) { page ->
             when (page) {
                 0 -> WhatItIsPage()
@@ -178,10 +200,15 @@ private fun OnboardingContent(
                     onAutoStartBreakChanged = onAutoStartBreakChanged,
                     onAutoStartFocusChanged = onAutoStartFocusChanged,
                 )
-                else -> WidgetAndPermissionsPage(
+                PERMISSIONS_PAGE -> WidgetAndPermissionsPage(
                     state = state,
                     onRequestNotifications = onRequestNotifications,
                     onRequestExactAlarms = onRequestExactAlarms,
+                )
+                else -> AlertRepeatsPage(
+                    settings = state.settings,
+                    onFocusAlertRepeatsSelected = onFocusAlertRepeatsSelected,
+                    onBreakAlertRepeatsSelected = onBreakAlertRepeatsSelected,
                 )
             }
         }
@@ -196,12 +223,20 @@ private fun OnboardingContent(
 }
 
 /**
+ * Whether the pager is being held on this page: only ever the permissions page, and only until both are
+ * granted. Shared by the footer and the pager itself so the control and the gesture cannot disagree.
+ */
+private fun isGated(page: Int, permissionsGranted: Boolean): Boolean =
+    page == PERMISSIONS_PAGE && !permissionsGranted
+
+/**
  * Page dots, the forward control, and — only while a permission is still pending — the way out.
  *
- * The forward control is greyed out on the last page until both permissions are in place: they are what
- * makes the timer ring on time, so onboarding presses for them rather than mentioning them. The escape
- * hatch is not optional politeness: Android lets the user deny either permission for good, and a first-run
- * screen that could trap them there would be a bug. See docs/decisions/008-*.
+ * The forward control is greyed out on the permissions page until both are in place: they are what makes
+ * the timer ring on time, so onboarding presses for them rather than mentioning them. The escape hatch is
+ * not optional politeness: Android lets the user deny either permission for good, and a first-run screen
+ * that could trap them there would be a bug. It moves the pager on rather than finishing, because there is
+ * a page after this one now. See docs/decisions/008-*.
  */
 @Composable
 private fun Footer(
@@ -211,7 +246,7 @@ private fun Footer(
     onFinished: () -> Unit,
 ) {
     val isLastPage = currentPage == PAGE_COUNT - 1
-    val gated = isLastPage && !permissionsGranted
+    val gated = isGated(currentPage, permissionsGranted)
 
     Column(
         modifier = Modifier
@@ -251,7 +286,7 @@ private fun Footer(
             if (gated) {
                 TextControl(
                     label = stringResource(R.string.onboarding_continue_without),
-                    onClick = onFinished,
+                    onClick = onNext,
                     color = TextMuted,
                     style = Caption,
                     height = ESCAPE_SLOT_HEIGHT,
@@ -436,6 +471,54 @@ private fun WidgetAndPermissionsPage(
 }
 
 /**
+ * The last page: how many times each end of a slot rings.
+ *
+ * It is here and not buried in Settings because missing the end of a slot is the failure nobody attributes
+ * to a setting — you assume the timer did not ring, not that it rang once while you were in the kitchen.
+ * Both ends default to two plays, chained without a gap so they read as one longer alert, and both are
+ * asked separately for the same reason the sounds are: getting up from the desk and coming back to it are
+ * not equally easy to sleep through.
+ */
+@Composable
+private fun AlertRepeatsPage(
+    settings: TimerSettings,
+    onFocusAlertRepeatsSelected: (Int) -> Unit,
+    onBreakAlertRepeatsSelected: (Int) -> Unit,
+) {
+    Page {
+        Title(stringResource(R.string.onboarding_alerts_title))
+        Spacer(Modifier.height(12.dp))
+        Body(stringResource(R.string.onboarding_alerts_body))
+
+        Spacer(Modifier.height(32.dp))
+        SectionLabel(stringResource(R.string.onboarding_alerts_focus))
+        Spacer(Modifier.height(8.dp))
+        ChoiceRow(
+            options = REPEAT_CHOICES.map { PickerOption(it, repeatsLabel(it)) },
+            selected = settings.focusAlertRepeats,
+            onSelect = onFocusAlertRepeatsSelected,
+        )
+
+        Spacer(Modifier.height(24.dp))
+        SectionLabel(stringResource(R.string.onboarding_alerts_break))
+        Spacer(Modifier.height(8.dp))
+        ChoiceRow(
+            options = REPEAT_CHOICES.map { PickerOption(it, repeatsLabel(it)) },
+            selected = settings.breakAlertRepeats,
+            onSelect = onBreakAlertRepeatsSelected,
+        )
+
+        Spacer(Modifier.height(24.dp))
+        Text(
+            text = stringResource(R.string.onboarding_page2_hint),
+            style = Caption,
+            color = TextMuted,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+/**
  * One permission, its state spelled out rather than implied.
  *
  * A row that says "pending" in amber with "required" underneath is what the old plain "Allow
@@ -542,6 +625,10 @@ private fun exactAlarmSettingsIntent(context: Context): Intent =
 private fun minutesLabel(minutes: Int): String =
     pluralStringResource(R.plurals.settings_minutes, minutes, minutes)
 
+@Composable
+private fun repeatsLabel(times: Int): String =
+    pluralStringResource(R.plurals.settings_alert_repeats_value, times, times)
+
 @Preview(showBackground = true, backgroundColor = 0xFF000000, widthDp = 360, heightDp = 720)
 @Composable
 private fun OnboardingPage1Preview() {
@@ -554,6 +641,8 @@ private fun OnboardingPage1Preview() {
             onLongBreakMinutesSelected = {},
             onAutoStartBreakChanged = {},
             onAutoStartFocusChanged = {},
+            onFocusAlertRepeatsSelected = {},
+            onBreakAlertRepeatsSelected = {},
             onRequestNotifications = {},
             onRequestExactAlarms = {},
             onFinished = {},
@@ -593,7 +682,7 @@ private fun OnboardingPermissionsPendingPreview() {
                 )
             }
             Footer(
-                currentPage = PAGE_COUNT - 1,
+                currentPage = PERMISSIONS_PAGE,
                 permissionsGranted = false,
                 onNext = {},
                 onFinished = {},
@@ -615,6 +704,28 @@ private fun OnboardingPermissionsGrantedPreview() {
                     ),
                     onRequestNotifications = {},
                     onRequestExactAlarms = {},
+                )
+            }
+            Footer(
+                currentPage = PERMISSIONS_PAGE,
+                permissionsGranted = true,
+                onNext = {},
+                onFinished = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000, widthDp = 360, heightDp = 720)
+@Composable
+private fun OnboardingAlertRepeatsPreview() {
+    AquiHayTomateTheme {
+        Column(Modifier.fillMaxSize()) {
+            Box(Modifier.weight(1f)) {
+                AlertRepeatsPage(
+                    settings = TimerSettings(),
+                    onFocusAlertRepeatsSelected = {},
+                    onBreakAlertRepeatsSelected = {},
                 )
             }
             Footer(

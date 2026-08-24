@@ -22,9 +22,9 @@ data class TimerSettings(
      * symmetric with [autoStartBreak]: a break often runs long on purpose.
      */
     val autoStartFocus: Boolean = false,
-    /** Sound when a pomodoro ends. Soft by default: finishing one is good news. */
+    /** Sound when a pomodoro ends. The bell by default: bright and long enough to be heard. */
     val focusAlertSound: AlertSound = AlertSound.DEFAULT_FOCUS,
-    /** Sound when a break ends. Harder by default: this one has to get you back to work. */
+    /** Sound when a break ends. The bowl by default, so the two ends do not sound alike. */
     val breakAlertSound: AlertSound = AlertSound.DEFAULT_BREAK,
     /** How many times the pomodoro's sound plays back to back. See [alertRepeatsFor]. */
     val focusAlertRepeats: Int = DEFAULT_ALERT_REPEATS,
@@ -64,8 +64,7 @@ data class TimerSettings(
     /**
      * How many times the alert sound plays back to back for the slot that has just **ended**.
      *
-     * One by default, which is the behaviour the app has always had. It goes up to ten because a single
-     * chime is easy to miss from another room, and how many repeats it takes to be impossible to miss
+     * Twice by default. It goes up to ten because how many repeats it takes to be impossible to miss
      * depends on the sound, the room and the person — the same reason there are two of these and not one:
      * getting up from the desk and coming back to it are not equally easy to sleep through.
      *
@@ -102,8 +101,13 @@ data class TimerSettings(
         const val DEFAULT_VIBRATION_SECONDS = 5
         const val DEFAULT_DAILY_GOAL = 8
 
-        /** One play, which is what the app did before the setting existed. */
-        const val DEFAULT_ALERT_REPEATS = 1
+        /**
+         * **Twice**, for both ends of the slot. A single play is easy to miss from the next room, and
+         * chained without a gap two plays read as one longer alert rather than as two alerts — so the
+         * default that gets noticed costs nothing in clarity. It was one play until 1.3.1, which is what
+         * the app did before the setting existed; the onboarding now asks about it on its own page.
+         */
+        const val DEFAULT_ALERT_REPEATS = 2
 
         const val MIN_FOCUS_MINUTES = 1
         const val MAX_FOCUS_MINUTES = 180

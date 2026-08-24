@@ -29,12 +29,12 @@ class TimerSettingsTest {
         val defaults = TimerSettings()
 
         assertTrue(
-            "Acabar un pomodoro es una buena noticia: cuenco, el más grave y largo de los cuatro",
-            defaults.focusAlertSound == AlertSound.DIGITAL,
+            "Acabar el pomodoro suena a campana: brillante y 2,6 s, elegida por oído",
+            defaults.focusAlertSound == AlertSound.BELL,
         )
         assertTrue(
-            "Acabar el descanso es una orden: campana, más brillante que el cuenco y sonando 2,6 s",
-            defaults.breakAlertSound == AlertSound.BELL,
+            "Acabar el descanso suena a cuenco: el más grave y el más largo de los cuatro",
+            defaults.breakAlertSound == AlertSound.BOWL,
         )
         assertTrue(
             "Si los dos coincidieran, la mitad de la idea se pierde",
@@ -64,11 +64,14 @@ class TimerSettingsTest {
     }
 
     @Test
-    fun `both repeat counts default to a single play`() {
+    fun `both repeat counts default to two plays`() {
         val settings = TimerSettings()
 
-        assertTrue(settings.alertRepeatsFor(SlotType.FOCUS) == 1)
-        assertTrue(settings.alertRepeatsFor(SlotType.SHORT_BREAK) == 1)
+        // Dos y no una: una sola pasada se pierde desde la habitación de al lado, y encadenadas sin hueco
+        // dos se leen como una alerta más larga. Es lo que pregunta la última página del onboarding.
+        assertTrue(settings.alertRepeatsFor(SlotType.FOCUS) == 2)
+        assertTrue(settings.alertRepeatsFor(SlotType.SHORT_BREAK) == 2)
+        assertTrue(settings.alertRepeatsFor(SlotType.LONG_BREAK) == 2)
         assertTrue(TimerSettings.ALERT_REPEATS_RANGE == 1..10)
     }
 

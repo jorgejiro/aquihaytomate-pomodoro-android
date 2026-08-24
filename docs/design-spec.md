@@ -387,12 +387,12 @@ Fila estándar: **52 dp** de alto, padding horizontal 16 dp. Etiqueta `rowLabel`
 
 ### 5.4 Onboarding (`OnboardingScreen`)
 
-Cuatro páginas en `HorizontalPager`, sin barra de pestañas, sin botón «saltar».
+Cinco páginas en `HorizontalPager`, sin barra de pestañas, sin botón «saltar»: qué es · tus duraciones · tu ciclo · widget y permisos · cuántas veces suena.
 
 La tercera —**Tu ciclo**— lleva `pomodorosPerCycle` y el descanso largo como filas de chips (`2 · 3 · 4 · 6` y `10 · 15 · 20 · 30 min`) y los dos auto-inicios como `SettingsToggleRow` dentro de un `SettingsGroup`, con los mismos textos que Ajustes. Son los cuatro ajustes que deciden cómo se comporta la app a lo largo de una mañana, y por eso se preguntan antes del primer pomodoro. Los valores por defecto se ven ya marcados: ciclo de 4, descanso largo de 15 min, **auto-iniciar el descanso activado** y auto-iniciar el pomodoro desactivado.
 
 ```
-Página 1 — Qué es          Página 2 — Tus duraciones   Página 3 — Widget y permisos
+Página 1 — Qué es          Página 2 — Tus duraciones   Página 4 — Widget y permisos
 ┌────────────────────┐     ┌────────────────────┐      ┌────────────────────┐
 │      ╭──────╮      │     │   ENFOQUE          │      │   ┌────┐           │
 │     │████████│     │120dp│   ┌──┬──┬──┬──┐    │      │   │ 25 │  widget   │
@@ -406,26 +406,54 @@ Página 1 — Qué es          Página 2 — Tus duraciones   Página 3 — Widg
 │  widget de una     │     │   Lo puedes cambiar│cap.  │ │Necesario     › │ │
 │  sola casilla.     │     │   luego en Ajustes │      │ │Alarmas ACTIVADO│ │
 │                    │     │                    │      │ └────────────────┘ │
-│   ● ○ ○            │     │   ○ ● ○            │      │   ○ ○ ●            │
-│         SIGUIENTE →│     │         SIGUIENTE →│      │        EMPEZAR →   │
+│   ● ○ ○ ○ ○        │     │   ○ ● ○ ○ ○        │      │   ○ ○ ○ ● ○        │
+│         SIGUIENTE →│     │         SIGUIENTE →│      │        SIGUIENTE → │
 └────────────────────┘     └────────────────────┘      └────────────────────┘
+```
+
+La quinta y última —**cuántas veces suena**— es un título, un cuerpo y dos filas de chips
+`1 · 2 · 3 · 4 veces`, una por extremo del slot, con el 2 de fábrica ya marcado en las dos. El rango
+completo (1–10) se queda en Ajustes: aquí lo que hay que transmitir es que la repetición existe, no
+agotarla.
+
+```
+Página 5 — Cuántas veces suena
+┌────────────────────┐
+│  ¿No te enteras    │28sp
+│  del final de fase?│
+│                    │
+│  El aviso puede    │body
+│  sonar varias veces│
+│  seguidas…         │
+│                    │
+│  AL TERMINAR EL PO…│label
+│  ┌──┬──┬──┬──┐     │chips
+│  │1 │2 │3 │4 │     │48 dp
+│  └──┴──┴──┴──┘     │
+│  AL TERMINAR EL DE…│
+│  ┌──┬──┬──┬──┐     │
+│  │1 │2 │3 │4 │     │
+│  └──┴──┴──┴──┘     │
+│   ○ ○ ○ ○ ●        │
+│         EMPEZAR →  │
+└────────────────────┘
 ```
 
 - **Toda la pantalla lleva `safeDrawingPadding()`**: el onboarding no está dentro del `Scaffold` de las pestañas, así que nadie más le aplica los insets y sin él el contenido se metía bajo la status bar y bajo la barra de gestos.
 - Padding lateral 32 dp. Título `titleScreen`. Cuerpo `bodyDefault` en `TextSecondary`, ancho máximo 260 dp, centrado.
-- Indicador de página: 3 puntos de 6 dp, gap 8 dp; activo `TomateFill`, inactivo `TextGhost`. Abajo a la izquierda, 24 dp del borde.
+- Indicador de página: 5 puntos de 6 dp, gap 8 dp; activo `TomateFill`, inactivo `TextGhost`. Abajo a la izquierda, 24 dp del borde.
 - Botón solo texto, `controlLabel` en `TextPrimary`, abajo a la derecha, alto táctil 48 dp.
 - **En la página 1 el tomate se drena de lleno a vacío en bucle de 6 s.** Es la demostración del concepto.
 - Al terminar se marca `onboarding_done`; `MainViewModel` decide el destino inicial.
 
-**Página 3: los permisos son filas de estado, no botones.** Cada uno es un `SettingsRow` dentro de un `SettingsGroup`, igual que en Ajustes, pero **con 64 dp de alto en vez de 52** y 14 dp entre la cabecera y el grupo: aquí las dos filas son todo el contenido de la página, y con las medidas de Ajustes —donde una fila es una de treinta— se leían apelotonadas. La cabecera dice `CONCEDE LOS PERMISOS NECESARIOS`, que es una instrucción y no una etiqueta de sección.
+**Página 4: los permisos son filas de estado, no botones.** Cada uno es un `SettingsRow` dentro de un `SettingsGroup`, igual que en Ajustes, pero **con 64 dp de alto en vez de 52** y 14 dp entre la cabecera y el grupo: aquí las dos filas son todo el contenido de la página, y con las medidas de Ajustes —donde una fila es una de treinta— se leían apelotonadas. La cabecera dice `CONCEDE LOS PERMISOS NECESARIOS`, que es una instrucción y no una etiqueta de sección.
 
 | Estado | Valor | Color | Sublabel | Chevron |
 |---|---|---|---|---|
 | Pendiente | `Pendiente` | `AlertAmber` | `Necesario` | sí, y la fila abre el diálogo o los ajustes del sistema |
 | Concedido | `Activado` | `TomateBright` | — | no, y la fila deja de ser pulsable |
 
-- **`EMPEZAR` queda en `TextGhost` y deshabilitado hasta que los dos estén concedidos**, con `CONTINUAR SIN ELLOS` en `caption` `TextMuted` debajo, a la derecha. El hueco de esa salida (40 dp) se reserva en las tres páginas para que el pager no salte al llegar a la última. Ver `docs/decisions/008-el-onboarding-exige-los-dos-permisos.md`.
+- **`SIGUIENTE` queda en `TextGhost` y deshabilitado en esa página hasta que los dos estén concedidos**, con `CONTINUAR SIN ELLOS` en `caption` `TextMuted` debajo, a la derecha, que **pasa a la página siguiente** en vez de terminar. El hueco de esa salida (40 dp) se reserva en las cinco páginas para que el pager no salte al llegar a ella. El gate está aquí y no en `EMPEZAR` desde que hay una página después: un control de terminar en gris en una pantalla que no habla de permisos se lee como una avería. Mientras el gate está puesto el pager **no acepta el gesto** (`userScrollEnabled = false`), porque un control deshabilitado con la página siguiente a un deslizamiento no gatea nada; vuelve en cuanto los dos permisos entran. Ver `docs/decisions/008-el-onboarding-exige-los-dos-permisos.md`.
 - El diálogo de `POST_NOTIFICATIONS` se puede mostrar **una sola vez por instalación**: después de una negativa Android lo descarta en silencio, así que el segundo toque abre `ACTION_APP_NOTIFICATION_SETTINGS`. En API 31–32 no hay permiso que pedir y la fila va directa a los ajustes.
 - El estado se relee en cada `ON_RESUME` con `RefreshPermissionsOnResume`, compartido con Ajustes, y también en la respuesta del diálogo: el diálogo del sistema no siempre pasa la Activity por `ON_PAUSE`, y sin eso la fila seguiría diciendo «Pendiente» sobre un permiso recién concedido.
 
@@ -735,7 +763,7 @@ Sin `windowSplashScreenIconBackgroundColor`: el tomate flota directamente sobre 
 | `LiquidCountdown` | `LiquidTomato` más los dos `Text` superpuestos que producen los dígitos en negativo. Con `onClick`, el círculo entero es el control primario |
 | `PhaseLabel` | `ENFOQUE` / `DESCANSO` / `DESCANSO LARGO` / `¡TIEMPO!` con tracking amplio y color de fase |
 | `TextControl` | Control sin caja: glifo + etiqueta **siempre en mayúsculas**, alto táctil configurable (48 dp por defecto), ripple sin límites. Base de `INICIAR`/`PAUSAR`/`REINICIAR`. El glifo se dibuja al 72 % del `fontSize` del estilo, así que crece con él |
-| `RefreshPermissionsOnResume` | Relee el estado de los dos permisos en cada `ON_RESUME`. Lo comparten Ajustes y la página 3 del onboarding |
+| `RefreshPermissionsOnResume` | Relee el estado de los dos permisos en cada `ON_RESUME`. Lo comparten Ajustes y la página de permisos del onboarding |
 | `CycleDots` | Fila de N puntos (completado / actual / pendiente) más el contador `2/4` |
 | `TopTabBar` | Tres pestañas de texto con subrayado animado |
 | `SectionLabel` | Cabecera de sección en `sectionLabel` `TextMuted` |

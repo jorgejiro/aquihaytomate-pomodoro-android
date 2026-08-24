@@ -163,6 +163,10 @@
     <string name="onboarding_permissions_ready">Activado</string>
     <string name="onboarding_permissions_hint">Sin ellos el temporizador puede retrasarse con la pantalla apagada y no puede avisarte al terminar un slot.</string>
     <string name="onboarding_continue_without">Continuar sin ellos</string>
+    <string name="onboarding_alerts_title">¿No te enteras del final de fase?</string>
+    <string name="onboarding_alerts_body">El aviso puede sonar varias veces seguidas, para asegurar que no se te pasa cuando termina cada fase.</string>
+    <string name="onboarding_alerts_focus">Al terminar el pomodoro</string>
+    <string name="onboarding_alerts_break">Al terminar el descanso</string>
 
     <!-- Alert sounds -->
     <string name="sound_silent">Silencio</string>
@@ -210,7 +214,8 @@
     <string name="changelog_current_badge">Actual</string>
 
     <string-array name="changelog_1_3_1">
-        <item>El sonido que avisa del final del pomodoro es ahora «Digital»: más seco y más fuerte que el cuenco tibetano, que era el que venía puesto y sigue estando en la lista. Si ya habías elegido uno, se queda el tuyo.</item>
+        <item>Sonidos nuevos por defecto, y los dos suenan dos veces: campana al terminar el pomodoro y cuenco tibetano al terminar el descanso. Si ya habías elegido los tuyos, se quedan — y los cinco sonidos siguen en la lista.</item>
+        <item>El onboarding termina en una página nueva que pregunta cuántas veces quieres que suene cada aviso, uno para el pomodoro y otro para el descanso. Se siguen pudiendo cambiar en Ajustes, hasta diez.</item>
         <item>El sonido del final del pomodoro vuelve a sonar. Si el descanso empezaba solo —que es lo normal—, el aviso se perdía por el camino: sonaba el final del descanso, pero no el del pomodoro.</item>
         <item>El aviso usa el volumen de alarma, como debía. Salía por el de multimedia, así que con los medios bajados no se oía aunque la alarma estuviera alta.</item>
         <item>El ciclo empieza de cero cada día. Si dejabas la app a medias, al volver días después te recibía en el pomodoro 3 de 4 de una tanda que ya no existía.</item>

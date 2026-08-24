@@ -123,14 +123,14 @@ class TimerEngineTest {
     }
 
     @Test
-    fun `repeats default to a single play`() = runTest {
+    fun `repeats default to two plays`() = runTest {
         settings.set(TimerSettings(autoStartBreak = false))
 
         start()
         advance(focusMs)
         assertTrue(complete())
 
-        assertEquals("Sin tocar el ajuste, la alerta suena una vez", 1, alerts.lastRepeats)
+        assertEquals("Sin tocar el ajuste, la alerta suena dos veces", 2, alerts.lastRepeats)
     }
 
     @Test

@@ -69,10 +69,10 @@ Todo dibujado con Compose `Canvas`. **Sin librería de gráficos** — ver `docs
 | Pomodoros por ciclo | **4** | 2–12 |
 | **Auto-iniciar el descanso** (al terminar un pomodoro) | **activado** | — |
 | **Auto-iniciar el pomodoro** (al terminar un descanso) | desactivado | — |
-| **Sonido al terminar el pomodoro** | **Digital** | `silent`, `bell`, `bowl`, `digital`, `soft` |
-| **Repetir ese sonido** (al terminar el pomodoro) | **1 vez** | 1–10 |
-| **Sonido al terminar el descanso** | **Campana** | los mismos cinco |
-| **Repetir ese sonido** (al terminar el descanso) | **1 vez** | 1–10 |
+| **Sonido al terminar el pomodoro** | **Campana** | `silent`, `bell`, `bowl`, `digital`, `soft` |
+| **Repetir ese sonido** (al terminar el pomodoro) | **2 veces** | 1–10 |
+| **Sonido al terminar el descanso** | **Cuenco tibetano** | los mismos cinco |
+| **Repetir ese sonido** (al terminar el descanso) | **2 veces** | 1–10 |
 | **Duración de la vibración** | **5 s** | 0 (= desactivada) – 30 |
 | **Mantener pantalla encendida** (en la pantalla Temporizador) | **Mientras carga** | Nunca / Mientras carga / Siempre |
 | Objetivo diario de pomodoros | 8 | 1–24 |
@@ -83,11 +83,13 @@ Más: estado de los permisos (notificaciones y alarmas exactas) con botón a los
 
 ### 2.4 Pantalla Onboarding ✅ Implementada
 
-Cuatro páginas: qué es la técnica pomodoro · elige tus duraciones · **tu ciclo** · el widget y los dos permisos.
+Cinco páginas: qué es la técnica pomodoro · elige tus duraciones · **tu ciclo** · el widget y los dos permisos · **cuántas veces suena el aviso**.
 
 La tercera reúne los cuatro ajustes que deciden cómo se siente la app a lo largo de una mañana —pomodoros por ciclo, descanso largo y los dos auto-inicios— porque son los que conviene preguntar antes del primer pomodoro y no dejar enterrados en Ajustes. **Auto-iniciar el descanso viene activado**; el pomodoro siguiente, no.
 
-En la tercera página los permisos son **filas con su estado escrito** (`Pendiente` en ámbar con `Necesario` debajo, o `Activado`), no botones planos, y **`EMPEZAR` está deshabilitado hasta que los dos estén concedidos**, con un `CONTINUAR SIN ELLOS` discreto como válvula de escape obligatoria. Ver `docs/decisions/008-el-onboarding-exige-los-dos-permisos.md`.
+En la página de los permisos son **filas con su estado escrito** (`Pendiente` en ámbar con `Necesario` debajo, o `Activado`), no botones planos, y **`SIGUIENTE` está deshabilitado ahí hasta que los dos estén concedidos**, con un `CONTINUAR SIN ELLOS` discreto —que pasa de página— como válvula de escape obligatoria. El gate vive en esa página y no en `EMPEZAR` desde que hay una página después: deshabilitar el control de terminar en una pantalla que no habla de permisos se lee como una avería. Ver `docs/decisions/008-el-onboarding-exige-los-dos-permisos.md`.
+
+La última pregunta **cuántas veces suena el aviso al terminar cada fase**, con un control por extremo del slot (1–4 aquí; el rango completo, hasta 10, está en Ajustes). Está en el onboarding porque perderse el final de una fase no se atribuye a un ajuste: se atribuye a que el temporizador no sonó.
 
 ### 2.5 Widget de escritorio 1×1 ✅ Implementado
 
@@ -105,8 +107,8 @@ En la tercera página los permisos son **filas con su estado escrito** (`Pendien
 
 ### 2.6 Alertas de fin de slot ✅ Implementadas
 
-- Sonido seleccionable de un catálogo de 4 más silencio, reproducido con `USAGE_ALARM` (usa el volumen de alarma, no el de multimedia). **Hay dos ajustes, uno por extremo del slot**, y lo que importa es que **los dos extremos no suenen igual**: acabar un pomodoro suena seco y corto —digital, el más fuerte de los cuatro y 0,72 s— y acabar el descanso suena largo y brillante —campana, 2,6 s—, que es el que tiene que llegarte desde otra habitación. El cuenco fue el valor por defecto del pomodoro hasta la 1.3.1, elegido por ser el más suave; sigue en el catálogo, a un toque. Lo decide el slot que **acaba**, en `TimerSettings.alertSoundFor`. El selector reproduce cada opción al tocarla y no se cierra, que es lo que hace el ajuste utilizable: los nombres no significan nada hasta oírlos. Ver `docs/decisions/012-*`. Los clips son **Opus mono en contenedor `.ogg`** —no Vorbis—, sintetizados para la app: mismo contenedor, soportado desde API 21 y comprime mejor en mono.
-- **El sonido se puede repetir de 1 a 10 veces seguidas**, con **un ajuste por cada extremo del slot** igual que el sonido —`TimerSettings.alertRepeatsFor`—, y por defecto **una sola vez**, que es lo que hacía la app antes. Encadenado sin hueco: una repetición tiene que leerse como una alerta más larga, no como dos. **La cadena se cuenta, nunca se usa `isLooping`**: un bucle es ilimitado y lo único que lo pararía —este proceso— es justo lo que el sistema puede matar a mitad de alerta, así que sería la versión sonora del bug de la vibración infinita.
+- Sonido seleccionable de un catálogo de 4 más silencio, reproducido con `USAGE_ALARM` (usa el volumen de alarma, no el de multimedia). **Hay dos ajustes, uno por extremo del slot**, y lo que importa es que **los dos extremos no suenen igual**: acabar un pomodoro suena brillante y largo —campana, 1112 Hz de centroide y 2,6 s— y acabar el descanso suena grave y aún más largo —cuenco, 506 Hz y 2,9 s—. Los dos por defecto suenan **dos veces**, que es lo que los lleva a otra habitación. Los defaults del pomodoro los ha elegido el autor por oído y han cambiado dos veces —cuenco hasta la 1.3.0, digital en el camino de la 1.3.1, campana ahora—; lo que no se mueve es que los dos extremos no coincidan, y los cinco sonidos siguen en el catálogo a un toque. Lo decide el slot que **acaba**, en `TimerSettings.alertSoundFor`. El selector reproduce cada opción al tocarla y no se cierra, que es lo que hace el ajuste utilizable: los nombres no significan nada hasta oírlos. Ver `docs/decisions/012-*`. Los clips son **Opus mono en contenedor `.ogg`** —no Vorbis—, sintetizados para la app: mismo contenedor, soportado desde API 21 y comprime mejor en mono.
+- **El sonido se puede repetir de 1 a 10 veces seguidas**, con **un ajuste por cada extremo del slot** igual que el sonido —`TimerSettings.alertRepeatsFor`—, y por defecto **dos veces** en los dos extremos —era una sola hasta la 1.3.1—, que es lo que pregunta la última página del onboarding. Encadenado sin hueco: una repetición tiene que leerse como una alerta más larga, no como dos. **La cadena se cuenta, nunca se usa `isLooping`**: un bucle es ilimitado y lo único que lo pararía —este proceso— es justo lo que el sistema puede matar a mitad de alerta, así que sería la versión sonora del bug de la vibración infinita.
 - **Vibración de duración configurable en segundos**, por defecto 5 s, en pulsos de 400 ms con huecos de 250 ms.
 - Respeta modo silencio y No molestar.
 - **La alerta la toca la app, no el canal de notificación.** Ver `docs/decisions/004-alerta-propia-en-vez-de-sonido-de-canal.md`.

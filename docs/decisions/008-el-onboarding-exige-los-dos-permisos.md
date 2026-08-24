@@ -65,3 +65,33 @@ puntualidad y no como un fallo, que es lo que es.
 - Queda una regla nueva para la checklist de F9: **denegar los dos permisos y comprobar que
   `CONTINUAR SIN ELLOS` deja terminar el onboarding**, en Android 12 (donde `POST_NOTIFICATIONS` no
   existe y la fila va directa a los ajustes) y en Android 14+.
+
+---
+
+## Añadido el 2026-08-24 · el gate se muda de `EMPEZAR` a `SIGUIENTE`
+
+El onboarding gana una **quinta página**, la última: cuántas veces suena el aviso al terminar cada fase,
+con un control por extremo del slot (ver el añadido del ADR 012). La de los permisos pasa a ser la cuarta.
+
+Eso deja el gate de esta decisión sin su soporte original. `EMPEZAR` ya no vive en la página de los
+permisos, y un control de terminar en gris en una pantalla que solo habla de sonidos no se lee como una
+exigencia: se lee como una avería. Así que **el gate se queda con los permisos**:
+
+- En la página de los permisos, `SIGUIENTE` queda en `TextGhost` y deshabilitado mientras alguno de los
+  dos siga pendiente.
+- `CONTINUAR SIN ELLOS` sigue debajo, con las mismas condiciones, pero ahora **pasa de página** en vez de
+  terminar el onboarding. Quien no puede o no quiere conceder los permisos ve la última página igual que
+  todo el mundo.
+- En la última página `EMPEZAR` está siempre habilitado: allí no hay nada que exigir.
+- **Y el pager deja de aceptar el gesto mientras el gate está puesto** (`userScrollEnabled = false` en esa
+  página con algo pendiente). Sin esto el gate sería decorativo: deshabilitar el control de avance no vale
+  nada si la página siguiente está a un deslizamiento. El gesto vuelve en cuanto los dos permisos entran,
+  y mientras tanto `CONTINUAR SIN ELLOS` sigue ahí, que es lo que separa retener el pager de atrapar al
+  usuario. El coste es que en esa página, y solo con permisos pendientes, tampoco se puede volver atrás
+  con el dedo.
+
+La presión sobre los dos permisos es la misma —no se pasa de esa página sin concederlos o sin renunciar
+explícitamente— y ahora se aplica donde el usuario está mirando lo que se le pide, que era el argumento
+del problema 1 de este ADR. La regla de la checklist de F9 se mantiene tal cual, cambiando qué control
+hay que mirar: **denegar los dos permisos y comprobar que `CONTINUAR SIN ELLOS` lleva a la última página
+y deja terminar el onboarding.**

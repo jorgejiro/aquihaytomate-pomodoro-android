@@ -26,7 +26,7 @@ class OnboardingViewModel @Inject constructor(
         PermissionState(notificationsGranted = false, exactAlarmsGranted = false),
     )
 
-    /** Only the two durations page 2 offers, plus the permission state page 3 gates on. */
+    /** The settings the pages offer, plus the permission state the permissions page gates on. */
     val uiState: StateFlow<OnboardingUiState> =
         combine(observeSettings(), permissions) { settings, permissionState ->
             OnboardingUiState(
@@ -80,6 +80,14 @@ class OnboardingViewModel @Inject constructor(
 
     fun onAutoStartFocusChanged(enabled: Boolean) {
         viewModelScope.launch { settingsRepository.setAutoStartFocus(enabled) }
+    }
+
+    fun onFocusAlertRepeatsSelected(count: Int) {
+        viewModelScope.launch { settingsRepository.setFocusAlertRepeats(count) }
+    }
+
+    fun onBreakAlertRepeatsSelected(count: Int) {
+        viewModelScope.launch { settingsRepository.setBreakAlertRepeats(count) }
     }
 
     /** Marks onboarding done. `MainViewModel` reads this to decide the start destination. */

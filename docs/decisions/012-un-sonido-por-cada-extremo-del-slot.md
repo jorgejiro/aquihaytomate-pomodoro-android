@@ -134,3 +134,43 @@ suena 2,6 s contra 0,72. Si los dos extremos usaran `digital` se perdería justo
 **Ojo con lo que esto significa al actualizar:** el valor por defecto no está persistido, así que quien
 nunca haya tocado el ajuste pasará a oír `digital` al instalar la 1.3.1. Quien lo eligiera a mano
 conserva el suyo. El cuenco sigue en el catálogo.
+
+---
+
+## Añadido el 2026-08-24 · campana y cuenco, y las dos por defecto suenan dos veces
+
+Los valores por defecto quedan así, decididos por el autor por oído en su propio dispositivo, antes de
+que la 1.3.1 llegue a Play:
+
+| extremo del slot | sonido | repeticiones |
+|---|---|---|
+| fin del pomodoro | `bell` (campana) | **2** |
+| fin del descanso | `bowl` (cuenco tibetano) | **2** |
+
+Es el tercer juego de defaults de este ADR —`bowl`/`bell`, luego `digital`/`bell`, ahora `bell`/`bowl`—
+y los tres cambios son la misma corrección aplicada de otra manera: **el criterio no es lo agradable ni
+el nivel de pico, es que llegue**. `digital` mide más fuerte que los otros tres y se pierde igual, porque
+0,72 s se acaban antes de que registres que ha sonado; el cuenco se pierde por lo contrario, por entrar
+demasiado suave. La campana es lo que queda cuando lo que se mide es el tiempo que el aviso está en el
+aire con energía por encima de 2 kHz.
+
+**Lo que este ADR decide sigue en pie sin un rasguño: los dos extremos no suenan igual.** Lo que cambia
+es cuál va en cada lado. La campana pasa al pomodoro porque es el aviso que hay que oír *estando
+concentrado en otra cosa* —que es un estado más difícil de interrumpir que el de estar descansando—, y el
+cuenco cubre el fin del descanso, donde ya estás esperando volver y donde 2,9 s de cola llenan la
+habitación.
+
+**Y las dos suben a dos repeticiones**, que es la otra mitad de la decisión y la que probablemente pesa
+más que la elección del clip: encadenadas sin hueco, dos pasadas del cuenco son 5,8 s de aviso y dos de
+la campana 5,2 s, contra los 2,9 y 2,6 de una sola. Es la diferencia entre un aviso que hay que estar
+esperando y uno que te alcanza desde la cocina. El apéndice de la 1.3 razonaba el ajuste y lo dejaba en
+una pasada «porque es lo que la app hacía antes»; eso era conservar el comportamiento anterior por
+defecto, no elegirlo.
+
+Consecuencia de todo esto, la misma que la vez anterior: **quien nunca haya tocado estos cuatro ajustes
+oirá lo nuevo al actualizar**, porque los defaults no están persistidos. Quien los eligiera a mano
+conserva los suyos, y los cinco sonidos siguen en el catálogo.
+
+Como la repetición deja de ser una rareza escondida en Ajustes para ser el comportamiento de fábrica,
+**el onboarding la pregunta en su última página** —ver el añadido del ADR 008—: perderse el final de una
+fase es el fallo que nadie atribuye a un ajuste, y por tanto el que nadie va a buscar a Ajustes.
