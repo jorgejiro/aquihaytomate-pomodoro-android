@@ -80,13 +80,13 @@ import kotlinx.coroutines.launch
 private const val PAGE_COUNT = 5
 
 /**
- * The page the two permissions live on, and the only one the forward control is gated on.
+ * The page the alert repeats live on: fourth, and deliberately not last.
  *
- * It is no longer the last page — the alert repeats page is — so the gate cannot ride on `EMPEZAR` any
- * more: greying out the finish control on a page that says nothing about permissions would read as broken.
- * The pressure is the same, applied where it is legible. See docs/decisions/008-*.
+ * The permissions keep the final page, which is what lets the gate ride on `EMPEZAR` — the page after a
+ * gated one would be one swipe away, and a gate you can swipe past is decoration. See
+ * docs/decisions/008-*.
  */
-private const val PERMISSIONS_PAGE = 3
+private const val ALERT_REPEATS_PAGE = 3
 
 private const val DRAIN_LOOP_MS = 6000
 private const val REDUCED_MOTION_FILL = 0.55f
@@ -97,7 +97,7 @@ private val WIDGET_TOMATO_SIZE = 48.dp
 private val BODY_MAX_WIDTH = 260.dp
 private val FOOTER_PADDING = 24.dp
 
-/** Reserved on every page so the pager does not shift when the escape hatch appears on the permissions page. */
+/** Reserved on every page so the pager does not shift when the escape hatch appears on the last one. */
 private val ESCAPE_SLOT_HEIGHT = 40.dp
 
 /** The permission rows own their page, so they get more room than the 52 dp of a Settings row. */
@@ -111,6 +111,9 @@ private val LONG_BREAK_CHOICES = listOf(10, 15, 20, 30)
 
 /** A subset of the 1..10 Settings offers: enough to make the idea land, few enough to fit one row. */
 private val REPEAT_CHOICES = listOf(1, 2, 3, 4)
+
+/** Breathing room between that page's copy and its controls, so the chips are not read as part of it. */
+private val ALERTS_BODY_GAP = 48.dp
 
 @Composable
 fun OnboardingScreen(
@@ -184,11 +187,6 @@ private fun OnboardingContent(
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.weight(1f),
-            // The gate would be decorative without this: greying out the forward control means nothing if
-            // the page after it is one swipe away. The gesture comes back the moment both permissions are
-            // in, and `CONTINUAR SIN ELLOS` is there in the meantime — that escape hatch is what makes
-            // holding the pager here acceptable rather than a trap. See docs/decisions/008-*.
-            userScrollEnabled = !isGated(pagerState.currentPage, state.permissionsGranted),
         ) { page ->
             when (page) {
                 0 -> WhatItIsPage()
@@ -200,15 +198,15 @@ private fun OnboardingContent(
                     onAutoStartBreakChanged = onAutoStartBreakChanged,
                     onAutoStartFocusChanged = onAutoStartFocusChanged,
                 )
-                PERMISSIONS_PAGE -> WidgetAndPermissionsPage(
-                    state = state,
-                    onRequestNotifications = onRequestNotifications,
-                    onRequestExactAlarms = onRequestExactAlarms,
-                )
-                else -> AlertRepeatsPage(
+                ALERT_REPEATS_PAGE -> AlertRepeatsPage(
                     settings = state.settings,
                     onFocusAlertRepeatsSelected = onFocusAlertRepeatsSelected,
                     onBreakAlertRepeatsSelected = onBreakAlertRepeatsSelected,
+                )
+                else -> WidgetAndPermissionsPage(
+                    state = state,
+                    onRequestNotifications = onRequestNotifications,
+                    onRequestExactAlarms = onRequestExactAlarms,
                 )
             }
         }
@@ -223,20 +221,12 @@ private fun OnboardingContent(
 }
 
 /**
- * Whether the pager is being held on this page: only ever the permissions page, and only until both are
- * granted. Shared by the footer and the pager itself so the control and the gesture cannot disagree.
- */
-private fun isGated(page: Int, permissionsGranted: Boolean): Boolean =
-    page == PERMISSIONS_PAGE && !permissionsGranted
-
-/**
  * Page dots, the forward control, and — only while a permission is still pending — the way out.
  *
- * The forward control is greyed out on the permissions page until both are in place: they are what makes
- * the timer ring on time, so onboarding presses for them rather than mentioning them. The escape hatch is
- * not optional politeness: Android lets the user deny either permission for good, and a first-run screen
- * that could trap them there would be a bug. It moves the pager on rather than finishing, because there is
- * a page after this one now. See docs/decisions/008-*.
+ * The forward control is greyed out on the last page until both permissions are in place: they are what
+ * makes the timer ring on time, so onboarding presses for them rather than mentioning them. The escape
+ * hatch is not optional politeness: Android lets the user deny either permission for good, and a first-run
+ * screen that could trap them there would be a bug. See docs/decisions/008-*.
  */
 @Composable
 private fun Footer(
@@ -246,7 +236,7 @@ private fun Footer(
     onFinished: () -> Unit,
 ) {
     val isLastPage = currentPage == PAGE_COUNT - 1
-    val gated = isGated(currentPage, permissionsGranted)
+    val gated = isLastPage && !permissionsGranted
 
     Column(
         modifier = Modifier
@@ -286,7 +276,7 @@ private fun Footer(
             if (gated) {
                 TextControl(
                     label = stringResource(R.string.onboarding_continue_without),
-                    onClick = onNext,
+                    onClick = onFinished,
                     color = TextMuted,
                     style = Caption,
                     height = ESCAPE_SLOT_HEIGHT,
@@ -471,7 +461,7 @@ private fun WidgetAndPermissionsPage(
 }
 
 /**
- * The last page: how many times each end of a slot rings.
+ * How many times each end of a slot rings.
  *
  * It is here and not buried in Settings because missing the end of a slot is the failure nobody attributes
  * to a setting — you assume the timer did not ring, not that it rang once while you were in the kitchen.
@@ -487,10 +477,10 @@ private fun AlertRepeatsPage(
 ) {
     Page {
         Title(stringResource(R.string.onboarding_alerts_title))
-        Spacer(Modifier.height(12.dp))
-        Body(stringResource(R.string.onboarding_alerts_body))
+        Spacer(Modifier.height(16.dp))
+        WideBody(stringResource(R.string.onboarding_alerts_body))
 
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(ALERTS_BODY_GAP))
         SectionLabel(stringResource(R.string.onboarding_alerts_focus))
         Spacer(Modifier.height(8.dp))
         ChoiceRow(
@@ -574,6 +564,25 @@ private fun Page(content: @Composable ColumnScope.() -> Unit) {
 @Composable
 private fun Title(text: String) {
     Text(text = text, style = TitleScreen, color = TextPrimary, textAlign = TextAlign.Center)
+}
+
+/**
+ * The body on the last page: full content width, read from the left.
+ *
+ * The centred 260 dp of [Body] is right under a one-line title with nothing but a tomato around it. On the
+ * repeats page it sits under a title that wraps to two lines and above two rows of chips, and three centred lines
+ * in that sandwich read as cramped. Left-aligned and full width it lines up with the section labels and
+ * the chips underneath, so the page reads as one column instead of a centred blob over a grid.
+ */
+@Composable
+private fun WideBody(text: String) {
+    Text(
+        text = text,
+        style = BodyDefault,
+        color = TextSecondary,
+        textAlign = TextAlign.Start,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 @Composable
@@ -682,7 +691,7 @@ private fun OnboardingPermissionsPendingPreview() {
                 )
             }
             Footer(
-                currentPage = PERMISSIONS_PAGE,
+                currentPage = PAGE_COUNT - 1,
                 permissionsGranted = false,
                 onNext = {},
                 onFinished = {},
@@ -707,7 +716,7 @@ private fun OnboardingPermissionsGrantedPreview() {
                 )
             }
             Footer(
-                currentPage = PERMISSIONS_PAGE,
+                currentPage = PAGE_COUNT - 1,
                 permissionsGranted = true,
                 onNext = {},
                 onFinished = {},
@@ -729,7 +738,7 @@ private fun OnboardingAlertRepeatsPreview() {
                 )
             }
             Footer(
-                currentPage = PAGE_COUNT - 1,
+                currentPage = ALERT_REPEATS_PAGE,
                 permissionsGranted = true,
                 onNext = {},
                 onFinished = {},

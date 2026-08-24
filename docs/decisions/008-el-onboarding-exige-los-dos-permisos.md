@@ -68,30 +68,22 @@ puntualidad y no como un fallo, que es lo que es.
 
 ---
 
-## Añadido el 2026-08-24 · el gate se muda de `EMPEZAR` a `SIGUIENTE`
+## Añadido el 2026-08-24 · la página nueva va antes, no después
 
-El onboarding gana una **quinta página**, la última: cuántas veces suena el aviso al terminar cada fase,
-con un control por extremo del slot (ver el añadido del ADR 012). La de los permisos pasa a ser la cuarta.
+El onboarding gana una **quinta página** —cuántas veces suena el aviso al terminar cada fase, ver el
+añadido del ADR 012— y se coloca **cuarta, justo antes de los permisos**. Los permisos siguen cerrando el
+onboarding y el gate sigue siendo `EMPEZAR`, sin un solo cambio.
 
-Eso deja el gate de esta decisión sin su soporte original. `EMPEZAR` ya no vive en la página de los
-permisos, y un control de terminar en gris en una pantalla que solo habla de sonidos no se lee como una
-exigencia: se lee como una avería. Así que **el gate se queda con los permisos**:
+Se probó al revés, con la página nueva la última, y se descartó por dos razones que solo se ven montado:
 
-- En la página de los permisos, `SIGUIENTE` queda en `TextGhost` y deshabilitado mientras alguno de los
-  dos siga pendiente.
-- `CONTINUAR SIN ELLOS` sigue debajo, con las mismas condiciones, pero ahora **pasa de página** en vez de
-  terminar el onboarding. Quien no puede o no quiere conceder los permisos ve la última página igual que
-  todo el mundo.
-- En la última página `EMPEZAR` está siempre habilitado: allí no hay nada que exigir.
-- **Y el pager deja de aceptar el gesto mientras el gate está puesto** (`userScrollEnabled = false` en esa
-  página con algo pendiente). Sin esto el gate sería decorativo: deshabilitar el control de avance no vale
-  nada si la página siguiente está a un deslizamiento. El gesto vuelve en cuanto los dos permisos entran,
-  y mientras tanto `CONTINUAR SIN ELLOS` sigue ahí, que es lo que separa retener el pager de atrapar al
-  usuario. El coste es que en esa página, y solo con permisos pendientes, tampoco se puede volver atrás
-  con el dedo.
+1. **Un gate con una página detrás no gatea.** Deshabilitar el control de avance en la página de los
+   permisos no cuesta nada de saltarse cuando la siguiente está a un deslizamiento del dedo. Se puede
+   tapar bloqueando el gesto del pager (`userScrollEnabled = false`), pero eso también quita el volver
+   atrás, y se acaba defendiendo con dos mecanismos lo que aquí sostiene uno solo: **si los permisos son
+   lo último, no hay nada detrás que alcanzar**.
+2. **El control de terminar es el sitio natural del gate.** `EMPEZAR` en gris sobre las dos filas que
+   dicen `Pendiente · Necesario` se lee como lo que es. En una página que habla de sonidos se lee como una
+   avería.
 
-La presión sobre los dos permisos es la misma —no se pasa de esa página sin concederlos o sin renunciar
-explícitamente— y ahora se aplica donde el usuario está mirando lo que se le pide, que era el argumento
-del problema 1 de este ADR. La regla de la checklist de F9 se mantiene tal cual, cambiando qué control
-hay que mirar: **denegar los dos permisos y comprobar que `CONTINUAR SIN ELLOS` lleva a la última página
-y deja terminar el onboarding.**
+Que la última pregunta del onboarding sea la de los permisos tiene además el efecto que buscaba este ADR:
+la pantalla en la que el usuario decide si sigue adelante es la que le explica por qué hacen falta.

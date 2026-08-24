@@ -172,5 +172,6 @@ oirá lo nuevo al actualizar**, porque los defaults no están persistidos. Quien
 conserva los suyos, y los cinco sonidos siguen en el catálogo.
 
 Como la repetición deja de ser una rareza escondida en Ajustes para ser el comportamiento de fábrica,
-**el onboarding la pregunta en su última página** —ver el añadido del ADR 008—: perderse el final de una
-fase es el fallo que nadie atribuye a un ajuste, y por tanto el que nadie va a buscar a Ajustes.
+**el onboarding la pregunta en su cuarta página**, justo antes de la de los permisos —que sigue siendo la
+última, ver el añadido del ADR 008—: perderse el final de una fase es el fallo que nadie atribuye a un
+ajuste, y por tanto el que nadie va a buscar a Ajustes.

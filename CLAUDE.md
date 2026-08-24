@@ -83,13 +83,13 @@ Más: estado de los permisos (notificaciones y alarmas exactas) con botón a los
 
 ### 2.4 Pantalla Onboarding ✅ Implementada
 
-Cinco páginas: qué es la técnica pomodoro · elige tus duraciones · **tu ciclo** · el widget y los dos permisos · **cuántas veces suena el aviso**.
+Cinco páginas: qué es la técnica pomodoro · elige tus duraciones · **tu ciclo** · **cuántas veces suena el aviso** · el widget y los dos permisos.
 
 La tercera reúne los cuatro ajustes que deciden cómo se siente la app a lo largo de una mañana —pomodoros por ciclo, descanso largo y los dos auto-inicios— porque son los que conviene preguntar antes del primer pomodoro y no dejar enterrados en Ajustes. **Auto-iniciar el descanso viene activado**; el pomodoro siguiente, no.
 
-En la página de los permisos son **filas con su estado escrito** (`Pendiente` en ámbar con `Necesario` debajo, o `Activado`), no botones planos, y **`SIGUIENTE` está deshabilitado ahí hasta que los dos estén concedidos**, con un `CONTINUAR SIN ELLOS` discreto —que pasa de página— como válvula de escape obligatoria. El gate vive en esa página y no en `EMPEZAR` desde que hay una página después: deshabilitar el control de terminar en una pantalla que no habla de permisos se lee como una avería. Ver `docs/decisions/008-el-onboarding-exige-los-dos-permisos.md`.
+La cuarta pregunta **cuántas veces suena el aviso al terminar cada fase**, con un control por extremo del slot (1–4 aquí; el rango completo, hasta 10, está en Ajustes). Está en el onboarding porque perderse el final de una fase no se atribuye a un ajuste: se atribuye a que el temporizador no sonó. Va antes de los permisos y no después: **un gate con una página detrás no gatea**, porque la siguiente queda a un deslizamiento.
 
-La última pregunta **cuántas veces suena el aviso al terminar cada fase**, con un control por extremo del slot (1–4 aquí; el rango completo, hasta 10, está en Ajustes). Está en el onboarding porque perderse el final de una fase no se atribuye a un ajuste: se atribuye a que el temporizador no sonó.
+En la última página los permisos son **filas con su estado escrito** (`Pendiente` en ámbar con `Necesario` debajo, o `Activado`), no botones planos, y **`EMPEZAR` está deshabilitado hasta que los dos estén concedidos**, con un `CONTINUAR SIN ELLOS` discreto como válvula de escape obligatoria. Ver `docs/decisions/008-el-onboarding-exige-los-dos-permisos.md`.
 
 ### 2.5 Widget de escritorio 1×1 ✅ Implementado
 
