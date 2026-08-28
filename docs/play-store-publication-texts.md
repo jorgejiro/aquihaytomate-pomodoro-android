@@ -319,7 +319,7 @@ dependencias externas, sin fuentes remotas— con la misma estructura bilingüe 
 
 1. Súbela a tu web como `aqui-hay-tomate.html`, junto a `bebe-agua.html`.
 2. En Play Console → Contenido de la aplicación → Política de privacidad, pon la URL resultante:
-   **`https://www.jorgejiro.es/aqui-hay-tomate.html`**.
+   **`https://jorgejiro.es/apps/aqui-hay-tomate/privacidad/`**.
 3. Si algún día cambia cómo se tratan los datos, actualiza la página **y** la fecha de entrada en vigor que
    figura en las dos versiones.
 
