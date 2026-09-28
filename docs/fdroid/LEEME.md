@@ -29,6 +29,10 @@ abrir un merge request allí con la receta.
 - **La receta de la 1.4.0 apunta a un commit, no al tag `v1.4.0`.** El tag es anterior a quitar dos
   cosas que F-Droid rechaza: el bloque de dependencias cifrado para Google (`dependenciesInfo`) y el
   plugin foojay. La app es la misma: solo cambia la configuración del build.
+- **Ese commit tiene que contener ya `fastlane/`.** F-Droid lee la ficha del mismo commit que compila.
+  La primera receta apuntaba a `28598aa`, el del plugin foojay, que es anterior a la ficha, y el
+  revisor contestó «Fastlane/Triple-T is not found». Ahora apunta a `cfac7a2`, que solo añade
+  `fastlane/` sobre `28598aa`.
 - **Las versiones siguientes se publican solas.** Con `UpdateCheckMode: Tags` y
   `AutoUpdateMode: Version`, F-Droid detecta cada tag `vX.Y.Z` nuevo, lee `versionCode` y
   `versionName` de `app/build.gradle.kts` y añade el build. Basta con seguir etiquetando las releases.
