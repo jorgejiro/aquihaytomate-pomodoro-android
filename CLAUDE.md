@@ -116,12 +116,15 @@ En la última página los permisos son **filas con su estado escrito** (`Pendien
 
 ### 2.7 Pantalla Novedades (changelog) ✅ Implementada
 
-Igual que en Bebe Agua. **Cuatro sitios que hay que mantener sincronizados** al publicar una versión:
+Igual que en Bebe Agua. **Cinco sitios que hay que mantener sincronizados** al publicar una versión:
 
 1. `CHANGELOG.md` en la raíz (fuente de verdad del repo).
 2. Los `string-array` `changelog_<version>` en `values/strings.xml` y `values-es/strings.xml`.
 3. `ui/changelog/ChangelogCatalog.kt`.
 4. `versionCode` / `versionName` en `app/build.gradle.kts`.
+5. `fastlane/metadata/android/{en-US,es-ES}/changelogs/<versionCode>.txt` (máximo 500 caracteres,
+   con el mismo texto que las notas de Play) — es lo que lee F-Droid; sin él la versión sale sin
+   novedades. Ver `docs/fdroid/LEEME.md`.
 
 El test unitario `ChangelogCatalogTest` falla si el `versionCode` compilado no tiene entrada en el catálogo; el instrumentado `ChangelogResourcesTest` falla si falta el array en ES o EN.
 
@@ -448,7 +451,7 @@ CAPA 3 · RED       AlarmManager ELAPSED_REALTIME_WAKEUP al mismo deadline.
 
 - Los strings van en `strings.xml`. **Nunca hardcodees strings en Composables.**
 - Si añades un string en `values/`, añade la traducción en `values-es/` en el mismo commit. `StringsParityTest` falla si no.
-- Si subes `versionCode`/`versionName` → actualiza los cuatro sitios de §2.7.
+- Si subes `versionCode`/`versionName` → actualiza los cinco sitios de §2.7.
 - Si tocas el schema de Room → migration + test de migration, e incrementa la versión.
 - Si tocas notificaciones, el servicio o las alarmas → **pasa la checklist de resiliencia** (§10) en Android 12, 14 y 16. La lógica de permisos y de background cambia mucho entre versiones.
 - Si tocas el widget → pruébalo en **Nova Launcher** (el que usa Jorge), Pixel Launcher y One UI.

@@ -5,8 +5,9 @@ repositorio; el que se muestra dentro de la app vive en los `string-array` `chan
 `app/src/main/res/values/strings.xml` y `values-es/strings.xml`, indexados desde
 `ui/changelog/ChangelogCatalog.kt`.
 
-Al publicar una versión nueva hay que tocar los cuatro sitios: este archivo, los dos
-`string-array` (EN y ES), el catálogo y el `versionCode`/`versionName` de `app/build.gradle.kts`.
+Al publicar una versión nueva hay que tocar los cinco sitios: este archivo, los dos
+`string-array` (EN y ES), el catálogo, el `versionCode`/`versionName` de `app/build.gradle.kts` y el
+changelog de fastlane para F-Droid (`fastlane/metadata/android/{en-US,es-ES}/changelogs/<versionCode>.txt`).
 
 **El `versionCode` sube de uno en uno en cada subida a Play, incluso si el `versionName` solo cambia de
 patch.** Play rechaza un bundle cuyo `versionCode` no sea mayor que el de la última subida, y no se puede
