@@ -63,6 +63,12 @@ android {
         compose = true
         buildConfig = true
     }
+    // AGP mete en el APK la lista de dependencias cifrada con una clave de Google:
+    // solo Google puede leerla, y F-Droid rechaza los APK que la llevan.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
     // MigrationTestHelper reads the exported schemas from the instrumentation assets.
     sourceSets.getByName("androidTest") {
         assets.directories.add("$projectDir/schemas")
