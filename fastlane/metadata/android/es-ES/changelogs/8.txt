@@ -1,0 +1,6 @@
+• Los avisos de fin suenan ahora dos veces: campana al acabar el pomodoro y cuenco tibetano al acabar el descanso. Si ya elegiste los tuyos, se quedan.
+• La primera puesta en marcha pregunta cuántas veces quieres que suene cada aviso.
+• El aviso del final del pomodoro vuelve a sonar, y con el volumen de alarma.
+• El ciclo empieza de cero cada día, y el icono es un reloj que marca las cinco y cinco.
+
+Sin cuentas, sin nube, sin anuncios y sin seguimiento.

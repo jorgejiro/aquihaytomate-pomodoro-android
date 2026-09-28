@@ -1,0 +1,6 @@
+• End-of-slot alerts play twice now: a bell when the pomodoro is over, a singing bowl when the break is. If you had picked your own, yours stay.
+• First-run setup asks how many times each alert should play.
+• The end-of-pomodoro alert sounds again, and it follows the alarm volume.
+• The cycle starts from zero each day, and the icon is a clock reading five past five.
+
+No accounts, no cloud, no ads, no tracking.

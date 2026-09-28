@@ -1,0 +1,1 @@
+Temporizador Pomodoro con widget de una sola casilla. Oscuro, rápido y sin ruido

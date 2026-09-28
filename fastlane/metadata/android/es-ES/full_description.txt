@@ -1,0 +1,26 @@
+Un temporizador Pomodoro que cabe en una casilla.
+
+Todas las apps de pomodoro traen un widget de 2×2 como mínimo, y te comen el escritorio. «¡Aquí hay tomate!» trae uno de una sola casilla: un toque para empezar o pausar, dos toques para reiniciar. Sin abrir la app, sin buscar nada.
+
+Trabaja 25 minutos, descansa 5, y cada cuatro pomodoros tómate un descanso largo. O configúralo como te dé la gana: todas las duraciones son tuyas.
+
+Fiable de verdad. Suena en el segundo correcto con la pantalla apagada, después de cerrar la app desde recientes y después de reiniciar el móvil. Un temporizador que llega tarde no sirve para nada.
+
+Y bonito. Fondo negro y un tomate rojo que se va vaciando conforme pasa el tiempo. Nada de botones enormes ni de interfaces de juguete.
+
+Funciones principales:
+
+• Widget de escritorio de 1×1: iniciar, pausar y reiniciar sin abrir la app
+• Ciclos completos de enfoque, descanso corto y descanso largo
+• Todas las duraciones configurables, y también cuántos pomodoros por ciclo
+• Estadísticas: pomodoros completados, tiempo enfocado, racha de días, mapa mensual y tendencia
+• Aviso al terminar con sonido a elegir y repeticiones, uno por cada extremo del slot
+• Vibración de duración configurable
+• Auto-iniciar el descanso, el pomodoro siguiente, o ninguno de los dos
+• Notificación con el descuento y botones de pausar, saltar y reiniciar
+• Respeta el modo silencio y No molestar
+• Español e inglés
+
+Sin cuentas. Sin nube. Sin anuncios. Sin seguimiento. Todos tus datos se quedan en el móvil.
+
+El nombre es un juego: pomodoro es «tomate» en italiano, que es de donde viene el nombre de la técnica. Y sí, también es un guiño a aquel anuncio de tomate frito.

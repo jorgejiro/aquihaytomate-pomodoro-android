@@ -1,0 +1,26 @@
+A Pomodoro timer that fits in one cell.
+
+Every Pomodoro app ships a 2×2 widget at minimum, and it eats your home screen. "¡Aquí hay tomate!" ships a one-cell widget: tap to start or pause, double-tap to reset. No app to open, nothing to hunt for.
+
+Work for 25 minutes, rest for 5, and take a long break every four Pomodoros. Or set it up however you like — every duration is yours.
+
+Actually reliable. It fires on the right second with the screen off, after you swipe the app away, and after a reboot. A timer that runs late is no timer at all.
+
+And good-looking. A black background and a red tomato that drains as time passes. No giant buttons, no toy interface.
+
+Main features:
+
+• 1×1 home screen widget: start, pause and reset without opening the app
+• Full cycles of focus, short break and long break
+• Every duration configurable, plus how many Pomodoros per cycle
+• Statistics: completed Pomodoros, time focused, day streak, monthly map and trend
+• End-of-slot alert with its own sound and repeat count, one for each end of the slot
+• Configurable vibration length
+• Optional auto-start of the next slot
+• Notification with the countdown and pause, skip and reset buttons
+• Respects silent mode and Do Not Disturb
+• Spanish and English
+
+No accounts. No cloud. No ads. No tracking. All your data stays on your phone.
+
+The name is a Spanish pun: pomodoro is Italian for tomato, which is where the technique's name comes from. And yes, it also nods to an old tinned-tomato commercial.
