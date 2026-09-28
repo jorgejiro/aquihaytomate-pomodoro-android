@@ -92,6 +92,13 @@ justo el que valora eso.
     `CLAUDE.md` §8 («cinco sitios de §2.7») y en la cabecera de `CHANGELOG.md`. Se comprobó con `rg`
     que no hay ninguna otra mención de «cuatro sitios» sobre este tema en el repo.
 
+- Comprobación del orquestador: `lint test` repetido en verde; `fdroid lint` repetido con salida 0 y el
+  mismo aviso de espacio final. Poner `Changelog:` en una línea quita el aviso, pero `rewritemeta` lo
+  vuelve a partir y la CI de fdroiddata exige su forma canónica; la única URL que cabe es `/releases`, que
+  en GitHub está vacía. Se deja la forma canónica.
+- RDD: `review assess` sobre `main..HEAD` (sin los ficheros sin seguimiento) → riesgo medio, 263 líneas,
+  `review_due: false` (`under_budget`). Sin revisión en este lote.
+
 ## Estado
 
 Las tres tareas están completas y verificadas localmente. Falta lo que exige confirmación explícita
