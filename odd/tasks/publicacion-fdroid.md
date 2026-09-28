@@ -106,6 +106,25 @@ de Jorge y operación remota: empujar la rama `feat/publicacion-fdroid` a GitHub
 `fdroid/fdroiddata`, crear la rama `com.jjrapps.aquihaytomate` con la receta y abrir el merge request
 con `glab`.
 
+## Envío (2026-09-28, confirmado por Jorge)
+
+- `feat/publicacion-fdroid` integrada en `main` por fast-forward y empujada a GitHub (`33b9839`); el
+  commit de la receta `28598aa` existe en GitHub.
+- Fork `jorgejiro/fdroiddata`, rama `com.jjrapps.aquihaytomate` desde `master` (`3db245b5a1`), commit
+  `7a4c4d48` «New app: ¡Aquí hay tomate!», con la receta idéntica a la del repo.
+- Merge request: https://gitlab.com/fdroid/fdroiddata/-/merge_requests/50458, con la checklist de
+  Sleep Noise adaptada y `allow_collaboration`. El APK sí trae dos librerías nativas mínimas de
+  AndroidX (`androidx.graphics.path`, `datastore_shared_counter`, ~60 KB en las cuatro ABI); el MR lo
+  dice en vez de afirmar que no hay código nativo.
+
+- Primera CI: `fdroid build`, `checkupdates` y `check source code` fallaron con «Authentication failed»
+  al clonar desde GitHub: **el repositorio era privado**. Se revisó el historial antes de abrirlo (sin
+  keystores, `keystore.properties`, `local.properties` ni tokens) y Jorge lo hizo público.
+- Segunda CI, reintentando las pipelines 2889056419 y 2889054961: **todos los jobs en verde**, incluidos
+  `fdroid build` (BUILD SUCCESSFUL en 4 min 31 s, sin hallazgos del escáner), `check apk` y
+  `checkupdates`.
+
 ## Siguiente paso
 
-Jorge confirma push de la rama a GitHub + MR en fdroiddata.
+Esperar la revisión de los voluntarios en el MR !50458 y contestar sus comentarios. Las versiones
+siguientes entran solas con cada tag `vX.Y.Z`, siempre que lleven su `changelogs/<versionCode>.txt`.
