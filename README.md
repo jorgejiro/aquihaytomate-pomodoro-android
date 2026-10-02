@@ -172,7 +172,17 @@ cd aquihaytomate-pomodoro-android
 ./gradlew lint test
 ```
 
-Release builds need a `keystore.properties` at the repo root (git-ignored, never committed):
+Release builds are signed from Bitwarden Secrets Manager when `con-claves` injects
+`AQUIHAYTOMATE_KEYSTORE_B64` (base64 of the `.jks`), `AQUIHAYTOMATE_STORE_PASSWORD`,
+`AQUIHAYTOMATE_KEY_ALIAS` and `AQUIHAYTOMATE_KEY_PASSWORD`; the keystore is decoded into
+`app/build/signing/`:
+
+```bash
+con-claves './gradlew :app:assembleRelease'
+```
+
+Without those variables they fall back to a `keystore.properties` at the repo root (git-ignored,
+never committed):
 
 ```properties
 storeFile=../aquihaytomate-release.jks
@@ -180,6 +190,8 @@ storePassword=…
 keyAlias=aquihaytomate
 keyPassword=…
 ```
+
+With neither, the release build is left unsigned and debug builds are unaffected.
 
 ---
 
