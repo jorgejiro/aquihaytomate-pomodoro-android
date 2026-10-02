@@ -1,3 +1,7 @@
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.attribute.PosixFilePermissions
+import java.util.Base64
 import java.util.Properties
 
 plugins {
@@ -7,11 +11,36 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+// Release signing reads Bitwarden Secrets Manager first: `con-claves` injects
+// AQUIHAYTOMATE_KEYSTORE_B64 plus the three credentials as env vars, and the keystore is
+// decoded into the build dir (owner-only). keystore.properties is the fallback; with
+// neither, release stays unsigned and debug still builds.
+fun signingEnv(key: String): String? =
+    System.getenv("AQUIHAYTOMATE_$key")?.takeIf { it.isNotBlank() }
+
+fun decodeKeystore(base64: String, target: File): File {
+    target.parentFile.mkdirs()
+    target.delete()
+    target.createNewFile()
+    runCatching {
+        Files.setPosixFilePermissions(target.toPath(), PosixFilePermissions.fromString("rw-------"))
+    }
+    target.writeBytes(Base64.getDecoder().decode(base64.trim()))
+    return target
+}
+
+val envStorePassword = signingEnv("STORE_PASSWORD")
+val envKeyAlias = signingEnv("KEY_ALIAS")
+val envKeyPassword = signingEnv("KEY_PASSWORD")
+val envKeystoreFile = signingEnv("KEYSTORE_B64")
+    ?.takeIf { envStorePassword != null && envKeyAlias != null && envKeyPassword != null }
+    ?.let { decodeKeystore(it, layout.buildDirectory.file("signing/release.jks").get().asFile) }
+
 val keystoreProps = Properties().also { props ->
     val f = rootProject.file("keystore.properties")
     if (f.exists()) props.load(f.inputStream())
 }
-val hasReleaseKeystore = keystoreProps["storeFile"] != null
+val hasReleaseKeystore = envKeystoreFile != null || keystoreProps["storeFile"] != null
 
 android {
     namespace = "com.jjrapps.aquihaytomate"
@@ -32,7 +61,14 @@ android {
     }
 
     signingConfigs {
-        if (hasReleaseKeystore) {
+        if (envKeystoreFile != null) {
+            create("release") {
+                storeFile = envKeystoreFile
+                storePassword = envStorePassword
+                keyAlias = envKeyAlias
+                keyPassword = envKeyPassword
+            }
+        } else if (hasReleaseKeystore) {
             create("release") {
                 storeFile = file(keystoreProps["storeFile"] as String)
                 storePassword = keystoreProps["storePassword"] as String
