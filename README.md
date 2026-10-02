@@ -181,8 +181,9 @@ Release builds are signed from Bitwarden Secrets Manager when `con-claves` injec
 con-claves './gradlew :app:assembleRelease'
 ```
 
-Without those variables they fall back to a `keystore.properties` at the repo root (git-ignored,
-never committed):
+No local copy of the keystore is kept, so any machine with access to the secrets can build a
+release. Without those variables they fall back to a `keystore.properties` at the repo root
+(git-ignored, never committed):
 
 ```properties
 storeFile=../aquihaytomate-release.jks
