@@ -12,6 +12,9 @@
   <a href="https://play.google.com/store/apps/details?id=com.jjrapps.aquihaytomate">
     <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80" />
   </a>
+  <a href="https://f-droid.org/packages/com.jjrapps.aquihaytomate/">
+    <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80" />
+  </a>
 </p>
 
 <p align="center">
@@ -116,6 +119,9 @@ No accounts. No cloud. No ads. No tracking. All your data stays on your phone.
   <a href="https://play.google.com/store/apps/details?id=com.jjrapps.aquihaytomate">
     <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80" />
   </a>
+  <a href="https://f-droid.org/packages/com.jjrapps.aquihaytomate/">
+    <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80" />
+  </a>
 </p>
 
 <p align="center">
@@ -127,6 +133,7 @@ No accounts. No cloud. No ads. No tracking. All your data stays on your phone.
 | | |
 | :--- | :--- |
 | **Google Play** | [`com.jjrapps.aquihaytomate`](https://play.google.com/store/apps/details?id=com.jjrapps.aquihaytomate) |
+| **F-Droid** | [`com.jjrapps.aquihaytomate`](https://f-droid.org/packages/com.jjrapps.aquihaytomate/) |
 | **Latest version** | 1.4.0 — see [`CHANGELOG.md`](CHANGELOG.md) |
 | **Requires** | Android 12 (API 31) or newer |
 | **Price** | Free, no ads, no in-app purchases |
