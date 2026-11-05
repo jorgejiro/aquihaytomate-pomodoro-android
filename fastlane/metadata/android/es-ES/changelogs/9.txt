@@ -1,0 +1,3 @@
+• El aviso del final del pomodoro vuelve a sonar cuando la app sigue abierta en segundo plano. El descanso arrancaba solo, pero el pomodoro terminaba en silencio: sin sonido, sin vibración y sin notificación.
+
+Sin cuentas, sin nube, sin anuncios y sin seguimiento.

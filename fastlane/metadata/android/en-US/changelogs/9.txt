@@ -1,0 +1,3 @@
+• The end-of-pomodoro alert plays again when the app is still open in the background. The break started on its own, but the pomodoro ended in silence: no sound, no vibration and no notification.
+
+No accounts, no cloud, no ads, no tracking.

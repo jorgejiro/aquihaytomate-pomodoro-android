@@ -216,6 +216,9 @@
     <string name="changelog_title">What\'s new</string>
     <string name="changelog_current_badge">Current</string>
 
+    <string-array name="changelog_1_4_1">
+        <item>The end-of-pomodoro alert plays again when the app is still open in the background. The break started on its own, but the pomodoro ended in silence: no sound, no vibration and no notification.</item>
+    </string-array>
     <string-array name="changelog_1_4_0">
         <item>New default sounds, and both play twice: a bell when the pomodoro is over and the singing bowl when the break is. If you had already picked your own, yours stay — and all five sounds are still in the list.</item>
         <item>The first-run setup now asks how many times each alert should play, one setting for the pomodoro and one for the break. You can still change them in Settings, up to ten.</item>

@@ -213,6 +213,9 @@
     <string name="changelog_title">Novedades</string>
     <string name="changelog_current_badge">Actual</string>
 
+    <string-array name="changelog_1_4_1">
+        <item>El aviso del final del pomodoro vuelve a sonar cuando la app sigue abierta en segundo plano. El descanso arrancaba solo, pero el pomodoro terminaba en silencio: sin sonido, sin vibración y sin notificación.</item>
+    </string-array>
     <string-array name="changelog_1_4_0">
         <item>Sonidos nuevos por defecto, y los dos suenan dos veces: campana al terminar el pomodoro y cuenco tibetano al terminar el descanso. Si ya habías elegido los tuyos, se quedan — y los cinco sonidos siguen en la lista.</item>
         <item>La primera puesta en marcha pregunta cuántas veces quieres que suene cada aviso, uno para el pomodoro y otro para el descanso. Se siguen pudiendo cambiar en Ajustes, hasta diez.</item>

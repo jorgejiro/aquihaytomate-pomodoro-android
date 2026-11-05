@@ -1,0 +1,50 @@
+# Publishes ¡Aquí hay tomate! to Google Play with fastlane supply. Same shape as Constanza's Fastfile,
+# with one deliberate difference: an AAB upload carries only the binary and the release notes for its
+# versionCode (fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt). The store listing in
+# Play Console was written by hand and is not overwritten from here.
+
+# Do not auto-generate fastlane/README.md on every run.
+skip_docs
+
+default_platform(:android)
+
+platform :android do
+  desc "Check the Play credentials and the listing against the API without publishing anything"
+  lane :validar do
+    upload_to_play_store(
+      validate_only: true,
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Build :app:bundleRelease and publish the signed AAB to Play production, live (params: track, release_status)"
+  lane :subir do |options|
+    # Production + completed by default: the release goes live in one command. Pass
+    # track:internal release_status:draft to stage one instead.
+    track = options[:track] || "production"
+    release_status = options[:release_status] || "completed"
+
+    ENV["JAVA_HOME"] = "/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+
+    gradle(task: "app:bundleRelease")
+
+    aab_paths = lane_context[SharedValues::GRADLE_ALL_AAB_OUTPUT_PATHS]
+    UI.user_error!("gradle(task: 'app:bundleRelease') produced no .aab") if aab_paths.nil? || aab_paths.empty?
+
+    upload_to_play_store(
+      track: track,
+      release_status: release_status,
+      aab: aab_paths.first,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: false,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+end
