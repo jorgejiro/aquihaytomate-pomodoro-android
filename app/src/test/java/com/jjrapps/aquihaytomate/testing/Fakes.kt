@@ -64,16 +64,32 @@ class FakeTimerStateRepository(initial: TimerState = TimerState.EMPTY) : TimerSt
         }
     }
 
-    override suspend fun update(transform: (TimerState) -> TimerState?): Boolean = mutex.withLock {
-        val currentState = flow.value
-        val next = transform(currentState)
-        if (next != null && next != currentState) {
-            flow.value = next
-            writeCount++
-            true
-        } else {
-            false
+    /**
+     * Runs right after a transition lands, before the caller gets the answer back. A test uses it to
+     * cancel the caller at that moment, the way `collectLatest` does when it sees the new state.
+     */
+    var onCommitted: (() -> Unit)? = null
+
+    /**
+     * The `yield()` after the write mirrors DataStore: `edit` awaits the write actor's acknowledgement in
+     * a cancellable way, so a caller cancelled while the write is landing gets a `CancellationException`
+     * even though the new state is already on disk.
+     */
+    override suspend fun update(transform: (TimerState) -> TimerState?): Boolean {
+        val changed = mutex.withLock {
+            val currentState = flow.value
+            val next = transform(currentState)
+            if (next != null && next != currentState) {
+                flow.value = next
+                writeCount++
+                true
+            } else {
+                false
+            }
         }
+        if (changed) onCommitted?.invoke()
+        yield()
+        return changed
     }
 }
 

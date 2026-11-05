@@ -814,6 +814,32 @@ class TimerEngineTest {
         assertEquals(1, stats.recorded.size)
     }
 
+    /**
+     * Con la Activity viva, el `TimerViewModel` también espera al deadline y suele ganar la carrera por
+     * cerrar el slot. Lo llama desde un `collectLatest` sobre el estado, así que la propia transición
+     * cancela al llamante mientras DataStore confirma la escritura: el estado avanzaba al descanso pero
+     * ni se rearmaba nada ni sonaba la alerta. Se vio en un Galaxy Z Fold7 con la 1.4.0.
+     */
+    @Test
+    fun `the alert sounds even when the state change itself cancels the caller`() = runTest {
+        settings.set(TimerSettings(autoStartBreak = true))
+        start()
+        advance(focusMs)
+
+        val closing = launch {
+            val self = currentCoroutineContext()[Job]!!
+            timerState.onCommitted = { self.cancel() }
+            complete()
+        }
+        closing.join()
+        timerState.onCommitted = null
+
+        assertEquals(SlotType.SHORT_BREAK, state().slotType)
+        assertEquals("El pomodoro tiene que sonar aunque se cancele quien lo cerró", 1, alerts.playCount)
+        assertEquals(AlertSound.DEFAULT_FOCUS, alerts.lastSound)
+        assertEquals("Y el descanso tiene que quedar en marcha", 1, runtime.chainedNotificationCount)
+    }
+
     // ─── La notificación del temporizador parado ────────────────────────────
 
     @Test

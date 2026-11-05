@@ -26,12 +26,14 @@ import kotlinx.coroutines.withContext
  *    `RUNNING` state matching the slot it means to close; the rest get null back and do nothing.
  * 3. **Only the caller that won the compare-and-set alerts.** That is why the alert comes last and is
  *    gated on the return value of the update, rather than on having written the row.
- * 4. **Everything after the transition runs `NonCancellable`.** The usual caller is the service's own
- *    countdown coroutine, and with auto-start on, `syncTimerRuntime` starts the service for the next
- *    slot — whose `onStartCommand` cancels that very coroutine. Without this the job died at the next
- *    suspension point and the alert never played: the end of a pomodoro was silent while the end of a
- *    break, which chains into nothing, rang normally. Once the state has moved on, the alert and the
- *    notification are owed to the user and cannot be dropped halfway.
+ * 4. **The transition and everything after it run `NonCancellable`.** Two callers get cancelled right
+ *    there. The service's countdown coroutine: with auto-start on, `syncTimerRuntime` starts the service
+ *    for the next slot, whose `onStartCommand` cancels that very coroutine. And the `TimerViewModel`,
+ *    which closes the slot from a `collectLatest` over the state: the transition itself is a new state,
+ *    so it cancels the caller while DataStore is still acknowledging the write — `edit` then throws
+ *    `CancellationException` although the new state is already on disk, and the caller never learns it
+ *    won. Either way the end of a pomodoro was silent. Once the compare-and-set is attempted, the
+ *    answer, the alert and the notification are owed to the user and cannot be dropped halfway.
  *
  * See CLAUDE.md §6 and docs/decisions/002-motor-del-temporizador-hibrido.md.
  */
@@ -91,47 +93,49 @@ class CompleteSlotUseCase @Inject constructor(
             else -> TimerStatus.IDLE
         }
 
-        val closedByUs = timerStateRepository.update { current ->
-            val stillOurs = current.status == TimerStatus.RUNNING &&
-                current.sessionId == state.sessionId &&
-                current.slotIndex == state.slotIndex
-            if (!stillOurs) {
-                null
-            } else {
-                TimerTransitions.advanceTo(
-                    state = current,
-                    planned = planned,
-                    status = nextStatus,
-                    settings = settings,
-                    nowEpochMs = nowEpochMs,
-                    nowElapsedRealtimeMs = nowElapsedRealtimeMs,
-                )
-            }
-        }
-
-        if (closedByUs) withContext(NonCancellable) {
-            // Rearm or tear down before alerting: the alert can take seconds of vibration, and the
-            // next slot's alarm should already be armed by then.
-            syncTimerRuntime()
-
-            if (alertUser) {
-                // When the next slot chained on its own, `syncTimerRuntime` cleared the alert on its way
-                // through RUNNING and nothing else would publish one — so the phone would buzz and leave no
-                // trace, and a paired watch would never hear about the pomodoro ending. Published after the
-                // sync, precisely so it survives that clear.
-                if (nextStatus == TimerStatus.RUNNING) {
-                    notifier.showSlotFinished(timerStateRepository.current(), chained = true)
+        return withContext(NonCancellable) {
+            val closedByUs = timerStateRepository.update { current ->
+                val stillOurs = current.status == TimerStatus.RUNNING &&
+                    current.sessionId == state.sessionId &&
+                    current.slotIndex == state.slotIndex
+                if (!stillOurs) {
+                    null
+                } else {
+                    TimerTransitions.advanceTo(
+                        state = current,
+                        planned = planned,
+                        status = nextStatus,
+                        settings = settings,
+                        nowEpochMs = nowEpochMs,
+                        nowElapsedRealtimeMs = nowElapsedRealtimeMs,
+                    )
                 }
-                // El sonido lo elige el slot que **acaba**, no el que empieza: acabar un pomodoro suena
-                // suave y acabar un descanso suena duro. `state.slotType` sigue siendo el que se cierra
-                // aquí, porque el avance se hizo sobre una copia del estado.
-                alertPlayer.play(
-                    settings.alertSoundFor(state.slotType),
-                    settings.vibrationSeconds,
-                    settings.alertRepeatsFor(state.slotType),
-                )
             }
+
+            if (closedByUs) {
+                // Rearm or tear down before alerting: the alert can take seconds of vibration, and the
+                // next slot's alarm should already be armed by then.
+                syncTimerRuntime()
+
+                if (alertUser) {
+                    // When the next slot chained on its own, `syncTimerRuntime` cleared the alert on
+                    // its way through RUNNING and nothing else would publish one — so the phone would
+                    // buzz and leave no trace, and a paired watch would never hear about the pomodoro
+                    // ending. Published after the sync, precisely so it survives that clear.
+                    if (nextStatus == TimerStatus.RUNNING) {
+                        notifier.showSlotFinished(timerStateRepository.current(), chained = true)
+                    }
+                    // El sonido lo elige el slot que **acaba**, no el que empieza: acabar un pomodoro
+                    // suena suave y acabar un descanso suena duro. `state.slotType` sigue siendo el que
+                    // se cierra aquí, porque el avance se hizo sobre una copia del estado.
+                    alertPlayer.play(
+                        settings.alertSoundFor(state.slotType),
+                        settings.vibrationSeconds,
+                        settings.alertRepeatsFor(state.slotType),
+                    )
+                }
+            }
+            closedByUs
         }
-        return closedByUs
     }
 }
