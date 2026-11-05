@@ -20,6 +20,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 Un solo fallo, y es el que más importa: el fin del pomodoro volvía a quedarse mudo.
 
+**Enviada a Google Play el 2026-11-05**, la primera con `fastlane subir`; a F-Droid, con el tag `v1.4.1`.
+
 ### Corregido
 
 - **El aviso del final del pomodoro suena aunque la app siga abierta en recientes.** Con el auto-inicio
