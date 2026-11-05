@@ -16,6 +16,19 @@ reutilizar ni bajando la versión.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.4.1] — 2026-11-05 (versionCode 9)
+
+Un solo fallo, y es el que más importa: el fin del pomodoro volvía a quedarse mudo.
+
+### Corregido
+
+- **El aviso del final del pomodoro suena aunque la app siga abierta en recientes.** Con el auto-inicio
+  del descanso activado, el pomodoro se cerraba a su hora y el descanso arrancaba, pero no sonaba nada, ni
+  vibraba, ni llegaba la notificación de fin. Quien cerraba el slot era la pantalla del temporizador, y el
+  propio cambio de estado la cancelaba mientras se guardaba, antes de llegar a la alerta; el servicio y la
+  alarma de respaldo veían el slot ya cerrado y no hacían nada. Visto en un Galaxy Z Fold7 con Android 17.
+  Ahora el cierre y todo lo que lo sigue no se pueden cancelar a medias.
+
 ## [1.4.0] — 2026-08-24 (versionCode 8)
 
 Sube el minor por la página nueva del onboarding, pero lo que se va a notar de entrada son los avisos:
