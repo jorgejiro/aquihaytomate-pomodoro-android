@@ -126,6 +126,8 @@ Igual que en Bebe Agua. **Cinco sitios que hay que mantener sincronizados** al p
    con el mismo texto que las notas de Play) — es lo que lee F-Droid; sin él la versión sale sin
    novedades. Ver `docs/fdroid/LEEME.md`.
 
+Cómo compilar y publicar en Google Play y F-Droid, paso a paso: `docs/release-process.md`.
+
 El test unitario `ChangelogCatalogTest` falla si el `versionCode` compilado no tiene entrada en el catálogo; el instrumentado `ChangelogResourcesTest` falla si falta el array en ES o EN.
 
 ---
