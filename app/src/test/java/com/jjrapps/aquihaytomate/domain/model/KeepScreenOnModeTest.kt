@@ -52,4 +52,32 @@ class KeepScreenOnModeTest {
         assertEquals(KeepScreenOnMode.WHILE_CHARGING, KeepScreenOnMode.DEFAULT)
         assertEquals(KeepScreenOnMode.WHILE_CHARGING, TimerSettings().keepScreenOn)
     }
+    @Test
+    fun `the toggle turns any other mode into always and remembers it`() {
+        listOf(KeepScreenOnMode.NEVER, KeepScreenOnMode.WHILE_CHARGING).forEach { mode ->
+            val toggle = mode.toggleAlways(restore = null)
+            assertEquals(KeepScreenOnMode.ALWAYS, toggle.mode)
+            assertEquals(mode, toggle.restore)
+        }
+    }
+
+    /** Switching it back off must not take away "while charging", nor force it on someone who had never. */
+    @Test
+    fun `the toggle turns always back into the remembered mode`() {
+        listOf(KeepScreenOnMode.NEVER, KeepScreenOnMode.WHILE_CHARGING).forEach { mode ->
+            val toggle = KeepScreenOnMode.ALWAYS.toggleAlways(restore = mode)
+            assertEquals(mode, toggle.mode)
+            assertEquals(null, toggle.restore)
+        }
+    }
+
+    /** Always chosen in Settings leaves nothing to go back to: the default is the safe answer. */
+    @Test
+    fun `turning always off with nothing remembered falls back to the default`() {
+        assertEquals(KeepScreenOnMode.DEFAULT, KeepScreenOnMode.ALWAYS.toggleAlways(restore = null).mode)
+        assertEquals(
+            KeepScreenOnMode.DEFAULT,
+            KeepScreenOnMode.ALWAYS.toggleAlways(restore = KeepScreenOnMode.ALWAYS).mode,
+        )
+    }
 }

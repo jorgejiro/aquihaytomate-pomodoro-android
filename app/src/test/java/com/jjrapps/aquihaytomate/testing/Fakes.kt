@@ -158,6 +158,14 @@ class FakeSettingsRepository(initial: TimerSettings = TimerSettings()) : Setting
         flow.value = flow.value.copy(keepScreenOn = mode)
     }
 
+    private var keepScreenOnRestore: KeepScreenOnMode? = null
+
+    override suspend fun toggleKeepScreenOnAlways() {
+        val toggle = flow.value.keepScreenOn.toggleAlways(keepScreenOnRestore)
+        keepScreenOnRestore = toggle.restore
+        flow.value = flow.value.copy(keepScreenOn = toggle.mode)
+    }
+
     override suspend fun setDailyGoal(pomodoros: Int) {
         flow.value = flow.value.copy(dailyGoal = pomodoros.coerceIn(TimerSettings.DAILY_GOAL_RANGE))
     }

@@ -35,6 +35,26 @@ enum class KeepScreenOnMode(val id: String, @param:StringRes val labelRes: Int) 
     /** True when the answer depends on the charger, and only then is it worth watching for it. */
     val dependsOnCharging: Boolean get() = this == WHILE_CHARGING
 
+    /**
+     * What the "screen always on" button of the Timer screen does to this mode.
+     *
+     * The button is a shortcut to [ALWAYS], not a second switch: one setting answers the question, so the
+     * button and Settings can never disagree. Switching it on remembers the mode it replaced, and switching
+     * it off gives that one back — whoever had [WHILE_CHARGING] keeps it, and whoever had [NEVER] is not
+     * handed the charger rule by surprise. With nothing remembered, as when [ALWAYS] was picked in Settings,
+     * it falls back to [DEFAULT].
+     *
+     * @param restore the mode remembered by the last switch on, if any.
+     */
+    fun toggleAlways(restore: KeepScreenOnMode?): AlwaysToggle = if (this == ALWAYS) {
+        AlwaysToggle(mode = restore?.takeUnless { it == ALWAYS } ?: DEFAULT, restore = null)
+    } else {
+        AlwaysToggle(mode = ALWAYS, restore = this)
+    }
+
+    /** The outcome of [toggleAlways]: the new mode, and the one to remember for switching back. */
+    data class AlwaysToggle(val mode: KeepScreenOnMode, val restore: KeepScreenOnMode?)
+
     companion object {
         /**
          * Plugged in, keep it on.

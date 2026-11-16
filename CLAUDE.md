@@ -48,6 +48,7 @@ El nombre juega con el tomate (*pomodoro* en italiano, de donde viene el nombre 
 - Línea `SIGUIENTE: DESCANSO · 5 MIN`, de `SlotPlanner.upcomingSlot` — la misma función pura que alimenta la notificación ongoing.
 - **En horizontal el bloque se parte en dos columnas** —tomate a la izquierda, controles a la derecha—, porque en vertical no cabía y `SALTAR` se salía de la pantalla. Ver `docs/design-spec.md` §5.1.
 - Puntos de ciclo **pegados al borde inferior** (`● ● ○ ○   2/4`) indicando en qué pomodoro del ciclo vamos. No forman parte del grupo de controles.
+- **Botón de pantalla siempre encendida** a la derecha de los puntos (`○ PANTALLA` / `● PANTALLA ENCENDIDA` en el color de la fase). Es un atajo al modo `Siempre` del ajuste, no un segundo interruptor: al apagarlo vuelve el modo que había, así que «mientras carga» se mantiene. Ver `docs/decisions/017-*`.
 
 ### 2.2 Pantalla Estadísticas ✅ Implementada
 
@@ -315,7 +316,7 @@ gradle/
 docs/
   design-spec.md
   play-store-publication-texts.md
-  decisions/001…005-*.md
+  decisions/001…017-*.md
 ```
 
 ---

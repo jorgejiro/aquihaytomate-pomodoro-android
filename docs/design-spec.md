@@ -214,8 +214,8 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 │                                      │  ← el mismo aire, peso 0,675 → el grupo va centrado
 │      SIGUIENTE: DESCANSO · 5 MIN     │  sectionLabel · TextMuted · hueco de 20 dp
 │                                      │  16 dp
-│          ● ● ○ ○      2/4            │  puntos 7 dp, gap 10 dp
-└──────────────────────────────────────┘  32 dp de aire inferior
+│  ● ● ○ ○  2/4           ○ PANTALLA   │  puntos 7 dp, gap 10 dp · botón de pantalla
+└──────────────────────────────────────┘  fila de 48 dp + 16 dp de aire inferior
 ```
 
 | Elemento | Valor |
@@ -232,6 +232,7 @@ Medidas de referencia: pantalla de 360 dp de ancho, área de contenido de **320 
 | «Siguiente» | `sectionLabel` `TextMuted` vía `SectionLabel`, hueco de 20 dp reservado, 16 dp por encima de los puntos |
 | Puntos de ciclo | 7 dp Ø, gap 10 dp. Completado: relleno `phase.bright`. Actual: anillo de 1,5 dp `phase.bright` + relleno al 25 %. Pendiente: anillo de 1 dp `TextGhost` |
 | `2/4` | `numberSmall` `TextMuted`, 12 dp a la derecha del último punto |
+| Pantalla siempre encendida | `ScreenAlwaysOnToggle`, a la derecha de la fila de los puntos (`SpaceBetween`), alto táctil 48 dp, `sectionLabel`. Apagado: anillo de 1 dp y `PANTALLA` en `TextMuted`. Encendido: punto relleno y `PANTALLA ENCENDIDA` en `phase.bright`. Como la fila mide 48 dp, el aire inferior baja de 32 a 16 dp para que los puntos sigan en la misma línea. En horizontal va debajo de los puntos, centrado. Ver `docs/decisions/017-*` |
 
 **El reparto vertical no es un `Arrangement.Center` con espaciados fijos.** El aire libre se divide en tres `Spacer` con peso: **1 encima del tomate** y **0,675 a cada lado del grupo de controles**, con los puntos de ciclo pegados al borde inferior a 32 dp. Tres razones:
 

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,6 +37,7 @@ import com.jjrapps.aquihaytomate.ui.common.ControlGlyph
 import com.jjrapps.aquihaytomate.ui.common.CycleDots
 import com.jjrapps.aquihaytomate.ui.common.LiquidCountdown
 import com.jjrapps.aquihaytomate.ui.common.PhaseLabel
+import com.jjrapps.aquihaytomate.ui.common.ScreenAlwaysOnToggle
 import com.jjrapps.aquihaytomate.ui.common.TextControl
 import com.jjrapps.aquihaytomate.ui.common.phaseLabelRes
 import com.jjrapps.aquihaytomate.ui.common.phaseNameRes
@@ -61,7 +63,12 @@ private val PRIMARY_HEIGHT = 56.dp
  */
 private val CONTROLS_MIN_GAP = 10.dp
 private val SCREEN_PADDING = 20.dp
-private val DOTS_BOTTOM_MARGIN = 32.dp
+/**
+ * Air under the bottom row. The row is as tall as the 48 dp touch target of the screen toggle, so the
+ * margin is smaller than the 32 dp of design-spec §5.1 by half of what that target adds: the dots stay
+ * where they were, centred on the same line.
+ */
+private val DOTS_BOTTOM_MARGIN = 16.dp
 private val NEXT_UP_TO_DOTS = 16.dp
 
 /** Reserved whether or not the secondary controls are showing, so the tomato does not jump. */
@@ -113,6 +120,7 @@ fun TimerScreen(
         onPrimaryClick = viewModel::onPrimaryControlClick,
         onResetClick = viewModel::onResetClick,
         onSkipClick = viewModel::onSkipClick,
+        onScreenAlwaysOnClick = viewModel::onScreenAlwaysOnClick,
         modifier = modifier,
     )
 }
@@ -123,6 +131,7 @@ private fun TimerContent(
     onPrimaryClick: () -> Unit,
     onResetClick: () -> Unit,
     onSkipClick: () -> Unit,
+    onScreenAlwaysOnClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
@@ -151,6 +160,7 @@ private fun TimerContent(
                         onPrimaryClick = onPrimaryClick,
                         onResetClick = onResetClick,
                         onSkipClick = onSkipClick,
+                        onScreenAlwaysOnClick = onScreenAlwaysOnClick,
                     )
                 } else {
                     TimerBlock(
@@ -159,6 +169,7 @@ private fun TimerContent(
                         onPrimaryClick = onPrimaryClick,
                         onResetClick = onResetClick,
                         onSkipClick = onSkipClick,
+                        onScreenAlwaysOnClick = onScreenAlwaysOnClick,
                     )
                 }
             }
@@ -173,6 +184,7 @@ private fun TimerBlock(
     onPrimaryClick: () -> Unit,
     onResetClick: () -> Unit,
     onSkipClick: () -> Unit,
+    onScreenAlwaysOnClick: () -> Unit,
 ) {
     val colors = phaseColorsOf(state.slotType)
     val primaryLabel = stringResource(state.primaryControl.labelRes)
@@ -224,12 +236,26 @@ private fun TimerBlock(
         NextUpLine(state.nextSlot)
 
         Spacer(Modifier.height(NEXT_UP_TO_DOTS))
-        CycleDots(
-            completed = state.completedInCycle,
-            current = state.cyclePosition,
-            total = state.pomodorosPerCycle,
-            accent = colors.bright,
-        )
+        // The cycle on the left, the screen toggle on the right: both are status of the screen, not
+        // actions on the pomodoro, so they share the bottom row instead of joining the control cluster.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            CycleDots(
+                completed = state.completedInCycle,
+                current = state.cyclePosition,
+                total = state.pomodorosPerCycle,
+                accent = colors.bright,
+            )
+            ScreenAlwaysOnToggle(
+                enabled = state.screenAlwaysOn,
+                accent = colors.bright,
+                onClick = onScreenAlwaysOnClick,
+                modifier = Modifier.weight(1f, fill = false),
+            )
+        }
         Spacer(Modifier.height(DOTS_BOTTOM_MARGIN))
     }
 }
@@ -253,6 +279,7 @@ private fun TimerBlockLandscape(
     onPrimaryClick: () -> Unit,
     onResetClick: () -> Unit,
     onSkipClick: () -> Unit,
+    onScreenAlwaysOnClick: () -> Unit,
 ) {
     val colors = phaseColorsOf(state.slotType)
     val primaryLabel = stringResource(state.primaryControl.labelRes)
@@ -308,6 +335,11 @@ private fun TimerBlockLandscape(
                 current = state.cyclePosition,
                 total = state.pomodorosPerCycle,
                 accent = colors.bright,
+            )
+            ScreenAlwaysOnToggle(
+                enabled = state.screenAlwaysOn,
+                accent = colors.bright,
+                onClick = onScreenAlwaysOnClick,
             )
         }
     }
@@ -454,6 +486,7 @@ private fun previewState(
     fillFraction: Float = 0.74f,
     primaryControl: PrimaryControl = PrimaryControl.PAUSE,
     nextSlot: NextSlot? = NextSlot(SlotType.SHORT_BREAK, 5),
+    screenAlwaysOn: Boolean = false,
 ) = TimerUiState.Success(
     status = status,
     slotType = slotType,
@@ -464,7 +497,8 @@ private fun previewState(
     completedInCycle = 1,
     cyclePosition = 2,
     pomodorosPerCycle = 4,
-    keepScreenOn = false,
+    keepScreenOn = screenAlwaysOn,
+    screenAlwaysOn = screenAlwaysOn,
     nextSlot = nextSlot,
 )
 
@@ -472,7 +506,13 @@ private fun previewState(
 @Composable
 private fun TimerScreenRunningPreview() {
     AquiHayTomateTheme {
-        TimerContent(previewState(), onPrimaryClick = {}, onResetClick = {}, onSkipClick = {})
+        TimerContent(
+            previewState(),
+            onPrimaryClick = {},
+            onResetClick = {},
+            onSkipClick = {},
+            onScreenAlwaysOnClick = {},
+        )
     }
 }
 
@@ -490,6 +530,7 @@ private fun TimerScreenIdlePreview() {
             onPrimaryClick = {},
             onResetClick = {},
             onSkipClick = {},
+            onScreenAlwaysOnClick = {},
         )
     }
 }
@@ -503,10 +544,13 @@ private fun TimerScreenBreakPreview() {
                 slotType = SlotType.SHORT_BREAK,
                 timeText = "04:07",
                 fillFraction = 0.82f,
+                // The screen toggle lit, in the amber of the break.
+                screenAlwaysOn = true,
             ),
             onPrimaryClick = {},
             onResetClick = {},
             onSkipClick = {},
+            onScreenAlwaysOnClick = {},
         )
     }
 }
@@ -526,6 +570,7 @@ private fun TimerScreenRingingPreview() {
             onPrimaryClick = {},
             onResetClick = {},
             onSkipClick = {},
+            onScreenAlwaysOnClick = {},
         )
     }
 }
@@ -534,7 +579,13 @@ private fun TimerScreenRingingPreview() {
 @Composable
 private fun TimerScreenCompactPreview() {
     AquiHayTomateTheme {
-        TimerContent(previewState(), onPrimaryClick = {}, onResetClick = {}, onSkipClick = {})
+        TimerContent(
+            previewState(),
+            onPrimaryClick = {},
+            onResetClick = {},
+            onSkipClick = {},
+            onScreenAlwaysOnClick = {},
+        )
     }
 }
 
@@ -543,6 +594,12 @@ private fun TimerScreenCompactPreview() {
 @Composable
 private fun TimerScreenLandscapePreview() {
     AquiHayTomateTheme {
-        TimerContent(previewState(), onPrimaryClick = {}, onResetClick = {}, onSkipClick = {})
+        TimerContent(
+            previewState(),
+            onPrimaryClick = {},
+            onResetClick = {},
+            onSkipClick = {},
+            onScreenAlwaysOnClick = {},
+        )
     }
 }
