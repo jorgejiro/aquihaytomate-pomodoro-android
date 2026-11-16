@@ -1,0 +1,3 @@
+• La pantalla del temporizador tiene un botón nuevo, junto a los puntos del ciclo, para mantener la pantalla siempre encendida aunque el móvil no esté enchufado. Cuando está activado se ilumina en el color de la fase. Al apagarlo todo vuelve a ser como antes: enchufado, la pantalla sigue encendida.
+
+Sin cuentas, sin nube, sin anuncios y sin seguimiento.

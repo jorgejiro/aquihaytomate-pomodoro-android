@@ -1,0 +1,3 @@
+• The Timer screen has a new button, next to the cycle dots, to keep the screen always on, even unplugged. When it is on it lights up in the colour of the phase. Switch it off and everything is as before: plugged in, the screen still stays on.
+
+No accounts, no cloud, no ads, no tracking.

@@ -216,6 +216,9 @@
     <string name="changelog_title">Novedades</string>
     <string name="changelog_current_badge">Actual</string>
 
+    <string-array name="changelog_1_5_0">
+        <item>La pantalla del temporizador tiene un botón nuevo, junto a los puntos del ciclo, para mantener la pantalla siempre encendida aunque el móvil no esté enchufado. Cuando está activado se ilumina en el color de la fase. Al apagarlo todo vuelve a ser como antes: enchufado, la pantalla sigue encendida.</item>
+    </string-array>
     <string-array name="changelog_1_4_1">
         <item>El aviso del final del pomodoro vuelve a sonar cuando la app sigue abierta en segundo plano. El descanso arrancaba solo, pero el pomodoro terminaba en silencio: sin sonido, sin vibración y sin notificación.</item>
     </string-array>

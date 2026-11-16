@@ -16,6 +16,18 @@ reutilizar ni bajando la versión.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y las versiones
 [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.5.0] — 2026-11-16 (versionCode 10)
+
+Un botón para que la pantalla no se apague, también lejos del cargador.
+
+### Añadido
+
+- **Botón de pantalla siempre encendida en la pantalla del temporizador**, a la derecha de los puntos del
+  ciclo. Apagado se ve como `○ PANTALLA` en gris; encendido, como `● PANTALLA ENCENDIDA` en el color de la
+  fase. Es un atajo al modo «Siempre» de *Mantener pantalla encendida*: al apagarlo vuelve el modo que
+  había, así que con el valor por defecto la pantalla sigue encendida mientras el móvil carga. Ver
+  `docs/decisions/017-*`.
+
 ## [1.4.1] — 2026-11-05 (versionCode 9)
 
 Un solo fallo, y es el que más importa: el fin del pomodoro volvía a quedarse mudo.
