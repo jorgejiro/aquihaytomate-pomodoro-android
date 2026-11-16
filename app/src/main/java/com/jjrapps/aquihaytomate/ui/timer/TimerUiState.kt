@@ -32,6 +32,11 @@ sealed interface TimerUiState {
         val cyclePosition: Int,
         val pomodorosPerCycle: Int,
         val keepScreenOn: Boolean,
+        /**
+         * Whether the "screen always on" button is lit: the setting is `always`, whoever picked it. Not the
+         * same as [keepScreenOn], which is also true on the charger with the default mode.
+         */
+        val screenAlwaysOn: Boolean = false,
         /** Null while ringing: there the primary control already names what comes next. */
         val nextSlot: NextSlot? = null,
     ) : TimerUiState {

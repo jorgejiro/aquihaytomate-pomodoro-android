@@ -2,6 +2,7 @@ package com.jjrapps.aquihaytomate.ui.timer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jjrapps.aquihaytomate.domain.model.KeepScreenOnMode
 import com.jjrapps.aquihaytomate.domain.model.SlotType
 import com.jjrapps.aquihaytomate.domain.model.TimerSettings
 import com.jjrapps.aquihaytomate.domain.model.TimerState
@@ -16,6 +17,7 @@ import com.jjrapps.aquihaytomate.domain.usecase.ResetTimerUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.SkipSlotUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.SlotPlanner
 import com.jjrapps.aquihaytomate.domain.usecase.TimerMath
+import com.jjrapps.aquihaytomate.domain.usecase.ToggleScreenAlwaysOnUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.ToggleTimerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Clock
@@ -45,6 +47,7 @@ class TimerViewModel @Inject constructor(
     private val skipSlot: SkipSlotUseCase,
     private val completeSlot: CompleteSlotUseCase,
     private val reconcileTimer: ReconcileTimerUseCase,
+    private val toggleScreenAlwaysOn: ToggleScreenAlwaysOnUseCase,
     private val clock: Clock,
     private val elapsedRealtime: ElapsedRealtimeSource,
 ) : ViewModel() {
@@ -115,6 +118,10 @@ class TimerViewModel @Inject constructor(
         viewModelScope.launch { skipSlot() }
     }
 
+    fun onScreenAlwaysOnClick() {
+        viewModelScope.launch { toggleScreenAlwaysOn() }
+    }
+
     /**
      * Closes the slot the moment it runs out, while the app is in the foreground.
      *
@@ -169,6 +176,7 @@ class TimerViewModel @Inject constructor(
             cyclePosition = state.cyclePosition,
             pomodorosPerCycle = state.pomodorosPerCycleWith(settings),
             keepScreenOn = keepScreenOn,
+            screenAlwaysOn = settings.keepScreenOn == KeepScreenOnMode.ALWAYS,
             nextSlot = nextSlotFor(state, settings),
         )
     }

@@ -37,6 +37,12 @@ interface SettingsRepository {
 
     suspend fun setKeepScreenOn(mode: KeepScreenOnMode)
 
+    /**
+     * Switches [KeepScreenOnMode.ALWAYS] on or off from the Timer screen, remembering the mode it replaces.
+     * Atomic: the mode and what to restore are written in one edit. See [KeepScreenOnMode.toggleAlways].
+     */
+    suspend fun toggleKeepScreenOnAlways()
+
     suspend fun setDailyGoal(pomodoros: Int)
 
     suspend fun setWidgetBackground(background: WidgetBackground)

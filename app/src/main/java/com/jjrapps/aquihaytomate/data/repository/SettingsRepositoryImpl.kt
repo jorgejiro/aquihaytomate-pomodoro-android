@@ -49,6 +49,8 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setKeepScreenOn(mode: KeepScreenOnMode) = dataSource.setKeepScreenOn(mode)
 
+    override suspend fun toggleKeepScreenOnAlways() = dataSource.toggleKeepScreenOnAlways()
+
     override suspend fun setDailyGoal(pomodoros: Int) = dataSource.setDailyGoal(pomodoros)
 
     override suspend fun setWidgetBackground(background: WidgetBackground) =

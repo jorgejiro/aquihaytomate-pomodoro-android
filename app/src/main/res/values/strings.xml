@@ -41,6 +41,9 @@
     <string name="a11y_remaining_seconds_only">%1$s remaining</string>
     <string name="a11y_tomato_progress">%1$s, %2$d%% elapsed</string>
     <string name="a11y_cycle_position">Pomodoro %1$d of %2$d</string>
+    <string name="screen_always_on_label_off">Screen</string>
+    <string name="screen_always_on_label_on">Screen on</string>
+    <string name="a11y_screen_always_on">Keep the screen always on</string>
 
     <!-- Statistics -->
     <string name="stats_today">Today</string>
@@ -216,6 +219,9 @@
     <string name="changelog_title">What\'s new</string>
     <string name="changelog_current_badge">Current</string>
 
+    <string-array name="changelog_1_5_0">
+        <item>The Timer screen has a new button, next to the cycle dots, to keep the screen always on, even unplugged. When it is on it lights up in the colour of the phase. Switch it off and everything is as before: plugged in, the screen still stays on.</item>
+    </string-array>
     <string-array name="changelog_1_4_1">
         <item>The end-of-pomodoro alert plays again when the app is still open in the background. The break started on its own, but the pomodoro ended in silence: no sound, no vibration and no notification.</item>
     </string-array>

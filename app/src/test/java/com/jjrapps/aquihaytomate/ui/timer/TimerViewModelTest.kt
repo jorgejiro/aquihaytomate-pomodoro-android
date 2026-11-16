@@ -16,6 +16,7 @@ import com.jjrapps.aquihaytomate.domain.usecase.SkipSlotUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.StartFreshDayUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.StartTimerUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.SyncTimerRuntimeUseCase
+import com.jjrapps.aquihaytomate.domain.usecase.ToggleScreenAlwaysOnUseCase
 import com.jjrapps.aquihaytomate.domain.usecase.ToggleTimerUseCase
 import com.jjrapps.aquihaytomate.testing.FakeAlertPlayer
 import com.jjrapps.aquihaytomate.testing.FakeChargingMonitor
@@ -96,6 +97,7 @@ class TimerViewModelTest {
                 clock,
                 elapsed,
             ),
+            toggleScreenAlwaysOn = ToggleScreenAlwaysOnUseCase(settings),
             clock = clock,
             elapsedRealtime = elapsed,
         )
@@ -435,6 +437,66 @@ class TimerViewModelTest {
         vm.uiState.test {
             skipItems(1)
             assertTrue((awaitItem() as TimerUiState.Success).keepScreenOn)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+    /** The button on the Timer screen holds the display awake on battery, and says so. */
+    @Test
+    fun `the screen toggle keeps the screen on without a charger and lights up`() =
+        runTest(dispatcher) {
+            settings.set(TimerSettings(keepScreenOn = KeepScreenOnMode.WHILE_CHARGING))
+            val vm = viewModel()
+            vm.uiState.test {
+                skipItems(1)
+                (awaitItem() as TimerUiState.Success).let { state ->
+                    assertFalse(state.keepScreenOn)
+                    assertFalse(state.screenAlwaysOn)
+                }
+
+                vm.onScreenAlwaysOnClick()
+                runCurrent()
+                (expectMostRecentItem() as TimerUiState.Success).let { state ->
+                    assertTrue(state.keepScreenOn)
+                    assertTrue(state.screenAlwaysOn)
+                }
+                assertEquals(KeepScreenOnMode.ALWAYS, settings.current().keepScreenOn)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    /** Switching it off gives back exactly what there was: plugged in, the screen still stays on. */
+    @Test
+    fun `switching the screen toggle off restores while charging`() = runTest(dispatcher) {
+        settings.set(TimerSettings(keepScreenOn = KeepScreenOnMode.WHILE_CHARGING))
+        charging.set(true)
+        val vm = viewModel()
+        vm.uiState.test {
+            skipItems(1)
+            assertTrue((awaitItem() as TimerUiState.Success).keepScreenOn)
+
+            vm.onScreenAlwaysOnClick()
+            runCurrent()
+            assertTrue((awaitItem() as TimerUiState.Success).screenAlwaysOn)
+
+            vm.onScreenAlwaysOnClick()
+            runCurrent()
+            (expectMostRecentItem() as TimerUiState.Success).let { state ->
+                assertFalse(state.screenAlwaysOn)
+                assertTrue(state.keepScreenOn)
+            }
+            assertEquals(KeepScreenOnMode.WHILE_CHARGING, settings.current().keepScreenOn)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    /** Always picked in Settings is the same thing the button does, so the button shows it on. */
+    @Test
+    fun `the screen toggle shows on when settings say always`() = runTest(dispatcher) {
+        settings.set(TimerSettings(keepScreenOn = KeepScreenOnMode.ALWAYS))
+        val vm = viewModel()
+        vm.uiState.test {
+            skipItems(1)
+            assertTrue((awaitItem() as TimerUiState.Success).screenAlwaysOn)
             cancelAndIgnoreRemainingEvents()
         }
     }

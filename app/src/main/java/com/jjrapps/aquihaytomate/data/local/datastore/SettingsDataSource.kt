@@ -65,6 +65,21 @@ class SettingsDataSource @Inject constructor(
 
     suspend fun setKeepScreenOn(mode: KeepScreenOnMode) = edit(Keys.KEEP_SCREEN_ON) { mode.id }
 
+    /** Read, decide and write in a single edit, so two quick taps cannot interleave. */
+    suspend fun toggleKeepScreenOnAlways() {
+        dataStore.edit { prefs ->
+            val current = prefs.keepScreenOnMode(TimerSettings().keepScreenOn)
+            val restore = prefs[Keys.KEEP_SCREEN_ON_RESTORE]?.let(KeepScreenOnMode::fromId)
+            val toggle = current.toggleAlways(restore)
+            prefs[Keys.KEEP_SCREEN_ON] = toggle.mode.id
+            if (toggle.restore != null) {
+                prefs[Keys.KEEP_SCREEN_ON_RESTORE] = toggle.restore.id
+            } else {
+                prefs.remove(Keys.KEEP_SCREEN_ON_RESTORE)
+            }
+        }
+    }
+
     suspend fun setLiquidAnimationEnabled(enabled: Boolean) =
         edit(Keys.LIQUID_ANIMATION) { enabled }
 
@@ -194,6 +209,9 @@ class SettingsDataSource @Inject constructor(
          * nombre de clave a propósito: leer un booleano guardado como texto revienta.
          */
         val RETIRED_KEEP_SCREEN_ON = booleanPreferencesKey("keep_screen_on")
+
+        /** The mode the Timer screen's button replaced with `always`, to give it back when switched off. */
+        val KEEP_SCREEN_ON_RESTORE = stringPreferencesKey("keep_screen_on_restore")
         val DAILY_GOAL = intPreferencesKey("daily_goal")
         val WIDGET_BACKGROUND = stringPreferencesKey("widget_background")
         val LANGUAGE = stringPreferencesKey("language")
