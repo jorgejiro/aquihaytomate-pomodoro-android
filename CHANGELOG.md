@@ -20,6 +20,9 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y l
 
 Un botón para que la pantalla no se apague, también lejos del cargador.
 
+**Enviada a Google Play el 2026-11-16**; a F-Droid, con el tag `v1.5.0`. Es la primera con GitHub Release y
+el APK adjunto.
+
 ### Añadido
 
 - **Botón de pantalla siempre encendida en la pantalla del temporizador**, a la derecha de los puntos del

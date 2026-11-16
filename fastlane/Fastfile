@@ -39,7 +39,9 @@ platform :android do
     upload_to_play_store(
       track: track,
       release_status: release_status,
-      aab: aab_paths.first,
+      # The bundle just built, not the first one listed: archivesName carries the version, so the
+      # output folder keeps the bundles of earlier versions and .first picked 1.4.1 over 1.5.0.
+      aab: aab_paths.max_by { |path| File.mtime(path) },
       skip_upload_apk: true,
       skip_upload_metadata: true,
       skip_upload_changelogs: false,

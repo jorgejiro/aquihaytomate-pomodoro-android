@@ -103,7 +103,8 @@ $BT/aapt2 dump permissions $A                        # comparar con la versión 
 con-claves 'fastlane subir'
 ```
 
-Vuelve a compilar el AAB firmado y lo publica en **producción** con estado `completed`: sale
+Vuelve a compilar el AAB firmado y publica el más reciente de la carpeta (en la 1.5.0, `.first`
+cogió el de la 1.4.1 y Play lo rechazó por `versionCode` repetido). Lo publica en **producción** con estado `completed`: sale
 directamente, sin borrador. Debe acabar con `Successfully finished the upload to Google Play`.
 
 - **Solo sube el binario y las novedades de su `versionCode`.** La ficha (títulos, descripciones,
@@ -124,7 +125,7 @@ git push origin vX.Y.Z
 
 Nada más. La receta de `fdroiddata` tiene `UpdateCheckMode: Tags` y `AutoUpdateMode: Version`:
 F-Droid detecta el tag, lee la versión de `app/build.gradle.kts`, compila y firma con **su** clave.
-Tarda unos días. No hace falta GitHub Release (no se ha publicado ninguna).
+Tarda unos días. F-Droid no necesita la GitHub Release: le basta el tag.
 
 Antes de etiquetar, que siga en pie lo que F-Droid necesita para compilar:
 
@@ -134,6 +135,22 @@ rg -c foojay settings.gradle.kts                     # 0: sin el plugin foojay
 ```
 
 Detalles en [`fdroid/LEEME.md`](fdroid/LEEME.md).
+
+---
+
+## 5b. GitHub Release
+
+Con el tag ya subido, la release de GitHub con el APK firmado adjunto:
+
+```bash
+gh release create vX.Y.Z app/build/outputs/apk/release/aquihaytomate-X.Y.Z-vcN-release.apk \
+  --title "X.Y.Z — <titular>" --notes-file <notas.md> --verify-tag
+```
+
+Las notas, en español y en inglés, salen del texto de fastlane de esa versión. Añade los enlaces a Play
+y a F-Droid, y avisa de que el APK va firmado con la clave de subida: no se instala encima de la versión
+de Play ni de la de F-Droid sin desinstalar antes, y desinstalar borra las estadísticas. La primera es la
+`v1.5.0`. Las versiones anteriores solo tienen tag.
 
 ---
 
@@ -147,3 +164,4 @@ Detalles en [`fdroid/LEEME.md`](fdroid/LEEME.md).
 | Versión | versionCode | Fecha | Play | F-Droid |
 |---|---|---|---|---|
 | 1.4.1 | 9 | 2026-11-05 | `fastlane subir`, producción | tag `v1.4.1` sobre `727b616` |
+| 1.5.0 | 10 | 2026-11-16 | `fastlane subir`, producción | tag `v1.5.0` sobre `f05347e`, con GitHub Release |
